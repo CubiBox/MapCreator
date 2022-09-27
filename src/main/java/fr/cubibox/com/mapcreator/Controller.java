@@ -124,7 +124,7 @@ public class Controller implements Initializable {
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
             Main.setPoints(Point.shortPoints());
         });
-        xSlid.setPrefWidth(300);
+        xSlid.setPrefWidth(250);
         xBoard.getChildren().addAll(new Label("      X : "),xSlid);
 
         //Y cursor
@@ -139,7 +139,7 @@ public class Controller implements Initializable {
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
             Main.setPoints(Point.shortPoints());
         });
-        ySlid.setPrefWidth(300);
+        ySlid.setPrefWidth(250);
         yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
 
 
@@ -197,7 +197,7 @@ public class Controller implements Initializable {
             pol.setupEdges();
             drawFunction();
         });
-        xSlid.setPrefWidth(300);
+        xSlid.setPrefWidth(220);
         xBoard.getChildren().addAll(new Label("      X : "),xSlid);
 
         //Y cursor
@@ -213,7 +213,7 @@ public class Controller implements Initializable {
             pol.setupEdges();
             drawFunction();
         });
-        ySlid.setPrefWidth(300);
+        ySlid.setPrefWidth(220);
         yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
 
 
@@ -227,6 +227,51 @@ public class Controller implements Initializable {
     }
 
 
+    public HBox heightBoard(Polygon p){
+        VBox rightPart = new VBox();
+        HBox heightBoard = new HBox();
+        HBox name = new HBox();
+        VBox choise = new VBox();
+
+        heightBoard.setStyle(
+                        "-fx-background-radius: 8 0 0 8;" +
+                        "-fx-background-color: #757575"
+                );
+
+        Label lName = new Label("Height");
+        Button help = new Button("?");
+        help.setPrefSize(10d,10d);
+        help.setOnMouseReleased(event -> {
+
+        });
+        name.getChildren().addAll(lName,help);
+
+        Slider height = new Slider(1, 5, 1);
+        height.setBlockIncrement(1);
+        height.setMajorTickUnit(8);
+        height.setShowTickLabels(true);
+        height.valueProperty().addListener((obs, oldval, newVal) -> height.setValue(newVal.intValue()));
+        height.valueProperty().addListener(event -> {
+            drawFunction();
+        });
+
+        RadioButton full = new RadioButton("Full");
+        full.setId("choise");
+        RadioButton top = new RadioButton("Top");
+        top.setId("choise");
+        RadioButton bottom = new RadioButton("Bottom");
+        bottom.setId("choise");
+        choise.getChildren().addAll(full,top,bottom);
+
+        heightBoard.getChildren().addAll(rightPart,choise);
+        return heightBoard;
+    }
+
+//    public VBox textureBoard(Polygon p){
+//        return null;
+//    }
+
+
     public VBox polygonBoard(Polygon p){
         VBox polBoard = new VBox();
         HBox nameBoard = new HBox();
@@ -235,7 +280,6 @@ public class Controller implements Initializable {
         HBox delete = new HBox();
 
         polBoard.setStyle(
-                "-fx-padding: 5;" +
                 "-fx-background-radius: 8 8 8 8;" +
                 "-fx-background-color: #656565"
         );
@@ -273,6 +317,9 @@ public class Controller implements Initializable {
         delete.setPrefWidth(230);
         delete.getChildren().add(close);
         nameBoard.getChildren().addAll(name,delete,showP);
+
+        //Height Board
+        polBoard.getChildren().addAll(heightBoard(p));
 
         //main board adds
         polBoard.getChildren().addAll(nameBoard,pointBoard);
