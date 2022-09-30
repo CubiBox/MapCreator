@@ -2,7 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ToggleGroup?>
@@ -13,8 +17,8 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1020.0" prefWidth="1920.0" style="-fx-background-color: #656565;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.Controller">
    <children>
-      <Pane fx:id="coordinateSystem" prefHeight="1000.0" prefWidth="1000.0" style="-fx-background-color: #000000;" />
-      <ScrollPane layoutX="1304.0" prefHeight="1024.0" prefWidth="616.0">
+      <Pane fx:id="coordinateSystem" layoutY="20.0" prefHeight="980.0" prefWidth="980.0" style="-fx-background-color: #000000;" />
+      <ScrollPane layoutX="1304.0" layoutY="24.0" prefHeight="1000.0" prefWidth="616.0">
          <content>
             <VBox fx:id="vBoxPanel" alignment="TOP_CENTER" prefHeight="1023.0" prefWidth="597.0" spacing="10" style="-fx-background-color: #808080;">
                <opaqueInsets>
@@ -22,24 +26,46 @@
                </opaqueInsets>
                <padding>
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding></VBox>
+               </padding>
+               <children>
+                  <ButtonBar prefHeight="40.0" prefWidth="200.0" />
+               </children></VBox>
          </content>
       </ScrollPane>
-      <RadioButton fx:id="addPoints" layoutX="1016.0" layoutY="78.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="171.0" selected="true" text="Add Point">
+      <RadioButton fx:id="addPoints" layoutX="1012.0" layoutY="130.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="171.0" selected="true" text="Add Point">
          <toggleGroup>
             <ToggleGroup fx:id="selectTypePoint" />
          </toggleGroup>
       </RadioButton>
-      <RadioButton fx:id="addInt" layoutX="1015.0" layoutY="113.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="171.0" text="Select Point" toggleGroup="$selectTypePoint" />
+      <RadioButton fx:id="addInt" layoutX="1011.0" layoutY="165.0" mnemonicParsing="false" prefHeight="17.0" prefWidth="171.0" text="Select Point" toggleGroup="$selectTypePoint" />
       <Button layoutX="1029.0" layoutY="888.0" mnemonicParsing="false" onAction="#reset" prefHeight="25.0" prefWidth="74.0" text="RESET" />
-      <Button fx:id="setPol" layoutX="1015.0" layoutY="161.0" mnemonicParsing="false" onAction="#setPolygon" prefHeight="31.0" prefWidth="91.0" text="Draw Polygon" />
-      <Button fx:id="setLine" layoutX="1015.0" layoutY="207.0" mnemonicParsing="false" onAction="#setPolyLine" prefHeight="31.0" prefWidth="91.0" text="Draw Line" />
+      <Button fx:id="setPol" layoutX="1011.0" layoutY="213.0" mnemonicParsing="false" onAction="#setPolygon" prefHeight="31.0" prefWidth="91.0" text="Draw Polygon" />
+      <Button fx:id="setLine" layoutX="1011.0" layoutY="259.0" mnemonicParsing="false" onAction="#setPolyLine" prefHeight="31.0" prefWidth="91.0" text="Draw Line" />
       <Button fx:id="exctract" layoutX="1029.0" layoutY="936.0" mnemonicParsing="false" onAction="#exportMapButton" prefHeight="49.0" prefWidth="120.0" text="Exctract Map" />
       <Button layoutX="1175.0" layoutY="936.0" mnemonicParsing="false" onAction="#importMapButton" prefHeight="49.0" prefWidth="120.0" text="Import Map" />
-      <Label layoutX="1015.0" layoutY="21.0" prefHeight="38.0" prefWidth="293.0" text="Mode ">
+      <Label layoutX="1011.0" layoutY="73.0" prefHeight="38.0" prefWidth="293.0" text="Mode ">
          <font>
             <Font size="27.0" />
          </font>
       </Label>
+      <MenuBar prefHeight="25.0" prefWidth="1920.0" style="-fx-background-color: #555555;">
+        <menus>
+          <Menu mnemonicParsing="false" text="Fichier">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Open" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Textures">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
    </children>
 </AnchorPane>

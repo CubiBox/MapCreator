@@ -22,8 +22,8 @@ import static fr.cubibox.com.mapcreator.Controller.WriteMap;
 import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
 
 public class Main extends Application {
-    public static float DIML = 1000;
-    public static float DIMC = 1000;
+    public static float DIML = 980;
+    public static float DIMC = 980;
     public static float xSize = 16f;
 
     public static ArrayList<Point> points = new ArrayList<>();
