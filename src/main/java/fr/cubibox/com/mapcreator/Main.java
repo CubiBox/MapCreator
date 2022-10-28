@@ -17,6 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static fr.cubibox.com.mapcreator.Controller.WriteMap;
 import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
@@ -30,15 +31,14 @@ public class Main extends Application {
     public static ArrayList<Polygon> polygons = new ArrayList<>();
 
     public static Player player1;
-
     public static Map map;
 
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("sample.fxml")));
         primaryStage.setTitle("Map maker");
-        primaryStage.getIcons().add(new Image(new BufferedInputStream(Main.class.getResource("images/icon.png").openStream())));
+        primaryStage.getIcons().add(new Image(new BufferedInputStream(Objects.requireNonNull(Main.class.getResource("images/icon.png")).openStream())));
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }

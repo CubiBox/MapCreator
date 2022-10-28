@@ -12,6 +12,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -23,8 +25,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
@@ -37,9 +41,20 @@ public class Controller implements Initializable {
     private TextArea functionText;
 
     @FXML
-    private RadioButton addPoints;
+    private ToggleButton walls;
     @FXML
-    private RadioButton addInt;
+    private ToggleButton bottom;
+    @FXML
+    private ToggleButton top;
+
+    @FXML
+    private ToggleButton topView;
+    @FXML
+    private ImageView topViewImage;
+    @FXML
+    private ToggleButton leftView;
+    @FXML
+    private ToggleButton rightView;
 
     @FXML
     private VBox vBoxPanel;
@@ -67,13 +82,9 @@ public class Controller implements Initializable {
                         .floatValue();
 
                 if ((roundX >= 0 && roundX <= Main.xSize && roundY >= 0 && roundY <= Main.xSize)) {
-                    if (addPoints.isSelected()) {
-                        Point p = new Point(roundX, roundY);
-                        Main.getPoints().add(p);
-                        vBoxPanel.getChildren().add(pointBoard(p));
-                    }
-                    else if (addInt.isSelected()){
-                    }
+                    Point p = new Point(roundX, roundY);
+                    Main.getPoints().add(p);
+                    vBoxPanel.getChildren().add(pointBoard(p));
                 }
             }
             drawFunction();
@@ -347,6 +358,27 @@ public class Controller implements Initializable {
         }
         drawFunction();
     }
+/*
+    private ToggleButton walls;
+    private ToggleButton bottom;
+    private ToggleButton top;
+
+    private ToggleButton topView;
+    private ToggleButton leftView;
+    private ToggleButton rightView;
+
+ */
+    public void actuCheckbox(ActionEvent ae){
+        CheckBox cb = (CheckBox) ae.getSource();
+        if (cb.isSelected()) {
+            try {
+                cb.setGraphic(new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("images/icon.png")).openStream())));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        else topViewImage.setImage(new Image(String.valueOf(new File(String.valueOf(Main.class.getResource("images/wall.png"))))));
+    }
 
 
     public void drawFunction() {
@@ -383,8 +415,8 @@ public class Controller implements Initializable {
     }
 
     public ArrayList<Rectangle> drawGrid(){
-        Double w = Double.valueOf(Main.DIMC);
-        Double h = Double.valueOf(Main.DIML);
+        double w = (double) Main.DIMC;
+        double h = (double) Main.DIML;
         ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
 
         Color gray1 = Color.rgb(30,30,30);
