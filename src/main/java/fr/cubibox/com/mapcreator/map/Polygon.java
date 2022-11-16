@@ -13,6 +13,8 @@ public class Polygon {
     private float height;
     private String id;
 
+    private Type type;
+
     private boolean isLine;
 
     private boolean showPoint = false;

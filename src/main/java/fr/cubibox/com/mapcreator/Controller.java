@@ -25,7 +25,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
@@ -37,8 +36,6 @@ public class Controller implements Initializable {
 
     @FXML
     private Pane coordinateSystem;
-    @FXML
-    private TextArea functionText;
 
     @FXML
     private ToggleButton walls;
@@ -57,7 +54,12 @@ public class Controller implements Initializable {
     private ToggleButton rightView;
 
     @FXML
-    private VBox vBoxPanel;
+    private Slider mapSizeSlide;
+    @FXML
+    private Slider polHeightSlide;
+
+    @FXML
+    private VBox polyBoard;
 
     @FXML
     private Button Reset;
@@ -72,6 +74,22 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         drawFunction();
+
+        polHeightSlide.setBlockIncrement(1);
+        polHeightSlide.setMajorTickUnit(8);
+        polHeightSlide.setShowTickLabels(true);
+        polHeightSlide.valueProperty().addListener((obs, oldval, newVal) -> polHeightSlide.setValue(newVal.intValue()));
+
+        mapSizeSlide.setBlockIncrement(1);
+        mapSizeSlide.setMajorTickUnit(1);
+        mapSizeSlide.setShowTickLabels(true);
+
+        mapSizeSlide.valueProperty().addListener((obs, oldval, newVal) -> mapSizeSlide.setValue(newVal.intValue()));
+        mapSizeSlide.valueProperty().addListener(event -> {
+            Main.setxSize((int) (16*mapSizeSlide.getValue()));
+            drawFunction();
+        });
+
         coordinateSystem.setOnMouseClicked(event -> {
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
                 float roundX = BigDecimal.valueOf(Main.toPlotX(event.getX()))
@@ -84,12 +102,13 @@ public class Controller implements Initializable {
                 if ((roundX >= 0 && roundX <= Main.xSize && roundY >= 0 && roundY <= Main.xSize)) {
                     Point p = new Point(roundX, roundY);
                     Main.getPoints().add(p);
-                    vBoxPanel.getChildren().add(pointBoard(p));
+                    polyBoard.getChildren().add(pointBoard(p));
                 }
             }
             drawFunction();
         });
     }
+
 
     public VBox pointBoard(Point p){
         VBox ptsBoard = new VBox();
@@ -339,35 +358,29 @@ public class Controller implements Initializable {
     }
 
     public void actuBoard(){
-        vBoxPanel.getChildren().clear();
+        polyBoard.getChildren().clear();
         for (Point p : Main.getPoints()){
-            vBoxPanel.getChildren().add(pointBoard(p));
+            polyBoard.getChildren().add(pointBoard(p));
         }
 
         for (Polygon p : Main.getPolygons()){
             VBox pBoard = polygonBoard(p);
 
-            if (p.isShowPoint()) {
+            //if (p.isShowPoint()) {
                 int countPoint = 0;
                 for (Point pt : p.getPoints()) {
                     pBoard.getChildren().add(pointBoard(pt, countPoint, p));
                     countPoint++;
                 }
-            }
-            vBoxPanel.getChildren().add(pBoard);
+            //}
+            polyBoard.getChildren().add(pBoard);
         }
         drawFunction();
     }
-/*
-    private ToggleButton walls;
-    private ToggleButton bottom;
-    private ToggleButton top;
 
-    private ToggleButton topView;
-    private ToggleButton leftView;
-    private ToggleButton rightView;
+    public void actuSelection(){
 
- */
+    }
     public void actuCheckbox(ActionEvent ae){
         CheckBox cb = (CheckBox) ae.getSource();
         if (cb.isSelected()) {
@@ -477,7 +490,7 @@ public class Controller implements Initializable {
             Polygon p = new Polygon(Main.getPoints(), 1);
             Main.getPolygons().add(p);
             Main.setPoints(new ArrayList<>());
-            vBoxPanel.getChildren().add(polygonBoard(p));
+            polyBoard.getChildren().add(polygonBoard(p));
             actuBoard();
         }
         drawFunction();
@@ -488,7 +501,7 @@ public class Controller implements Initializable {
             Polygon p = new Polygon(Main.getPoints(), 1, true);
             Main.getPolygons().add(p);
             Main.setPoints(new ArrayList<>());
-            vBoxPanel.getChildren().add(polygonBoard(p));
+            polyBoard.getChildren().add(polygonBoard(p));
             actuBoard();
         }
         drawFunction();
@@ -555,7 +568,6 @@ public class Controller implements Initializable {
         }
         stageSave.setScene(new Scene(vBox));
         stageSave.show();
-
     }
 
     public void exportMapButton(ActionEvent actionEvent) throws IOException {
@@ -573,13 +585,5 @@ public class Controller implements Initializable {
         BufferedWriter writer = new BufferedWriter(new FileWriter(name + ".map"));
         writer.write(content);
         writer.close();
-    }
-
-    public TextArea getFunctionText() {
-        return functionText;
-    }
-
-    public void setFunctionText(TextArea functionText) {
-        this.functionText = functionText;
     }
 }

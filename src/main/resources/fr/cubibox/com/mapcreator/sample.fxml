@@ -23,17 +23,6 @@
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1020.0" prefWidth="1920.0" style="-fx-background-color: #656565;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.Controller">
    <children>
       <Pane fx:id="coordinateSystem" layoutY="20.0" prefHeight="980.0" prefWidth="980.0" style="-fx-background-color: #000000;" />
-      <ScrollPane layoutX="1304.0" layoutY="24.0" prefHeight="1000.0" prefWidth="616.0" visible="false">
-         <content>
-            <VBox fx:id="vBoxPanel" alignment="TOP_CENTER" prefHeight="1023.0" prefWidth="597.0" spacing="10" style="-fx-background-color: #808080;">
-               <opaqueInsets>
-                  <Insets />
-               </opaqueInsets>
-               <padding>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-               </padding></VBox>
-         </content>
-      </ScrollPane>
       <MenuBar prefHeight="25.0" prefWidth="1920.0" style="-fx-background-color: #555555;">
         <menus>
           <Menu mnemonicParsing="false" text="Fichier">
@@ -192,7 +181,7 @@
                                     <ToggleGroup fx:id="SelectionOption" />
                                  </toggleGroup></RadioButton>
                               <RadioButton fx:id="bottomSelection" mnemonicParsing="false" text="Bottom" toggleGroup="$SelectionOption" />
-                              <RadioButton fx:id="topSelection" mnemonicParsing="false" text="Top" toggleGroup="$SelectionOption" />
+                              <RadioButton fx:id="topSelection" mnemonicParsing="false" onAction="#actuSelection" text="Top" toggleGroup="$SelectionOption" />
                            </children>
                         </VBox>
                         <HBox alignment="CENTER" prefHeight="31.0" prefWidth="317.0">
@@ -201,7 +190,7 @@
                               <Button mnemonicParsing="false" text="Ouvrir" />
                            </children>
                         </HBox>
-                        <Slider max="28.0" snapToTicks="true" value="14.0" />
+                        <Slider fx:id="polHeightSlide" blockIncrement="0.0" majorTickUnit="1.0" max="32.0" minorTickCount="0" snapToTicks="true" value="16.0" />
                      </children>
                   </VBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
@@ -230,7 +219,7 @@
                         <HBox alignment="CENTER" prefHeight="44.0" prefWidth="317.0">
                            <children>
                               <Label text="Taille de la map" />
-                              <Slider blockIncrement="1.0" majorTickUnit="8.0" max="4.0" min="1.0" prefHeight="14.0" prefWidth="209.0" showTickMarks="true" snapToTicks="true" value="2.0" />
+                              <Slider fx:id="mapSizeSlide" blockIncrement="0.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="0" prefHeight="14.0" prefWidth="209.0" snapToTicks="true" value="2.0" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
@@ -249,9 +238,9 @@
       </VBox>
       <VBox layoutX="1304.0" layoutY="34.0" prefHeight="980.0" prefWidth="616.0">
          <children>
-            <ScrollPane prefHeight="668.0" prefWidth="616.0" visible="false">
+            <ScrollPane prefHeight="668.0" prefWidth="616.0">
                <content>
-                  <VBox fx:id="vBoxPanel1" alignment="TOP_CENTER" prefHeight="1023.0" prefWidth="597.0" spacing="10" style="-fx-background-color: #808080;">
+                  <VBox fx:id="polyBoard" alignment="TOP_CENTER" prefHeight="529.0" prefWidth="597.0" spacing="10" style="-fx-background-color: #808080;">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
@@ -261,13 +250,25 @@
                   </VBox>
                </content>
             </ScrollPane>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox prefHeight="586.0" prefWidth="616.0">
                <children>
                   <Label prefHeight="38.0" prefWidth="293.0" text="Liste des Textures">
                      <font>
                         <Font size="27.0" />
                      </font>
                   </Label>
+                  <ScrollPane prefHeight="668.0" prefWidth="616.0">
+                     <content>
+                        <VBox fx:id="vBoxPanel1" alignment="TOP_CENTER" prefHeight="413.0" prefWidth="597.0" spacing="10" style="-fx-background-color: #808080;">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                           </padding>
+                        </VBox>
+                     </content>
+                  </ScrollPane>
                </children>
             </VBox>
          </children>
