@@ -1,7 +1,10 @@
 package fr.cubibox.com.mapcreator.map;
 
 import fr.cubibox.com.mapcreator.Main;
-import fr.cubibox.com.mapcreator.iu.Point;
+import fr.cubibox.com.mapcreator.graphics.Texture;
+import fr.cubibox.com.mapcreator.maths.Line2F;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Polygon2F;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -10,38 +13,39 @@ import java.util.ArrayList;
 import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
 
 public class Map {
-    private String idLevel;
-    private Chunk[][] mapContent;
+    private Texture wall;
+    private int size;
+    private String levelID;
+    private Chunk[][] chunks;
 
-    private int mapSize;
 
     public Map(String name, float mapSize) {
-        this.idLevel = name;
-        this.mapSize = (int)mapSize;
-        this.mapContent = new Chunk[this.mapSize/16][this.mapSize/16];
+        this.levelID = name;
+        this.size = (int)mapSize;
+        this.chunks = new Chunk[this.size /16][this.size /16];
     }
 
     public Map(Chunk[][] mapContent, String name, float mapSize) {
-        this.idLevel = name;
-        this.mapSize = (int)mapSize;
-        this.mapContent = mapContent;
+        this.levelID = name;
+        this.size = (int)mapSize;
+        this.chunks = mapContent;
     }
 
     public String exportMap(){
         int idPol = 0;
-        for (Polygon pol : Main.getPolygons()) {
+        for (Polygon2F pol : Main.getPolygons()) {
             pol.setId(String.valueOf(idPol));
             idPol ++;
         }
 
-        String output = "idLevel\n"+mapSize+"\n";
+        String output = "idLevel\n"+ size +"\n";
         int xChunk = 0;
         int yChunk = 0;
-        for (Chunk[] chunkL : mapContent){
+        for (Chunk[] chunkL : chunks){
             for (Chunk chunk : chunkL){
                 output += "#"+xChunk+";"+yChunk+"\n";
                 if (chunk.getPols() != null)
-                    for (Polygon pol : chunk.getPols()){
+                    for (Polygon2F pol : chunk.getPols()){
                         output += "\t"+pol.toString();
                     }
                 output += "!";
@@ -71,15 +75,15 @@ public class Map {
 
         //Initialize Polygons
         String poly = "";
-        ArrayList<Edge> currentEdges = new ArrayList<>();
-        ArrayList<Polygon> currentPolys = new ArrayList<>();
+        ArrayList<Line2F> currentEdges = new ArrayList<>();
+        ArrayList<Polygon2F> currentPolys = new ArrayList<>();
         float height;
 
         //Initialize Edges
         int tempX = 0;
         int tempY = 0;
-        Point tempP;
-        Point tempP2;
+        Vector2F tempP;
+        Vector2F tempP2;
 
         String temp="";
 
@@ -177,7 +181,7 @@ public class Map {
                             temp = "";
                             r = fis.read();
                         }
-                        tempP = new Point(tempX, tempY);
+                        tempP = new Vector2F(tempX, tempY);
                         r = fis.read();
                         r = fis.read();
 
@@ -198,8 +202,8 @@ public class Map {
                             r = fis.read();
                         }
                         if ((char)r == '\n')   r=fis.read();
-                        tempP2 = new Point(tempX, tempY);
-                        currentEdges.add(new Edge(tempP,tempP2));
+                        tempP2 = new Vector2F(tempX, tempY);
+                        currentEdges.add(new Line2F(tempP,tempP2));
                     }
 
                     //Height polygon / finish it
@@ -212,8 +216,8 @@ public class Map {
                         }
                         if ((char)r == '\n')   r=fis.read();
                         height = Float.parseFloat(temp);
-                        ArrayList<Point> tempPointsArray = new ArrayList<>();
-                        for (Edge e : currentEdges){
+                        ArrayList<Vector2F> tempPointsArray = new ArrayList<>();
+                        for (Line2F e : currentEdges){
                             tempPointsArray.add(e.getA());
                         }
                         boolean isLine = false;
@@ -228,7 +232,7 @@ public class Map {
                         else {
                             isLine = false;
                         }
-                        currentPolys.add(new Polygon(currentEdges, tempPointsArray, height, poly, isLine));
+                        currentPolys.add(new Polygon2F(currentEdges, tempPointsArray, height, poly));
                         poly = "";
                         currentEdges= new ArrayList<>();
                     }
@@ -249,27 +253,27 @@ public class Map {
         return new Map(chunks, idLevel, mapSize);
     }
 
-    public int getMapSize() {
-        return mapSize;
+    public int getSize() {
+        return size;
     }
 
-    public void setMapSize(int mapSize) {
-        this.mapSize = mapSize;
+    public void setSize(int size) {
+        this.size = size;
     }
 
-    public String getIdLevel() {
-        return idLevel;
+    public String getLevelID() {
+        return levelID;
     }
 
-    public void setIdLevel(String idLevel) {
-        this.idLevel = idLevel;
+    public void setLevelID(String levelID) {
+        this.levelID = levelID;
     }
 
-    public Chunk[][] getMapContent() {
-        return mapContent;
+    public Chunk[][] getChunks() {
+        return chunks;
     }
 
-    public void setMapContent(Chunk[][] mapContent) {
-        this.mapContent = mapContent;
+    public void setChunks(Chunk[][] chunks) {
+        this.chunks = chunks;
     }
 }

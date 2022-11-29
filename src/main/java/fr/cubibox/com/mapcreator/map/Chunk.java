@@ -1,23 +1,24 @@
 package fr.cubibox.com.mapcreator.map;
 
-import fr.cubibox.com.mapcreator.iu.Point;
 import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Polygon2F;
 
 import java.util.ArrayList;
 
 public class Chunk {
-    private ArrayList<Polygon> pols = new ArrayList<>();
+    private ArrayList<Polygon2F> pols = new ArrayList<>();
     private boolean isLoad;
 
     float originX;
     float originY;
 
-    public Chunk(ArrayList<Polygon> pols) {
+    public Chunk(ArrayList<Polygon2F> pols) {
         this.pols = pols;
         this.isLoad = false;
     }
 
-    public Chunk(ArrayList<Polygon> pols, int x, int y) {
+    public Chunk(ArrayList<Polygon2F> pols, int x, int y) {
         this.pols = pols;
         this.isLoad = false;
         this.originX = x;
@@ -25,17 +26,17 @@ public class Chunk {
     }
 
 
-    public static ArrayList<Polygon> findChunkPols(int x , int y) {
+    public static ArrayList<Polygon2F> findChunkPols(int x , int y) {
         int maxX = x * 16 + 16;
         int maxY = y * 16 + 16;
         int minX = x * 16;
         int minY = y * 16;
 
-        ArrayList<Polygon> polIn = Main.getPolygons();
-        ArrayList<Polygon> polOut = new ArrayList<>();
+        ArrayList<Polygon2F> polIn = Main.getPolygons();
+        ArrayList<Polygon2F> polOut = new ArrayList<>();
 
-        for (Polygon pol : polIn){
-            for (Point p : pol.getPoints()){
+        for (Polygon2F pol : polIn){
+            for (Vector2F p : pol.getPoints()){
                 if ((p.getX() >= minX && p.getX() <= maxX) && (p.getY() >= minY && p.getY() <= maxY)){
                     polOut.add(pol);
                     break;
@@ -45,16 +46,16 @@ public class Chunk {
         return polOut;
     }
 
-    public static ArrayList<Polygon> findChunkPols(ArrayList<Polygon> polIn, int x , int y) {
+    public static ArrayList<Polygon2F> findChunkPols(ArrayList<Polygon2F> polIn, int x , int y) {
         int maxX = x * 16 + 16;
         int maxY = y * 16 + 16;
         int minX = x * 16;
         int minY = y * 16;
 
-        ArrayList<Polygon> polOut = new ArrayList<>();
+        ArrayList<Polygon2F> polOut = new ArrayList<>();
 
-        for (Polygon pol : polIn){
-            for (Point p : pol.getPoints()){
+        for (Polygon2F pol : polIn){
+            for (Vector2F p : pol.getPoints()){
                 if ((p.getX() > minX && p.getX() <= maxX) && (p.getY() > minY && p.getY() <= maxY)){
                     polOut.add(pol);
                     break;
@@ -81,11 +82,11 @@ public class Chunk {
         this.originY = originY;
     }
 
-    public ArrayList<Polygon> getPols() {
+    public ArrayList<Polygon2F> getPols() {
         return pols;
     }
 
-    public void setPols(ArrayList<Polygon> pols) {
+    public void setPols(ArrayList<Polygon2F> pols) {
         this.pols = pols;
     }
 

@@ -1,13 +1,11 @@
 package fr.cubibox.com.mapcreator;
 
 import fr.cubibox.com.mapcreator.iu.Player;
-import fr.cubibox.com.mapcreator.iu.Point;
 import fr.cubibox.com.mapcreator.map.Chunk;
 import fr.cubibox.com.mapcreator.map.Map;
-import fr.cubibox.com.mapcreator.map.Polygon;
 import fr.cubibox.com.mapcreator.map.Type;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Polygon2F;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -17,7 +15,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -31,7 +28,6 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.EventListener;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -113,7 +109,7 @@ public class Controller implements Initializable {
                         .floatValue();
 
                 if ((roundX >= 0 && roundX <= Main.xSize && roundY >= 0 && roundY <= Main.xSize)) {
-                    Point p = new Point(roundX, roundY);
+                    Vector2F p = new Vector2F(roundX, roundY);
                     Main.getPoints().add(p);
                     polyBoard.getChildren().add(pointBoard(p));
                 }
@@ -123,7 +119,7 @@ public class Controller implements Initializable {
     }
 
 
-    public VBox pointBoard(Point p){
+    public VBox pointBoard(Vector2F p){
         VBox ptsBoard = new VBox();
         HBox nameBoard = new HBox();
         HBox pointBoard = new HBox();
@@ -165,7 +161,7 @@ public class Controller implements Initializable {
             p.setX((float) xSlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            Main.setPoints(Point.shortPoints());
+            Main.setPoints(Vector2F.shortPoints());
         });
         xSlid.setPrefWidth(250);
         xBoard.getChildren().addAll(new Label("      X : "),xSlid);
@@ -180,7 +176,7 @@ public class Controller implements Initializable {
             p.setY((float) ySlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            Main.setPoints(Point.shortPoints());
+            Main.setPoints(Vector2F.shortPoints());
         });
         ySlid.setPrefWidth(250);
         yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
@@ -194,7 +190,7 @@ public class Controller implements Initializable {
 
         return ptsBoard;
     }
-    public VBox pointBoard(Point p, int pointName, Polygon pol){
+    public VBox pointBoard(Vector2F p, int pointName, Polygon2F pol){
         VBox ptsBoard = new VBox();
         HBox nameBoard = new HBox();
         HBox pointBoard = new HBox();
@@ -274,7 +270,7 @@ public class Controller implements Initializable {
     }
 
 
-    public HBox heightBoard(Polygon p){
+    public HBox heightBoard(Polygon2F p){
         HBox genericBox = new HBox();
         VBox rightPart = new VBox();
 
@@ -352,7 +348,7 @@ public class Controller implements Initializable {
 //    }
 
 
-    public VBox polygonBoard(Polygon p){
+    public VBox polygonBoard(Polygon2F p){
         VBox polBoard = new VBox();
         VBox pointBoard = new VBox();
 
@@ -410,16 +406,16 @@ public class Controller implements Initializable {
 
     public void actuBoard(){
         polyBoard.getChildren().clear();
-        for (Point p : Main.getPoints()){
+        for (Vector2F p : Main.getPoints()){
             polyBoard.getChildren().add(pointBoard(p));
         }
 
-        for (Polygon p : Main.getPolygons()){
+        for (Polygon2F p : Main.getPolygons()){
             VBox pBoard = polygonBoard(p);
 
             if (p.isShowPoint()) {
                 int countPoint = 0;
-                for (Point pt : p.getPoints()) {
+                for (Vector2F pt : p.getPoints()) {
                     pBoard.getChildren().add(pointBoard(pt, countPoint, p));
                     countPoint++;
                 }
@@ -447,7 +443,7 @@ public class Controller implements Initializable {
     public void drawFunction() {
         coordinateSystem.getChildren().clear();
 
-        ArrayList<Point> points = Main.getPoints();
+        ArrayList<Vector2F> points = Main.getPoints();
 
         for (Rectangle r : drawGrid())
             coordinateSystem.getChildren().add(r);
@@ -456,12 +452,12 @@ public class Controller implements Initializable {
         //coordinateSystem.getChildren().add(Main.getPlayer1().getPoint().getCircle());
 
         //draw the points
-        for (Point p : points) {
+        for (Vector2F p : points) {
             coordinateSystem.getChildren().add(p.getCircle());
         }
 
         //draw the polygons
-        for (Polygon pols : Main.getPolygons()) {
+        for (Polygon2F pols : Main.getPolygons()) {
             coordinateSystem.getChildren().add(pols.getPolShape());
             switch (pols.getType()) {
                 case WALL -> pols.getPolShape().setStroke(Color.CYAN);
@@ -470,7 +466,7 @@ public class Controller implements Initializable {
             }
             if (pols.isShowPoint()) {
                 int countP = 0;
-                for (Point p : pols.getPoints()) {
+                for (Vector2F p : pols.getPoints()) {
                     Label pointName = new Label(countP + "");
                     pointName.setLayoutX(Main.toScreenX(p.getX()) - 5);
                     pointName.setLayoutY(Main.toScreenY(p.getY()) - 15);
@@ -547,18 +543,7 @@ public class Controller implements Initializable {
 
     public void setPolygon(ActionEvent actionEvent) {
         if (!Main.getPoints().isEmpty()) {
-            Polygon p = new Polygon(Main.getPoints(), (float) polHeightSlide.getValue(), selectType(SelectionOption));
-            Main.getPolygons().add(p);
-            Main.setPoints(new ArrayList<>());
-            polyBoard.getChildren().add(polygonBoard(p));
-            actuBoard();
-        }
-        drawFunction();
-    }
-
-    public void setPolyLine(ActionEvent actionEvent) {
-        if (!Main.getPoints().isEmpty()) {
-            Polygon p = new Polygon(Main.getPoints(), 1, true);
+            Polygon2F p = new Polygon2F(Main.getPoints(), (float) polHeightSlide.getValue(), selectType(SelectionOption));
             Main.getPolygons().add(p);
             Main.setPoints(new ArrayList<>());
             polyBoard.getChildren().add(polygonBoard(p));
@@ -633,12 +618,12 @@ public class Controller implements Initializable {
     public void exportMapButton(ActionEvent actionEvent) throws IOException {
         Map map = Main.getMap();
         System.out.println("Exctraction ...");
-        for (int i = 0; i < map.getMapSize()/16; i++) {
-            for (int j = 0; j < map.getMapSize()/16; j++) {
-                map.getMapContent()[i][j] = new Chunk(findChunkPols(j, i));
+        for (int i = 0; i < map.getSize()/16; i++) {
+            for (int j = 0; j < map.getSize()/16; j++) {
+                map.getChunks()[i][j] = new Chunk(findChunkPols(j, i));
             }
         }
-        WriteMap(map.getIdLevel(), map.exportMap());
+        WriteMap(map.getLevelID(), map.exportMap());
     }
 
     public static void WriteMap(String name, String content)throws IOException {

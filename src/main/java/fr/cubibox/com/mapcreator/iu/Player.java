@@ -1,20 +1,21 @@
 package fr.cubibox.com.mapcreator.iu;
 
 import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
 
 public class Player {
 	private float posX;
 	private float posY;
 	private float screenX; 
 	private float screenY; 
-	private Point point;
+	private Vector2F point;
 
 	public Player(float posX, float posY) {
 		this.setPosX(posX);
 		this.setPosY(posY);
 		this.setScreenX(Main.toScreenX(posX));
 		this.setScreenY(Main.toScreenY(posY));
-		this.setPoint(new Point(posX,posY));
+		this.setPoint(new Vector2F(posX,posY));
 	}
 
 	public float getPosX() {
@@ -50,11 +51,11 @@ public class Player {
 	}
 
 
-	public Point getPoint() {
+	public Vector2F getPoint() {
 		return this.point;
 	}
 
-	public void setPoint(Point point) {
+	public void setPoint(Vector2F point) {
 		this.point = point;
 	}
 }

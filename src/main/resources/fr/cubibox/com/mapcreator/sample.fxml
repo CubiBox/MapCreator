@@ -208,7 +208,6 @@
                   </VBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                      <children>
-                        <Button fx:id="setLine" mnemonicParsing="false" onAction="#setPolyLine" prefHeight="31.0" prefWidth="91.0" text="Draw Line" />
                         <Button fx:id="setPol" mnemonicParsing="false" onAction="#setPolygon" prefHeight="31.0" prefWidth="91.0" text="Draw Polygon" />
                      </children>
                   </HBox>

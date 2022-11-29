@@ -1,10 +1,10 @@
 package fr.cubibox.com.mapcreator;
 
 import fr.cubibox.com.mapcreator.iu.Player;
-import fr.cubibox.com.mapcreator.iu.Point;
 import fr.cubibox.com.mapcreator.map.Chunk;
 import fr.cubibox.com.mapcreator.map.Map;
-import fr.cubibox.com.mapcreator.map.Polygon;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Polygon2F;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,13 +13,11 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Objects;
 
-import static fr.cubibox.com.mapcreator.Controller.WriteMap;
 import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
 
 public class Main extends Application {
@@ -27,8 +25,8 @@ public class Main extends Application {
     public static float DIMC = 980;
     public static float xSize = 16f;
 
-    public static ArrayList<Point> points = new ArrayList<>();
-    public static ArrayList<Polygon> polygons = new ArrayList<>();
+    public static ArrayList<Vector2F> points = new ArrayList<>();
+    public static ArrayList<Polygon2F> polygons = new ArrayList<>();
 
     public static Player player1;
     public static Map map;
@@ -71,11 +69,11 @@ public class Main extends Application {
     }
 
 
-    public static ArrayList<Polygon> getPolygons() {
+    public static ArrayList<Polygon2F> getPolygons() {
         return polygons;
     }
 
-    public static void setPolygons(ArrayList<Polygon> polygons) {
+    public static void setPolygons(ArrayList<Polygon2F> polygons) {
         Main.polygons = polygons;
     }
 
@@ -85,15 +83,15 @@ public class Main extends Application {
 
     public static void setMap(Map map) {
         Main.map = map;
-        ArrayList<Polygon> allPol = new ArrayList<>();
+        ArrayList<Polygon2F> allPol = new ArrayList<>();
 
         ArrayList<Integer> counPol = new ArrayList<>();
         int xChunk = 0;
         int yChunk = 0;
-        for (Chunk[] chunkL : map.getMapContent()){
+        for (Chunk[] chunkL : map.getChunks()){
             for (Chunk chunk : chunkL){
                 if (chunk.getPols() != null)
-                    for (Polygon pol : chunk.getPols()){
+                    for (Polygon2F pol : chunk.getPols()){
                         if (!counPol.contains(Integer.parseInt(pol.getId()))){
                             allPol.add(pol);
                             counPol.add(Integer.parseInt(pol.getId()));
@@ -131,11 +129,11 @@ public class Main extends Application {
         Main.xSize = xSize;
     }
 
-    public static ArrayList<Point> getPoints() {
+    public static ArrayList<Vector2F> getPoints() {
         return points;
     }
 
-    public static void setPoints(ArrayList<Point> points) {
+    public static void setPoints(ArrayList<Vector2F> points) {
         Main.points = points;
     }
 
