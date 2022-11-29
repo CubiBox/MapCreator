@@ -2,23 +2,22 @@ package fr.cubibox.com.mapcreator.map;
 
 import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.iu.Point;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class Polygon {
     private ArrayList<Edge> edges = new ArrayList<>();
     private ArrayList<Point> points = new ArrayList<>();
     private float height;
     private String id;
-
     private Type type;
-
     private boolean isLine;
-
-    private boolean showPoint = false;
-
+    private boolean showPoint;
     private Shape polShape;
 
 //    public Polygon(float height){
@@ -27,37 +26,64 @@ public class Polygon {
 
     public Polygon(ArrayList<Point> points, float height){
         this.isLine = false;
+        this.showPoint = false;
         this.height = height;
         if (!points.isEmpty()) {
             this.points = points;
             setupEdges();
         }
+        type = Type.WALL;
+    }
+
+    public Polygon(ArrayList<Point> points, float height, Type type){
+        this.isLine = false;
+        this.showPoint = false;
+        this.height = height;
+        if (!points.isEmpty()) {
+            this.points = points;
+            setupEdges();
+        }
+        this.type = type;
     }
     public Polygon(ArrayList<Edge> edges, float height, String id){
         this.isLine = false;
+        this.showPoint = false;
         this.height = height;
         this.edges = edges;
         this.id = id;
+        type = Type.WALL;
     }
+
+    public Polygon(ArrayList<Edge> edges, float height, String id, Type type){
+        this.isLine = false;
+        this.showPoint = false;
+        this.height = height;
+        this.edges = edges;
+        this.id = id;
+        this.type = type;
+    }
+
 
     public Polygon(ArrayList<Point> points, float height, boolean isLine){
         this.isLine = isLine;
+        this.showPoint = false;
         this.height = height;
         if (!points.isEmpty()) {
             this.points = points;
             setupEdges();
         }
+        type = Type.WALL;
     }
 
     public Polygon(ArrayList<Edge> edges, ArrayList<Point> points, float height, String id, boolean isLine){
         this.isLine = isLine;
+        this.showPoint = false;
         this.height = height;
         this.points = points;
         this.id = id;
-        if (!points.isEmpty()) {
-            this.points = points;
+        if (!points.isEmpty())
             setupEdges();
-        }
+        type = Type.WALL;
     }
 
     public void setupEdges(){
@@ -75,7 +101,7 @@ public class Polygon {
             polPoints[countP] = Main.toScreenY(p.getY());
             countP ++;
         }
-        if (this.isLine == true) {
+        if (this.isLine) {
             this.polShape = new javafx.scene.shape.Polyline(polPoints);
             this.polShape.setFill(Color.TRANSPARENT);
             this.polShape.setStrokeWidth(2.0);
@@ -103,6 +129,24 @@ public class Polygon {
         return out;
     }
 
+    public String toName(){
+        String out = "";
+        out += (isLine()) ? "Line" : "Polygon";
+        out += " " + type.toString() + " : ";
+        out += id;
+        return out;
+    }
+
+
+
+
+    public Type getType() {
+        return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
 
     public boolean isShowPoint() {
         return showPoint;

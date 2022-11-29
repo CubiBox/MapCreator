@@ -5,6 +5,9 @@ import fr.cubibox.com.mapcreator.iu.Point;
 import fr.cubibox.com.mapcreator.map.Chunk;
 import fr.cubibox.com.mapcreator.map.Map;
 import fr.cubibox.com.mapcreator.map.Polygon;
+import fr.cubibox.com.mapcreator.map.Type;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -14,6 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -27,10 +31,12 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
 import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
+import static fr.cubibox.com.mapcreator.map.Type.*;
 
 public class Controller implements Initializable {
 
@@ -39,6 +45,10 @@ public class Controller implements Initializable {
 
     @FXML
     private ToggleButton walls;
+
+    @FXML
+    private ToggleGroup SelectionOption;
+
     @FXML
     private ToggleButton bottom;
     @FXML
@@ -78,13 +88,16 @@ public class Controller implements Initializable {
         polHeightSlide.setBlockIncrement(1);
         polHeightSlide.setMajorTickUnit(8);
         polHeightSlide.setShowTickLabels(true);
-        polHeightSlide.valueProperty().addListener((obs, oldval, newVal) -> polHeightSlide.setValue(newVal.intValue()));
+        polHeightSlide.valueProperty().addListener(
+                (obs, oldval, newVal) -> polHeightSlide.setValue(newVal.intValue())
+        );
 
         mapSizeSlide.setBlockIncrement(1);
         mapSizeSlide.setMajorTickUnit(1);
         mapSizeSlide.setShowTickLabels(true);
-
-        mapSizeSlide.valueProperty().addListener((obs, oldval, newVal) -> mapSizeSlide.setValue(newVal.intValue()));
+        mapSizeSlide.valueProperty().addListener(
+                (obs, oldval, newVal) -> mapSizeSlide.setValue(newVal.intValue())
+        );
         mapSizeSlide.valueProperty().addListener(event -> {
             Main.setxSize((int) (16*mapSizeSlide.getValue()));
             drawFunction();
@@ -191,8 +204,10 @@ public class Controller implements Initializable {
         HBox delete = new HBox();
 
         ptsBoard.setStyle(
-                "-fx-padding: 2;" +
-                "-fx-background-color: #808080"
+                "-fx-padding: 3px;" +
+                "-fx-spacing: 5px;" +
+                "-fx-background-color: #707070; " +
+                "-fx-background-radius : 3 3 3 3;"
         );
 
         xBoard.setAlignment(Pos.CENTER);
@@ -208,7 +223,9 @@ public class Controller implements Initializable {
 
         name.setAlignment(Pos.TOP_LEFT);
         name.setPrefWidth(240);
-        name.getChildren().add(new Label("Point " + pointName));
+        Label labelName = new Label("Point " + pointName);
+        labelName.setStyle("-fx-text-fill:WHITE;");
+        name.getChildren().add(labelName);
         delete.setAlignment(Pos.TOP_RIGHT);
         delete.setPrefWidth(230);
         delete.getChildren().add(close);
@@ -258,43 +275,76 @@ public class Controller implements Initializable {
 
 
     public HBox heightBoard(Polygon p){
+        HBox genericBox = new HBox();
         VBox rightPart = new VBox();
-        HBox heightBoard = new HBox();
-        HBox name = new HBox();
-        VBox choise = new VBox();
 
-        heightBoard.setStyle(
-                        "-fx-background-radius: 8 0 0 8;" +
-                        "-fx-background-color: #757575"
-                );
+        VBox heightBoard = new VBox();
+        HBox label = new HBox();
+
+        genericBox.setStyle(
+               "-fx-background-radius: 8 0 0 8;" +
+               "-fx-background-color: #757575;" +
+               "-fx-padding: 10px;" +
+               "-fx-spacing: 10px;"
+        );
 
         Label lName = new Label("Height");
         Button help = new Button("?");
         help.setPrefSize(10d,10d);
         help.setOnMouseReleased(event -> {
-
+            System.out.println("no help for now, good luck");
         });
-        name.getChildren().addAll(lName,help);
+        label.getChildren().addAll(lName,help);
 
-        Slider height = new Slider(1, 5, 1);
+        Slider height = new Slider(1, 32, 1);
+        height.setPrefWidth(256d);
         height.setBlockIncrement(1);
         height.setMajorTickUnit(8);
         height.setShowTickLabels(true);
         height.valueProperty().addListener((obs, oldval, newVal) -> height.setValue(newVal.intValue()));
         height.valueProperty().addListener(event -> {
+            p.setHeight((float) height.getValue());
+            drawFunction();
+        });
+        heightBoard.getChildren().addAll(label,height);
+
+        // Type RadioButtons
+        ToggleGroup choise = new ToggleGroup();
+
+        RadioButton wallButton = new RadioButton("Wall");
+        wallButton.setId("Wall");
+        wallButton.setToggleGroup(choise);
+        wallButton.selectedProperty().addListener(event -> {
+            p.setType(WALL);
             drawFunction();
         });
 
-        RadioButton full = new RadioButton("Full");
-        full.setId("choise");
-        RadioButton top = new RadioButton("Top");
-        top.setId("choise");
-        RadioButton bottom = new RadioButton("Bottom");
-        bottom.setId("choise");
-        choise.getChildren().addAll(full,top,bottom);
+        RadioButton floorButton = new RadioButton("Floor");
+        floorButton.setId("Floor");
+        floorButton.setToggleGroup(choise);
+        floorButton.selectedProperty().addListener(event -> {
+            p.setType(FLOOR);
+            drawFunction();
+        });
 
-        heightBoard.getChildren().addAll(rightPart,choise);
-        return heightBoard;
+        RadioButton cellingButton = new RadioButton("Celling");
+        cellingButton.setId("Celling");
+        cellingButton.setToggleGroup(choise);
+        cellingButton.selectedProperty().addListener(event -> {
+            p.setType(CELLING);
+            drawFunction();
+        });
+
+        switch (p.getType()) {
+            case WALL -> wallButton.setSelected(true);
+            case FLOOR -> floorButton.setSelected(true);
+            case CELLING -> cellingButton.setSelected(true);
+        }
+
+        rightPart.getChildren().addAll(wallButton,floorButton,cellingButton);
+
+        genericBox.getChildren().addAll(heightBoard,rightPart);
+        return genericBox;
     }
 
 //    public VBox textureBoard(Polygon p){
@@ -304,26 +354,29 @@ public class Controller implements Initializable {
 
     public VBox polygonBoard(Polygon p){
         VBox polBoard = new VBox();
-        HBox nameBoard = new HBox();
         VBox pointBoard = new VBox();
-        HBox name = new HBox();
-        HBox delete = new HBox();
 
+        // CSS board
         polBoard.setStyle(
-                "-fx-background-radius: 8 8 8 8;" +
-                "-fx-background-color: #656565"
+                "-fx-background-radius : 8 8 8 8;" +
+                "-fx-background-color : #656565;" +
+                "-fx-padding : 10px;" +
+                "-fx-spacing : 5px"
         );
-        //Color c = Color.rgb((int) (p.getPoints().get(0).getColor().getRed()*256), (int) (p.getPoints().get(0).getColor().getGreen()*256), (int) (p.getPoints().get(0).getColor().getBlue()*256),0.3);
-        //Color c = Color.rgb(0, 255, 255, 0.2);
 
-
+        //close button
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
             Main.getPolygons().remove(p);
             actuBoard();
         });
+        HBox delete = new HBox();
+        delete.setAlignment(Pos.TOP_RIGHT);
+        delete.setPrefWidth(230);
+        delete.getChildren().add(close);
 
+        //showPoint button
         Button showP = new Button("Show Points");
         showP.setPrefSize(100d,10d);
         showP.setOnMouseReleased(event -> {
@@ -337,15 +390,14 @@ public class Controller implements Initializable {
             actuBoard();
         });
 
+        // Name Label
+        HBox name = new HBox();
         name.setAlignment(Pos.TOP_LEFT);
         name.setPrefWidth(220);
-        if (p.isLine())
-            name.getChildren().add(new Label("Line  " + p.getId()));
-        else
-            name.getChildren().add(new Label("Polygon  " + p.getId()));
-        delete.setAlignment(Pos.TOP_RIGHT);
-        delete.setPrefWidth(230);
-        delete.getChildren().add(close);
+        name.getChildren().add(new Label(p.toName()));
+
+        //add name, delete, show points buttons
+        HBox nameBoard = new HBox();
         nameBoard.getChildren().addAll(name,delete,showP);
 
         //Height Board
@@ -353,7 +405,6 @@ public class Controller implements Initializable {
 
         //main board adds
         polBoard.getChildren().addAll(nameBoard,pointBoard);
-
         return polBoard;
     }
 
@@ -366,13 +417,13 @@ public class Controller implements Initializable {
         for (Polygon p : Main.getPolygons()){
             VBox pBoard = polygonBoard(p);
 
-            //if (p.isShowPoint()) {
+            if (p.isShowPoint()) {
                 int countPoint = 0;
                 for (Point pt : p.getPoints()) {
                     pBoard.getChildren().add(pointBoard(pt, countPoint, p));
                     countPoint++;
                 }
-            //}
+            }
             polyBoard.getChildren().add(pBoard);
         }
         drawFunction();
@@ -393,7 +444,6 @@ public class Controller implements Initializable {
         else topViewImage.setImage(new Image(String.valueOf(new File(String.valueOf(Main.class.getResource("images/wall.png"))))));
     }
 
-
     public void drawFunction() {
         coordinateSystem.getChildren().clear();
 
@@ -413,6 +463,11 @@ public class Controller implements Initializable {
         //draw the polygons
         for (Polygon pols : Main.getPolygons()) {
             coordinateSystem.getChildren().add(pols.getPolShape());
+            switch (pols.getType()) {
+                case WALL -> pols.getPolShape().setStroke(Color.CYAN);
+                case FLOOR -> pols.getPolShape().setStroke(Color.LIME);
+                case CELLING -> pols.getPolShape().setStroke(Color.RED);
+            }
             if (pols.isShowPoint()) {
                 int countP = 0;
                 for (Point p : pols.getPoints()) {
@@ -485,9 +540,14 @@ public class Controller implements Initializable {
         drawFunction();
     }
 
+    public Type selectType(ToggleGroup tg){
+        RadioButton rd = (RadioButton)tg.getSelectedToggle();
+        return Type.toType(rd.getId());
+    }
+
     public void setPolygon(ActionEvent actionEvent) {
         if (!Main.getPoints().isEmpty()) {
-            Polygon p = new Polygon(Main.getPoints(), 1);
+            Polygon p = new Polygon(Main.getPoints(), (float) polHeightSlide.getValue(), selectType(SelectionOption));
             Main.getPolygons().add(p);
             Main.setPoints(new ArrayList<>());
             polyBoard.getChildren().add(polygonBoard(p));

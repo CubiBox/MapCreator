@@ -163,6 +163,19 @@
                         <Insets right="10.0" />
                      </padding>
                   </HBox>
+                  <HBox alignment="CENTER" prefHeight="44.0" prefWidth="317.0" spacing="20.0">
+                     <children>
+                        <Label text="Grid size">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Slider fx:id="mapSizeSlide" blockIncrement="0.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="0" prefHeight="14.0" prefWidth="209.0" snapToTicks="true" value="1.0" />
+                     </children>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                  </HBox>
                </children>
             </VBox>
             <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #606060;">
@@ -176,12 +189,12 @@
                         </Label>
                         <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
                            <children>
-                              <RadioButton fx:id="wallSelection" mnemonicParsing="false" selected="true" text="Wall">
+                              <RadioButton fx:id="wall" mnemonicParsing="false" selected="true" text="Wall">
                                  <toggleGroup>
                                     <ToggleGroup fx:id="SelectionOption" />
                                  </toggleGroup></RadioButton>
-                              <RadioButton fx:id="bottomSelection" mnemonicParsing="false" text="Bottom" toggleGroup="$SelectionOption" />
-                              <RadioButton fx:id="topSelection" mnemonicParsing="false" onAction="#actuSelection" text="Top" toggleGroup="$SelectionOption" />
+                              <RadioButton fx:id="floor" mnemonicParsing="false" text="Floor" toggleGroup="$SelectionOption" />
+                              <RadioButton fx:id="celling" mnemonicParsing="false" text="Celling" toggleGroup="$SelectionOption" />
                            </children>
                         </VBox>
                         <HBox alignment="CENTER" prefHeight="31.0" prefWidth="317.0">
@@ -214,12 +227,6 @@
                            <children>
                               <TextField prefHeight="25.0" prefWidth="284.0" promptText="Nom de la map" />
                               <Label text=".bkr" />
-                           </children>
-                        </HBox>
-                        <HBox alignment="CENTER" prefHeight="44.0" prefWidth="317.0">
-                           <children>
-                              <Label text="Taille de la map" />
-                              <Slider fx:id="mapSizeSlide" blockIncrement="0.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="0" prefHeight="14.0" prefWidth="209.0" snapToTicks="true" value="2.0" />
                            </children>
                         </HBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
