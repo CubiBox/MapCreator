@@ -3,7 +3,8 @@ package fr.cubibox.com.mapcreator;
 import fr.cubibox.com.mapcreator.iu.Player;
 import fr.cubibox.com.mapcreator.map.Chunk;
 import fr.cubibox.com.mapcreator.map.Map;
-import fr.cubibox.com.mapcreator.map.Type;
+import fr.cubibox.com.mapcreator.mapObject.StaticObject;
+import fr.cubibox.com.mapcreator.mapObject.Type;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Polygon2F;
 import javafx.event.ActionEvent;
@@ -32,7 +33,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
-import static fr.cubibox.com.mapcreator.map.Type.*;
+import static fr.cubibox.com.mapcreator.mapObject.Type.*;
 
 public class Controller implements Initializable {
 
@@ -270,7 +271,8 @@ public class Controller implements Initializable {
     }
 
 
-    public HBox heightBoard(Polygon2F p){
+    public HBox heightBoard(StaticObject obj){
+        Polygon2F p = obj.getPolygon();
         HBox genericBox = new HBox();
         VBox rightPart = new VBox();
 
@@ -311,7 +313,7 @@ public class Controller implements Initializable {
         wallButton.setId("Wall");
         wallButton.setToggleGroup(choise);
         wallButton.selectedProperty().addListener(event -> {
-            p.setType(WALL);
+            obj.setType(WALL);
             drawFunction();
         });
 
@@ -319,7 +321,7 @@ public class Controller implements Initializable {
         floorButton.setId("Floor");
         floorButton.setToggleGroup(choise);
         floorButton.selectedProperty().addListener(event -> {
-            p.setType(FLOOR);
+            obj.setType(FLOOR);
             drawFunction();
         });
 
@@ -327,11 +329,11 @@ public class Controller implements Initializable {
         cellingButton.setId("Celling");
         cellingButton.setToggleGroup(choise);
         cellingButton.selectedProperty().addListener(event -> {
-            p.setType(CELLING);
+            obj.setType(CELLING);
             drawFunction();
         });
 
-        switch (p.getType()) {
+        switch (obj.getType()) {
             case WALL -> wallButton.setSelected(true);
             case FLOOR -> floorButton.setSelected(true);
             case CELLING -> cellingButton.setSelected(true);
@@ -348,7 +350,8 @@ public class Controller implements Initializable {
 //    }
 
 
-    public VBox polygonBoard(Polygon2F p){
+    public VBox polygonBoard(StaticObject obj){
+        Polygon2F p = obj.getPolygon();
         VBox polBoard = new VBox();
         VBox pointBoard = new VBox();
 
@@ -364,7 +367,7 @@ public class Controller implements Initializable {
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            Main.getPolygons().remove(p);
+            Main.getStaticObjects().remove(obj);
             actuBoard();
         });
         HBox delete = new HBox();
@@ -397,7 +400,7 @@ public class Controller implements Initializable {
         nameBoard.getChildren().addAll(name,delete,showP);
 
         //Height Board
-        polBoard.getChildren().addAll(heightBoard(p));
+        polBoard.getChildren().addAll(heightBoard(obj));
 
         //main board adds
         polBoard.getChildren().addAll(nameBoard,pointBoard);
@@ -410,8 +413,9 @@ public class Controller implements Initializable {
             polyBoard.getChildren().add(pointBoard(p));
         }
 
-        for (Polygon2F p : Main.getPolygons()){
-            VBox pBoard = polygonBoard(p);
+        for (StaticObject obj : Main.getStaticObjects()){
+            Polygon2F p = obj.getPolygon();
+            VBox pBoard = polygonBoard(obj);
 
             if (p.isShowPoint()) {
                 int countPoint = 0;
@@ -457,9 +461,10 @@ public class Controller implements Initializable {
         }
 
         //draw the polygons
-        for (Polygon2F pols : Main.getPolygons()) {
+        for (StaticObject obj : Main.getStaticObjects()) {
+            Polygon2F pols = obj.getPolygon();
             coordinateSystem.getChildren().add(pols.getPolShape());
-            switch (pols.getType()) {
+            switch (obj.getType()) {
                 case WALL -> pols.getPolShape().setStroke(Color.CYAN);
                 case FLOOR -> pols.getPolShape().setStroke(Color.LIME);
                 case CELLING -> pols.getPolShape().setStroke(Color.RED);
@@ -543,10 +548,10 @@ public class Controller implements Initializable {
 
     public void setPolygon(ActionEvent actionEvent) {
         if (!Main.getPoints().isEmpty()) {
-            Polygon2F p = new Polygon2F(Main.getPoints(), (float) polHeightSlide.getValue(), selectType(SelectionOption));
-            Main.getPolygons().add(p);
+            StaticObject obj = new StaticObject(new Polygon2F(Main.getPoints(), (float) polHeightSlide.getValue()),selectType(SelectionOption));
+            Main.getStaticObjects().add(obj);
             Main.setPoints(new ArrayList<>());
-            polyBoard.getChildren().add(polygonBoard(p));
+            polyBoard.getChildren().add(polygonBoard(obj));
             actuBoard();
         }
         drawFunction();
@@ -615,7 +620,10 @@ public class Controller implements Initializable {
         stageSave.show();
     }
 
+
     public void exportMapButton(ActionEvent actionEvent) throws IOException {
+    }
+    /*
         Map map = Main.getMap();
         System.out.println("Exctraction ...");
         for (int i = 0; i < map.getSize()/16; i++) {
@@ -625,6 +633,7 @@ public class Controller implements Initializable {
         }
         WriteMap(map.getLevelID(), map.exportMap());
     }
+     */
 
     public static void WriteMap(String name, String content)throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(name + ".map"));

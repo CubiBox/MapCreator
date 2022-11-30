@@ -3,6 +3,10 @@ package fr.cubibox.com.mapcreator;
 import fr.cubibox.com.mapcreator.iu.Player;
 import fr.cubibox.com.mapcreator.map.Chunk;
 import fr.cubibox.com.mapcreator.map.Map;
+import fr.cubibox.com.mapcreator.mapObject.LivingEntity;
+import fr.cubibox.com.mapcreator.mapObject.MapObject;
+import fr.cubibox.com.mapcreator.mapObject.StaticObject;
+import fr.cubibox.com.mapcreator.mapObject.TileEntity;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Polygon2F;
 import javafx.application.Application;
@@ -26,7 +30,10 @@ public class Main extends Application {
     public static float xSize = 16f;
 
     public static ArrayList<Vector2F> points = new ArrayList<>();
-    public static ArrayList<Polygon2F> polygons = new ArrayList<>();
+
+    public static ArrayList<StaticObject> staticObjects = new ArrayList<>();
+    public static ArrayList<LivingEntity> mobs = new ArrayList<>();
+    public static ArrayList<TileEntity> containers = new ArrayList<>();
 
     public static Player player1;
     public static Map map;
@@ -69,18 +76,18 @@ public class Main extends Application {
     }
 
 
-    public static ArrayList<Polygon2F> getPolygons() {
-        return polygons;
+    public static ArrayList<StaticObject> getStaticObjects() {
+        return staticObjects;
     }
 
-    public static void setPolygons(ArrayList<Polygon2F> polygons) {
-        Main.polygons = polygons;
+    public static void setPolygons(ArrayList<StaticObject> staticObjects) {
+        Main.staticObjects = staticObjects;
     }
 
     public static Map getMap() {
         return map;
     }
-
+/*
     public static void setMap(Map map) {
         Main.map = map;
         ArrayList<Polygon2F> allPol = new ArrayList<>();
@@ -104,6 +111,8 @@ public class Main extends Application {
         }
         Main.setPolygons(allPol);
     }
+
+ */
 
     public static float getDIML() {
         return DIML;
@@ -143,5 +152,29 @@ public class Main extends Application {
 
     public static void setPlayer1(Player player1) {
         Main.player1 = player1;
+    }
+
+    public static void setStaticObjects(ArrayList<StaticObject> staticObjects) {
+        Main.staticObjects = staticObjects;
+    }
+
+    public static ArrayList<LivingEntity> getMobs() {
+        return mobs;
+    }
+
+    public static void setMobs(ArrayList<LivingEntity> mobs) {
+        Main.mobs = mobs;
+    }
+
+    public static ArrayList<TileEntity> getContainers() {
+        return containers;
+    }
+
+    public static void setContainers(ArrayList<TileEntity> containers) {
+        Main.containers = containers;
+    }
+
+    public static void setMap(Map map) {
+        Main.map = map;
     }
 }

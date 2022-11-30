@@ -13,7 +13,6 @@ import java.util.ArrayList;
 import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
 
 public class Map {
-    private Texture wall;
     private int size;
     private String levelID;
     private Chunk[][] chunks;
@@ -31,6 +30,10 @@ public class Map {
         this.chunks = mapContent;
     }
 
+    public String exportMap() {
+        return null;
+    }
+/*
     public String exportMap(){
         int idPol = 0;
         for (Polygon2F pol : Main.getPolygons()) {
@@ -57,7 +60,12 @@ public class Map {
         return output;
     }
 
-    public static Map importMap(File f){
+ */
+
+    public static Map importMap(File f) {
+        return null;
+    }
+    /*
         //initialize Level Id
         String idLevel = "";
         boolean idLevelDone = false;
@@ -252,7 +260,7 @@ public class Map {
         Main.setMap(new Map(chunks, idLevel, mapSize));
         return new Map(chunks, idLevel, mapSize);
     }
-
+*/
     public int getSize() {
         return size;
     }

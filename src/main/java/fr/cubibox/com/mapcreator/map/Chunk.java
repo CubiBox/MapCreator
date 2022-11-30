@@ -1,41 +1,73 @@
 package fr.cubibox.com.mapcreator.map;
 
 import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.mapObject.*;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Polygon2F;
 
 import java.util.ArrayList;
 
 public class Chunk {
-    private ArrayList<Polygon2F> pols = new ArrayList<>();
-    private boolean isLoad;
+    private ArrayList<MapObject> mapObjects = new ArrayList<MapObject>();
+    int originX;
+    int originY;
 
-    float originX;
-    float originY;
-
-    public Chunk(ArrayList<Polygon2F> pols) {
-        this.pols = pols;
-        this.isLoad = false;
+    public Chunk(ArrayList<MapObject> mapObjects) {
+        this.mapObjects = mapObjects;
     }
 
-    public Chunk(ArrayList<Polygon2F> pols, int x, int y) {
-        this.pols = pols;
-        this.isLoad = false;
+    public Chunk(ArrayList<MapObject> mapObjects, int x, int y) {
+        this.mapObjects = mapObjects;
         this.originX = x;
         this.originY = y;
     }
 
+    public ArrayList<StaticObject> getStaticObjects(){
+        ArrayList<StaticObject> so = new ArrayList<>();
+        for (MapObject mo : mapObjects)
+            if (mo instanceof StaticObject)
+                so.add((StaticObject) mo);
+        return so;
+    }
+
+    public ArrayList<LivingEntity> getLivingEntities(){
+        ArrayList<LivingEntity> le = new ArrayList<>();
+        for (MapObject mo : mapObjects)
+            if (mo instanceof LivingEntity)
+                le.add((LivingEntity) mo);
+        return le;
+    }
+
+    public ArrayList<TileEntity> getContainers(){
+        ArrayList<TileEntity> te = new ArrayList<>();
+        for (MapObject mo : mapObjects)
+            if (mo instanceof TileEntity)
+                te.add((TileEntity) mo);
+        return te;
+    }
+
+    public ArrayList<Entity> getEntities(){
+        ArrayList<Entity> e = new ArrayList<>();
+        for (MapObject mo : mapObjects)
+            if (mo instanceof Entity)
+                e.add((Entity) mo);
+        return e;
+    }
+
 
     public static ArrayList<Polygon2F> findChunkPols(int x , int y) {
+        return null;
+    }
+    /*
         int maxX = x * 16 + 16;
         int maxY = y * 16 + 16;
         int minX = x * 16;
         int minY = y * 16;
 
-        ArrayList<Polygon2F> polIn = Main.getPolygons();
-        ArrayList<Polygon2F> polOut = new ArrayList<>();
+        ArrayList<StaticObject> polIn = Main.getStaticObjects();
+        ArrayList<StaticObject> polOut = new ArrayList<>();
 
-        for (Polygon2F pol : polIn){
+        for (StaticObject pol : polIn){
             for (Vector2F p : pol.getPoints()){
                 if ((p.getX() >= minX && p.getX() <= maxX) && (p.getY() >= minY && p.getY() <= maxY)){
                     polOut.add(pol);
@@ -64,37 +96,26 @@ public class Chunk {
         }
         return polOut;
     }
+*/
 
-
-    public float getOriginX() {
+    public int getOriginX() {
         return originX;
     }
-
-    public void setOriginX(float originX) {
+    public void setOriginX(int originX) {
         this.originX = originX;
     }
 
-    public float getOriginY() {
+    public int getOriginY() {
         return originY;
     }
-
-    public void setOriginY(float originY) {
+    public void setOriginY(int originY) {
         this.originY = originY;
     }
 
-    public ArrayList<Polygon2F> getPols() {
-        return pols;
+    public ArrayList<MapObject> getMapObjects() {
+        return mapObjects;
     }
-
-    public void setPols(ArrayList<Polygon2F> pols) {
-        this.pols = pols;
-    }
-
-    public boolean isLoad() {
-        return isLoad;
-    }
-
-    public void setLoad(boolean load) {
-        isLoad = load;
+    public void setMapObjects(ArrayList<MapObject> mapObjects) {
+        this.mapObjects = mapObjects;
     }
 }

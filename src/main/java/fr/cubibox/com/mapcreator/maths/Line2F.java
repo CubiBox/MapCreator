@@ -16,7 +16,6 @@ public class Line2F {
     public Vector2F getA() {
         return a;
     }
-
     public void setA(Vector2F a) {
         this.a = a;
     }
@@ -24,7 +23,6 @@ public class Line2F {
     public Vector2F getB() {
         return b;
     }
-
     public void setB(Vector2F b) {
         this.b = b;
     }

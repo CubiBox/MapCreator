@@ -1,19 +1,17 @@
 package fr.cubibox.com.mapcreator.maths;
 
-
-
 import fr.cubibox.com.mapcreator.Main;
-import fr.cubibox.com.mapcreator.map.Type;
+import fr.cubibox.com.mapcreator.mapObject.Type;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
 
 public class Polygon2F {
     private ArrayList<Line2F> edges;
-    private ArrayList<Vector2F> points;
     private float height;
-    private String id;
-    private Type type;
+
+    //pour l'Editor
+    private ArrayList<Vector2F> points;
     private boolean showPoint;
     private javafx.scene.shape.Shape polShape;
 
@@ -24,45 +22,6 @@ public class Polygon2F {
             this.points = points;
             setupEdges();
         }
-
-        type = Type.WALL;
-        this.showPoint = false;
-    }
-
-    public Polygon2F(ArrayList<Vector2F> points, float height, Type type) {
-        this.height = height;
-        if (!points.isEmpty()) {
-            this.points = points;
-            setupEdges();
-        }
-
-        this.type = type;
-        this.showPoint = false;
-    }
-
-    public Polygon2F(ArrayList<Line2F> edges, float height, String id) {
-        this.height = height;
-        this.edges = edges;
-        type = Type.WALL;
-        this.id = id;
-        this.showPoint = false;
-    }
-
-    public Polygon2F(ArrayList<Line2F> edges, float height, String id, Type type) {
-        this.height = height;
-        this.edges = edges;
-        this.type = type;
-        this.id = id;
-        this.showPoint = false;
-    }
-
-
-    public Polygon2F(ArrayList<Line2F> edges, ArrayList<Vector2F> points, float height, String id) {
-        this.height = height;
-        this.points = points;
-        this.id = id;
-        this.edges = edges;
-        type = Type.WALL;
         this.showPoint = false;
     }
 
@@ -112,7 +71,7 @@ public class Polygon2F {
     }
 
     public String toString(){
-        String out = "$"+id+"\n";
+        String out = "$\n";
         for (Line2F e : edges){
             out += e.toString();
         }
@@ -123,24 +82,7 @@ public class Polygon2F {
     public String toName(){
         String out = "";
         out += "Polygon";
-        out += " " + type.toString() + " : ";
-        out += id;
         return out;
-    }
-
-    public String getId() {
-        return id;
-    }
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public Type getType() {
-        return type;
-    }
-
-    public void setType(Type type) {
-        this.type = type;
     }
 
     public boolean isShowPoint() {
