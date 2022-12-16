@@ -1,7 +1,6 @@
 package fr.cubibox.com.mapcreator.maths;
 
 import fr.cubibox.com.mapcreator.Main;
-import fr.cubibox.com.mapcreator.mapObject.Type;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -13,7 +12,9 @@ public class Polygon2F {
     //pour l'Editor
     private ArrayList<Vector2F> points;
     private boolean showPoint;
-    private javafx.scene.shape.Shape polShape;
+    private javafx.scene.shape.Shape ShapeTop;
+    private javafx.scene.shape.Shape ShapeLeft;
+    private javafx.scene.shape.Shape ShapeRight;
 
 
     public Polygon2F(ArrayList<Vector2F> points, float height) {
@@ -42,12 +43,12 @@ public class Polygon2F {
             countP ++;
         }
         edges.add(new Line2F(points.get(pSize), points.get(0)));
-        this.polShape = new javafx.scene.shape.Polygon(polPoints);
-        this.polShape.setFill(Color.TRANSPARENT);
-        this.polShape.setStrokeWidth(2.0);
+        this.ShapeTop = new javafx.scene.shape.Polygon(polPoints);
+        this.ShapeTop.setFill(Color.TRANSPARENT);
+        this.ShapeTop.setStrokeWidth(2.0);
         Color c = Color.CYAN;
         //Color c = Color.rgb((int) (getPoints().get(0).getColor().getRed() * 256), (int) (getPoints().get(0).getColor().getGreen() * 256), (int) (getPoints().get(0).getColor().getBlue() * 256), 0.8);
-        this.polShape.setStroke(c);
+        this.ShapeTop.setStroke(c);
     }
 
 
@@ -95,8 +96,8 @@ public class Polygon2F {
 
 
 
-    public void setPolShape(javafx.scene.shape.Shape polShape) {
-        this.polShape = polShape;
+    public void setShapeTop(javafx.scene.shape.Shape shapeTop) {
+        this.ShapeTop = shapeTop;
     }
 
     public ArrayList<Vector2F> getPoints() {
@@ -107,12 +108,12 @@ public class Polygon2F {
         this.points = points;
     }
 
-    public javafx.scene.shape.Shape getPolShape() {
-        return polShape;
+    public javafx.scene.shape.Shape getShapeTop() {
+        return ShapeTop;
     }
 
     public void setPolShape(javafx.scene.shape.Polygon polShape) {
-        this.polShape = polShape;
+        this.ShapeTop = polShape;
     }
 
     public float getHeight() {

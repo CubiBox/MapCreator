@@ -65,7 +65,7 @@
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <ToggleButton fx:id="walls" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#actuCheckbox" selected="true">
+                        <ToggleButton fx:id="walls" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#actuView">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -79,8 +79,11 @@
                            <padding>
                               <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                            </padding>
+                           <toggleGroup>
+                              <ToggleGroup fx:id="view" />
+                           </toggleGroup>
                         </ToggleButton>
-                        <ToggleButton fx:id="bottom" mnemonicParsing="false" onAction="#actuCheckbox">
+                        <ToggleButton fx:id="bottom" mnemonicParsing="false" onAction="#actuView" toggleGroup="$view">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -92,7 +95,7 @@
                               <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
                            </padding>
                         </ToggleButton>
-                        <ToggleButton fx:id="top" mnemonicParsing="false" onAction="#actuCheckbox">
+                        <ToggleButton fx:id="top" mnemonicParsing="false" onAction="#actuView" toggleGroup="$view">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -116,7 +119,7 @@
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <ToggleButton fx:id="topView" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#actuCheckbox" selected="true">
+                        <ToggleButton fx:id="topView" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#actuView" selected="true">
                            <graphic>
                               <ImageView fx:id="topViewImage" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -134,19 +137,7 @@
                               <ToggleGroup fx:id="POV" />
                            </toggleGroup>
                         </ToggleButton>
-                        <ToggleButton fx:id="leftView" mnemonicParsing="false" onAction="#actuCheckbox" toggleGroup="$POV">
-                           <graphic>
-                              <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image url="@images/wall.png" />
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <padding>
-                              <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
-                           </padding>
-                        </ToggleButton>
-                        <ToggleButton fx:id="rightView" mnemonicParsing="false" onAction="#actuCheckbox" toggleGroup="$POV">
+                        <ToggleButton fx:id="horizontalView" mnemonicParsing="false" onAction="#actuView" toggleGroup="$POV">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                                  <image>

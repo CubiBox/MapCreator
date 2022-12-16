@@ -1,7 +1,6 @@
 package fr.cubibox.com.mapcreator;
 
 import fr.cubibox.com.mapcreator.iu.Player;
-import fr.cubibox.com.mapcreator.map.Chunk;
 import fr.cubibox.com.mapcreator.map.Map;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.Type;
@@ -32,7 +31,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
-import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
 import static fr.cubibox.com.mapcreator.mapObject.Type.*;
 
 public class Controller implements Initializable {
@@ -47,18 +45,10 @@ public class Controller implements Initializable {
     private ToggleGroup SelectionOption;
 
     @FXML
-    private ToggleButton bottom;
-    @FXML
-    private ToggleButton top;
+    private ToggleGroup view;
 
     @FXML
-    private ToggleButton topView;
-    @FXML
-    private ImageView topViewImage;
-    @FXML
-    private ToggleButton leftView;
-    @FXML
-    private ToggleButton rightView;
+    private ToggleGroup POV;
 
     @FXML
     private Slider mapSizeSlide;
@@ -80,7 +70,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        drawFunction();
+        drawPolygon();
 
         polHeightSlide.setBlockIncrement(1);
         polHeightSlide.setMajorTickUnit(8);
@@ -97,7 +87,7 @@ public class Controller implements Initializable {
         );
         mapSizeSlide.valueProperty().addListener(event -> {
             Main.setxSize((int) (16*mapSizeSlide.getValue()));
-            drawFunction();
+            drawPolygon();
         });
 
         coordinateSystem.setOnMouseClicked(event -> {
@@ -115,7 +105,7 @@ public class Controller implements Initializable {
                     polyBoard.getChildren().add(pointBoard(p));
                 }
             }
-            drawFunction();
+            drawPolygon();
         });
     }
 
@@ -191,6 +181,7 @@ public class Controller implements Initializable {
 
         return ptsBoard;
     }
+    
     public VBox pointBoard(Vector2F p, int pointName, Polygon2F pol){
         VBox ptsBoard = new VBox();
         HBox nameBoard = new HBox();
@@ -239,7 +230,7 @@ public class Controller implements Initializable {
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
             pol.setupEdges();
-            drawFunction();
+            drawPolygon();
         });
         xSlid.setPrefWidth(220);
         xBoard.getChildren().addAll(new Label("      X : "),xSlid);
@@ -255,7 +246,7 @@ public class Controller implements Initializable {
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
             pol.setupEdges();
-            drawFunction();
+            drawPolygon();
         });
         ySlid.setPrefWidth(220);
         yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
@@ -269,7 +260,6 @@ public class Controller implements Initializable {
 
         return ptsBoard;
     }
-
 
     public HBox heightBoard(StaticObject obj){
         Polygon2F p = obj.getPolygon();
@@ -302,7 +292,7 @@ public class Controller implements Initializable {
         height.valueProperty().addListener((obs, oldval, newVal) -> height.setValue(newVal.intValue()));
         height.valueProperty().addListener(event -> {
             p.setHeight((float) height.getValue());
-            drawFunction();
+            drawPolygon();
         });
         heightBoard.getChildren().addAll(label,height);
 
@@ -314,7 +304,7 @@ public class Controller implements Initializable {
         wallButton.setToggleGroup(choise);
         wallButton.selectedProperty().addListener(event -> {
             obj.setType(WALL);
-            drawFunction();
+            drawPolygon();
         });
 
         RadioButton floorButton = new RadioButton("Floor");
@@ -322,7 +312,7 @@ public class Controller implements Initializable {
         floorButton.setToggleGroup(choise);
         floorButton.selectedProperty().addListener(event -> {
             obj.setType(FLOOR);
-            drawFunction();
+            drawPolygon();
         });
 
         RadioButton cellingButton = new RadioButton("Celling");
@@ -330,7 +320,7 @@ public class Controller implements Initializable {
         cellingButton.setToggleGroup(choise);
         cellingButton.selectedProperty().addListener(event -> {
             obj.setType(CELLING);
-            drawFunction();
+            drawPolygon();
         });
 
         switch (obj.getType()) {
@@ -344,11 +334,6 @@ public class Controller implements Initializable {
         genericBox.getChildren().addAll(heightBoard,rightPart);
         return genericBox;
     }
-
-//    public VBox textureBoard(Polygon p){
-//        return null;
-//    }
-
 
     public VBox polygonBoard(StaticObject obj){
         Polygon2F p = obj.getPolygon();
@@ -426,25 +411,38 @@ public class Controller implements Initializable {
             }
             polyBoard.getChildren().add(pBoard);
         }
-        drawFunction();
+        drawPolygon();
     }
 
     public void actuSelection(){
 
     }
-    public void actuCheckbox(ActionEvent ae){
-        CheckBox cb = (CheckBox) ae.getSource();
-        if (cb.isSelected()) {
-            try {
-                cb.setGraphic(new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("images/icon.png")).openStream())));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+    public void actuView(ActionEvent ae){
+        ImageView imgSclt = new ImageView();
+        ImageView img = new ImageView();
+        try {
+            imgSclt = new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("images/icon.png")).openStream()));
+            img = new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("images/wall.png")).openStream()));;
+        } catch (IOException e) { throw new RuntimeException(e); }
+        img.setFitWidth(30);
+        img.setFitHeight(30);
+        imgSclt.setFitWidth(30);
+        imgSclt.setFitHeight(30);
+
+        ToggleButton cb = (ToggleButton) ae.getSource();
+        for (Toggle toggle :cb.getToggleGroup().getToggles()) {
+            ToggleButton tb = (ToggleButton) toggle;
+            tb.setGraphic(img);
         }
-        else topViewImage.setImage(new Image(String.valueOf(new File(String.valueOf(Main.class.getResource("images/wall.png"))))));
+        ToggleButton cbSlct = (ToggleButton) cb.getToggleGroup().getSelectedToggle();
+        cbSlct.setGraphic(imgSclt);
+
+        System.out.println(cbSlct + "; " + cb.getId());
+        drawPolygon();
+        
     }
 
-    public void drawFunction() {
+    public void drawPolygon() {
         coordinateSystem.getChildren().clear();
 
         ArrayList<Vector2F> points = Main.getPoints();
@@ -463,11 +461,11 @@ public class Controller implements Initializable {
         //draw the polygons
         for (StaticObject obj : Main.getStaticObjects()) {
             Polygon2F pols = obj.getPolygon();
-            coordinateSystem.getChildren().add(pols.getPolShape());
+            coordinateSystem.getChildren().add(pols.getShapeTop());
             switch (obj.getType()) {
-                case WALL -> pols.getPolShape().setStroke(Color.CYAN);
-                case FLOOR -> pols.getPolShape().setStroke(Color.LIME);
-                case CELLING -> pols.getPolShape().setStroke(Color.RED);
+                case WALL -> pols.getShapeTop().setStroke(Color.CYAN);
+                case FLOOR -> pols.getShapeTop().setStroke(Color.LIME);
+                case CELLING -> pols.getShapeTop().setStroke(Color.RED);
             }
             if (pols.isShowPoint()) {
                 int countP = 0;
@@ -484,8 +482,7 @@ public class Controller implements Initializable {
     }
 
     public ArrayList<Rectangle> drawGrid(){
-        double w = (double) Main.DIMC;
-        double h = (double) Main.DIML;
+        ToggleButton tb = (ToggleButton) POV.getSelectedToggle();
         ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
 
         Color gray1 = Color.rgb(30,30,30);
@@ -494,43 +491,39 @@ public class Controller implements Initializable {
 
         for (int i = 0; i<Main.getxSize(); i+=8)
             for (int j=1; j<=7; j++) {
-                r = new Rectangle(0, Main.toScreenY(i + j)-1, w, 2.0);
+                r = new Rectangle(0, Main.toScreenY(i + j)-1, Main.DIMC, 2.0);
                 r.setFill(gray1);
                 rectangles.add(r);
             }
 
         for (int i=0; i<Main.getxSize(); i+=8)
             for (int j=1; j<=7; j++) {
-                r = new Rectangle(Main.toScreenX(i + j)-1, 0, 2.0, h);
+                r = new Rectangle(Main.toScreenX(i + j)-1, 0, 2.0, Main.DIML);
                 r.setFill(gray1);
                 rectangles.add(r);
             }
 
         for (int i = 0; i<Main.getxSize(); i+=8) {
-            r = new Rectangle(0, Main.toScreenY(i)-1.25, w, 2.5);
+            r = new Rectangle(0, Main.toScreenY(i)-1.25, Main.DIMC, 2.5);
             r.setFill(gray2);
             rectangles.add(r);
         }
 
         for (int i=0; i<Main.getxSize(); i+=8) {
-            r = new Rectangle(Main.toScreenX(i)-1.25, 0, 2.5, h);
+            r = new Rectangle(Main.toScreenX(i)-1.25, 0, 2.5, Main.DIML);
             r.setFill(gray2);
             rectangles.add(r);
         }
 
-        r = new Rectangle(w/2-1, 0, 2, h);
+        r = new Rectangle(Main.DIMC/2-1, 0, 2, Main.DIML);
         r.setFill(Color.rgb(160,160,160));
         rectangles.add(r);
 
-        r = new Rectangle(0, h/2-1, w, 2);
+        r = new Rectangle(0, Main.DIML/2-1, Main.DIMC, 2);
         r.setFill(Color.rgb(180,180,180));
         rectangles.add(r);
 
         return rectangles;
-    }
-
-    public Circle drawPoint(double x, double y){
-        return new Circle(((x * Main.DIMC/(Main.xSize))),((y * Main.DIML/(Main.xSize))),1, Color.CYAN);
     }
 
     public void reset(ActionEvent actionEvent) {
@@ -538,7 +531,7 @@ public class Controller implements Initializable {
         Main.setPoints(new ArrayList<>());
         Main.setPolygons(new ArrayList<>());
         actuBoard();
-        drawFunction();
+        drawPolygon();
     }
 
     public Type selectType(ToggleGroup tg){
@@ -554,7 +547,7 @@ public class Controller implements Initializable {
             polyBoard.getChildren().add(polygonBoard(obj));
             actuBoard();
         }
-        drawFunction();
+        drawPolygon();
     }
 
     public void importMapButton(){
@@ -595,7 +588,7 @@ public class Controller implements Initializable {
 //                        catch (IOException e) {throw new RuntimeException(e);}
 //                    }
                     Map.importMap(new File("maps\\" + f.getName()));
-                    drawFunction();
+                    drawPolygon();
                     actuBoard();
                     stageSave.close();
                 });
