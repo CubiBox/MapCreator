@@ -71,9 +71,14 @@ public class Main extends Application {
     }
 
     public static float[] toScreenIso(double x, double y){
+        return toScreenIso(x,y,0);
+    }
+
+    public static float[] toScreenIso(double x, double y, double height){
         x *= getDIML()/xSize;
         y *= getDIML()/xSize;
-        return new float[] {(float) (getDIML()/2 + (x*0.5 - y*0.5)), (float) (0 + (y*0.25 + x*0.25))};
+        height *= getDIML()/32;
+        return new float[] {(float) (getDIML()/2 + (x*0.5 - y*0.5)), (float) ((getDIML()*0.25)-height*0.25 + (y*0.25 + x*0.25))};
     }
 
 

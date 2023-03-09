@@ -200,7 +200,7 @@ public class Controller implements Initializable {
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
             pol.getPoints().remove(p);
-            pol.setupEdges();
+            pol.setupShapes();
             actuBoard();
         });
 
@@ -224,7 +224,7 @@ public class Controller implements Initializable {
             p.setX((float) xSlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            pol.setupEdges();
+            pol.setupShapes();
             drawPolygon();
         });
         xSlid.setPrefWidth(220);
@@ -240,7 +240,7 @@ public class Controller implements Initializable {
             p.setY((float) ySlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            pol.setupEdges();
+            pol.setupShapes();
             drawPolygon();
         });
         ySlid.setPrefWidth(220);
@@ -279,15 +279,20 @@ public class Controller implements Initializable {
         });
         label.getChildren().addAll(lName,help);
 
-        Slider height = new Slider(1, 32, 1);
+        Slider height = new Slider(0, 31, obj.getPolygon().getHeight());
         height.setPrefWidth(256d);
         height.setBlockIncrement(1);
         height.setMajorTickUnit(8);
         height.setShowTickLabels(true);
-        height.valueProperty().addListener((obs, oldval, newVal) -> height.setValue(newVal.intValue()));
+        height.valueProperty().addListener(
+                (obs, oldval, newVal) -> {
+                    height.setValue(newVal.intValue());
+                    obj.getPolygon().setHeight((float) height.getValue());
+                    obj.getPolygon().setIsoShape();
+                    drawPolygon();
+                }
+        );
         height.valueProperty().addListener(event -> {
-            p.setHeight((float) height.getValue());
-            drawPolygon();
         });
         heightBoard.getChildren().addAll(label,height);
 
@@ -507,6 +512,7 @@ public class Controller implements Initializable {
         for (StaticObject obj : Main.getStaticObjects()) {
             Polygon2F pols = obj.getPolygon();
             coordinateSystem.getChildren().add(pols.getShapeIso());
+            System.out.println(pols.getHeight());
 
             switch (obj.getType()) {
                 case WALL -> pols.getShapeIso().setStroke(Color.CYAN);
@@ -519,7 +525,7 @@ public class Controller implements Initializable {
                 for (Vector2F p : pols.getPoints()) {
                     Label pointName = new Label(countP++ + "");
 
-                    float[] v = Main.toScreenIso(p.getX(),p.getY());
+                    float[] v = Main.toScreenIso(p.getX(),p.getY(),obj.getPolygon().getHeight());
                     pointName.setLayoutX(v[0] - 5);
                     pointName.setLayoutY(v[1] - 15);
                     pointName.setTextFill(Color.WHITE);
