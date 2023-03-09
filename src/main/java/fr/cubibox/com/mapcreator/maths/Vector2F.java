@@ -11,7 +11,6 @@ public class Vector2F {
     private float y;
 
     private Circle circlePoint;
-
     private Color color;
 
     public Vector2F(float x, float y) {
@@ -25,8 +24,7 @@ public class Vector2F {
         this.circlePoint = new Circle(Main.toScreenX(x), Main.toScreenY(y), 3, this.color);
     }
 
-    public static ArrayList<Vector2F> shortPoints(){
-        ArrayList<Vector2F> currentPoints = Main.points;
+    public static ArrayList<Vector2F> shortPoints(ArrayList<Vector2F> currentPoints){
         ArrayList<Vector2F> shortedPoints = new ArrayList<>();
 
         while (!currentPoints.isEmpty()){
@@ -45,7 +43,7 @@ public class Vector2F {
         return circlePoint;
     }
 
-    public void setRect(Circle circ) {
+    public void setCircle(Circle circ) {
         this.circlePoint = circ;
     }
 

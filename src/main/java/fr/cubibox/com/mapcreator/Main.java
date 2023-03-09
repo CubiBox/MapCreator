@@ -1,14 +1,11 @@
 package fr.cubibox.com.mapcreator;
 
 import fr.cubibox.com.mapcreator.iu.Player;
-import fr.cubibox.com.mapcreator.map.Chunk;
 import fr.cubibox.com.mapcreator.map.Map;
 import fr.cubibox.com.mapcreator.mapObject.LivingEntity;
-import fr.cubibox.com.mapcreator.mapObject.MapObject;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.TileEntity;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
-import fr.cubibox.com.mapcreator.maths.Polygon2F;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,8 +18,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Objects;
-
-import static fr.cubibox.com.mapcreator.map.Chunk.findChunkPols;
 
 public class Main extends Application {
     public static float DIML = 980;
@@ -64,7 +59,7 @@ public class Main extends Application {
     }
 
     public static float toScreenY(double y){
-        return (float) ((DIML*(y)/(xSize)));
+        return (float)(DIML*(y)/(xSize));
     }
 
     public static float toPlotX(double scrX){
@@ -73,6 +68,12 @@ public class Main extends Application {
 
     public static float toPlotY(double scrY){
         return (float) ((scrY/DIML)*(xSize));
+    }
+
+    public static float[] toScreenIso(double x, double y){
+        x *= getDIML()/xSize;
+        y *= getDIML()/xSize;
+        return new float[] {(float) (getDIML()/2 + (x*0.5 - y*0.5)), (float) (0 + (y*0.25 + x*0.25))};
     }
 
 

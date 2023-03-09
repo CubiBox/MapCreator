@@ -22,7 +22,6 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1020.0" prefWidth="1920.0" style="-fx-background-color: #656565;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.Controller">
    <children>
-      <Pane fx:id="coordinateSystem" layoutY="20.0" prefHeight="980.0" prefWidth="980.0" style="-fx-background-color: #000000;" />
       <MenuBar prefHeight="25.0" prefWidth="1920.0" style="-fx-background-color: #555555;">
         <menus>
           <Menu mnemonicParsing="false" text="Fichier">
@@ -49,6 +48,11 @@
             </Menu>
         </menus>
       </MenuBar>
+      <ScrollPane prefHeight="980.0" prefWidth="980.0" AnchorPane.topAnchor="25.0">
+         <content>
+            <Pane fx:id="coordinateSystem" prefHeight="980.0" prefWidth="980.0" style="-fx-background-color: #000000;" />
+         </content>
+      </ScrollPane>
       <VBox layoutX="985.0" layoutY="34.0" prefHeight="726.0" prefWidth="317.0" spacing="5.0">
          <children>
             <VBox prefHeight="137.0" prefWidth="307.0" style="-fx-background-color: #606060;">
@@ -226,6 +230,7 @@
                         </HBox>
                      </children>
                   </VBox>
+                  <ToggleButton fx:id="isoview" mnemonicParsing="false" text="Isometric view" />
                </children>
             </VBox>
          </children>

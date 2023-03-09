@@ -17,8 +17,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.*;
 import javafx.stage.Stage;
 
 import java.io.BufferedWriter;
@@ -37,27 +36,22 @@ public class Controller implements Initializable {
 
     @FXML
     private Pane coordinateSystem;
-
     @FXML
     private ToggleButton walls;
-
+    @FXML
+    private ToggleButton isoview;
     @FXML
     private ToggleGroup SelectionOption;
-
     @FXML
     private ToggleGroup view;
-
     @FXML
     private ToggleGroup POV;
-
     @FXML
     private Slider mapSizeSlide;
     @FXML
     private Slider polHeightSlide;
-
     @FXML
     private VBox polyBoard;
-
     @FXML
     private Button Reset;
 
@@ -89,9 +83,10 @@ public class Controller implements Initializable {
             Main.setxSize((int) (16*mapSizeSlide.getValue()));
             drawPolygon();
         });
+        isoview.setOnAction(this::actuView);
 
         coordinateSystem.setOnMouseClicked(event -> {
-            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
+            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY) && !isoview.isSelected()) {
                 float roundX = BigDecimal.valueOf(Main.toPlotX(event.getX()))
                         .setScale(0, BigDecimal.ROUND_HALF_DOWN)
                         .floatValue();
@@ -152,7 +147,7 @@ public class Controller implements Initializable {
             p.setX((float) xSlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            Main.setPoints(Vector2F.shortPoints());
+            Main.setPoints(Vector2F.shortPoints(Main.points));
         });
         xSlid.setPrefWidth(250);
         xBoard.getChildren().addAll(new Label("      X : "),xSlid);
@@ -167,7 +162,7 @@ public class Controller implements Initializable {
             p.setY((float) ySlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            Main.setPoints(Vector2F.shortPoints());
+            Main.setPoints(Vector2F.shortPoints(Main.points));
         });
         ySlid.setPrefWidth(250);
         yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
@@ -417,37 +412,46 @@ public class Controller implements Initializable {
     public void actuSelection(){
 
     }
+
     public void actuView(ActionEvent ae){
         ImageView imgSclt = new ImageView();
         ImageView img = new ImageView();
         try {
             imgSclt = new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("images/icon.png")).openStream()));
             img = new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("images/wall.png")).openStream()));;
-        } catch (IOException e) { throw new RuntimeException(e); }
+        }
+        catch (IOException e) { throw new RuntimeException(e); }
+
         img.setFitWidth(30);
         img.setFitHeight(30);
         imgSclt.setFitWidth(30);
         imgSclt.setFitHeight(30);
 
         ToggleButton cb = (ToggleButton) ae.getSource();
-        for (Toggle toggle :cb.getToggleGroup().getToggles()) {
-            ToggleButton tb = (ToggleButton) toggle;
-            tb.setGraphic(img);
-        }
-        ToggleButton cbSlct = (ToggleButton) cb.getToggleGroup().getSelectedToggle();
-        cbSlct.setGraphic(imgSclt);
+        if (cb.getToggleGroup() != null) {
+            for (Toggle toggle : cb.getToggleGroup().getToggles()) {
+                ToggleButton tb = (ToggleButton) toggle;
+                tb.setGraphic(img);
+            }
+            ToggleButton cbSlct = (ToggleButton) cb.getToggleGroup().getSelectedToggle();
+            cbSlct.setGraphic(imgSclt);
 
-        System.out.println(cbSlct + "; " + cb.getId());
+            System.out.println(cbSlct + "; " + cb.getId());
+        }
         drawPolygon();
-        
     }
 
     public void drawPolygon() {
+        if (isoview.isSelected()){
+            drawPolygonIso();
+            return;
+        }
+
         coordinateSystem.getChildren().clear();
 
         ArrayList<Vector2F> points = Main.getPoints();
 
-        for (Rectangle r : drawGrid())
+        for (Shape r : drawGrid())
             coordinateSystem.getChildren().add(r);
 
         //draw the player's point
@@ -481,7 +485,52 @@ public class Controller implements Initializable {
         }
     }
 
+    public void drawPolygonIso() {
+        coordinateSystem.getChildren().clear();
+
+        ArrayList<Vector2F> points = Main.getPoints();
+
+        for (Shape r : drawGridIso())
+            coordinateSystem.getChildren().add(r);
+
+        //draw the points
+        for (Vector2F p : points) {
+            Vector2F p2 = new Vector2F(p.getX(),p.getY());
+            float[] v = Main.toScreenIso(p.getX(),p.getY());
+            p2.getCircle().setCenterX(v[0]);
+            p2.getCircle().setCenterY(v[1]);
+            p2.getCircle().setFill(p.getColor());
+            coordinateSystem.getChildren().add(p2.getCircle());
+        }
+
+        //draw the polygons
+        for (StaticObject obj : Main.getStaticObjects()) {
+            Polygon2F pols = obj.getPolygon();
+            coordinateSystem.getChildren().add(pols.getShapeIso());
+
+            switch (obj.getType()) {
+                case WALL -> pols.getShapeIso().setStroke(Color.CYAN);
+                case FLOOR -> pols.getShapeIso().setStroke(Color.LIME);
+                case CELLING -> pols.getShapeIso().setStroke(Color.RED);
+            }
+
+            if (pols.isShowPoint()) {
+                int countP = 0;
+                for (Vector2F p : pols.getPoints()) {
+                    Label pointName = new Label(countP++ + "");
+
+                    float[] v = Main.toScreenIso(p.getX(),p.getY());
+                    pointName.setLayoutX(v[0] - 5);
+                    pointName.setLayoutY(v[1] - 15);
+                    pointName.setTextFill(Color.WHITE);
+                    coordinateSystem.getChildren().add(pointName);
+                }
+            }
+        }
+    }
+
     public ArrayList<Rectangle> drawGrid(){
+
         ToggleButton tb = (ToggleButton) POV.getSelectedToggle();
         ArrayList<Rectangle> rectangles = new ArrayList<Rectangle>();
 
@@ -524,6 +573,71 @@ public class Controller implements Initializable {
         rectangles.add(r);
 
         return rectangles;
+    }
+
+    public ArrayList<Shape> drawGridIso(){
+        ArrayList<Shape> lines = new ArrayList<>();
+
+        Color gray1 = Color.rgb(30,30,30);
+        Color gray2 = Color.rgb(70,70,70);
+        Line l;
+
+        for (int x = 0; x <= Main.xSize; x++) {
+            float[] v1 = Main.toScreenIso(x,0);
+            float[] v2 = Main.toScreenIso(x,Main.xSize);
+            l = new Line(v1[0],v1[1],v2[0],v2[1]);
+            l.setStroke(gray1);
+            l.setStrokeWidth(5);
+            lines.add(l);
+        }
+
+        for (int y = 0; y <= Main.xSize; y++) {
+            float[] v1 = Main.toScreenIso(0,y);
+            float[] v2 = Main.toScreenIso(Main.xSize,y);
+            l = new Line(v1[0],v1[1],v2[0],v2[1]);
+            l.setStroke(gray1);
+            l.setStrokeWidth(5);
+            //l.setSmooth(true);
+            lines.add(l);
+        }
+
+
+/*
+        for (int i = 0; i<Main.getxSize(); i+=8)
+            for (int j=1; j<=7; j++) {
+                l = new Line(0, Main.toScreenY(i + j)-1, Main.DIMC, 2.0);
+                l.setFill(gray1);
+                lines.add(l);
+            }
+
+        for (int i=0; i<Main.getxSize(); i+=8)
+            for (int j=1; j<=7; j++) {
+                l = new Rectangle(Main.toScreenX(i + j)-1, 0, 2.0, Main.DIML);
+                l.setFill(gray1);
+                lines.add(l);
+            }
+
+        for (int i = 0; i<Main.getxSize(); i+=8) {
+            l = new Rectangle(0, Main.toScreenY(i)-1.25, Main.DIMC, 2.5);
+            l.setFill(gray2);
+            lines.add(l);
+        }
+
+        for (int i=0; i<Main.getxSize(); i+=8) {
+            l = new Rectangle(Main.toScreenX(i)-1.25, 0, 2.5, Main.DIML);
+            l.setFill(gray2);
+            lines.add(l);
+        }
+
+        l = new Rectangle(Main.DIMC/2-1, 0, 2, Main.DIML);
+        l.setFill(Color.rgb(160,160,160));
+        lines.add(l);
+
+        l = new Rectangle(0, Main.DIML/2-1, Main.DIMC, 2);
+        l.setFill(Color.rgb(180,180,180));
+        lines.add(l);
+*/
+        return lines;
     }
 
     public void reset(ActionEvent actionEvent) {
