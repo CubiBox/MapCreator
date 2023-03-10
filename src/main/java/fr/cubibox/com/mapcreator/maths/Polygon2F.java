@@ -60,48 +60,6 @@ public class Polygon2F {
         this.ShapeTop.setStroke(Color.CYAN);
     }
 
-    public void setIsoShape(){
-        ArrayList<Double> polPoints = new ArrayList<>();
-
-        float[] v = null;
-        float[] v1 = null;
-        for (Vector2F p : points){
-            v = Main.toScreenIso(p.getX(),p.getY(),height);
-            v1 = Main.toScreenIso(p.getX(),p.getY(),0);
-            polPoints.add((double) v[0]);
-            polPoints.add((double) v[1]);
-
-            polPoints.add((double) v1[0]);
-            polPoints.add((double) v1[1]);
-
-            polPoints.add((double) v[0]);
-            polPoints.add((double) v[1]);
-        }
-
-        v = Main.toScreenIso(points.get(0).getX(),points.get(0).getY(),height);
-        polPoints.add((double) v[0]);
-        polPoints.add((double) v[1]);
-
-        for (Vector2F p : points){
-            v = Main.toScreenIso(p.getX(),p.getY(),0);
-            polPoints.add((double) v[0]);
-            polPoints.add((double) v[1]);
-        }
-
-        v = Main.toScreenIso(points.get(0).getX(),points.get(0).getY(),0);
-        polPoints.add((double) v[0]);
-        polPoints.add((double) v[1]);
-
-        int countP = 0;
-        double[] points = new double[polPoints.size()];
-        for (double d : polPoints)
-            points[countP++] = d;
-
-        this.ShapeIso = new javafx.scene.shape.Polygon(points);
-        this.ShapeIso.setFill(Color.TRANSPARENT);
-        this.ShapeIso.setStrokeWidth(2.0);
-        this.ShapeIso.setStroke(Color.CYAN);
-    }
 
     public void setIsoShapes(){
         ArrayList<Shape> shapes = new ArrayList<>();
@@ -157,7 +115,7 @@ public class Polygon2F {
             shapes.add(shape);
         }
 
-
+        //add global settings
         for (Shape pol : shapes) {
             pol.setStrokeWidth(2.0);
             pol.setStroke(Color.CYAN);

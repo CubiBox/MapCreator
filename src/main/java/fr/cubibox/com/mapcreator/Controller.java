@@ -34,6 +34,8 @@ import static fr.cubibox.com.mapcreator.mapObject.Type.*;
 
 public class Controller implements Initializable {
 
+    public Slider isoAngleSlider;
+    public Slider isoAngleSliderHorizontal;
     @FXML
     private Pane coordinateSystem;
     @FXML
@@ -83,6 +85,23 @@ public class Controller implements Initializable {
             Main.setxSize((int) (16*mapSizeSlide.getValue()));
             drawPolygon();
         });
+        isoAngleSlider.valueProperty().addListener((obs, oldval, newVal) ->{
+            isoAngleSlider.setValue(newVal.intValue());
+            Main.setIsoAngleVertical(isoAngleSlider.getValue());
+            for (StaticObject obj : Main.staticObjects){
+                obj.getPolygon().setIsoShapes();
+            }
+            drawPolygon();
+        });
+        isoAngleSliderHorizontal.valueProperty().addListener((obs, oldval, newVal) ->{
+            isoAngleSliderHorizontal.setValue(newVal.intValue());
+            Main.setIsoAngleHorizontal(isoAngleSliderHorizontal.getValue());
+            for (StaticObject obj : Main.staticObjects){
+                obj.getPolygon().setIsoShapes();
+            }
+            drawPolygon();
+        });
+
         isoview.setOnAction(this::actuView);
 
         coordinateSystem.setOnMouseClicked(event -> {
