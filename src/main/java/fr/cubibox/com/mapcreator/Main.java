@@ -11,6 +11,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.BufferedInputStream;
@@ -44,6 +45,7 @@ public class Main extends Application {
         primaryStage.getIcons().add(new Image(new BufferedInputStream(Objects.requireNonNull(Main.class.getResource("images/icon.png")).openStream())));
         primaryStage.setScene(new Scene(root));
         primaryStage.show();
+        primaryStage.setMaximized(true);
     }
 
     public static void main(String[] args) throws URISyntaxException, IOException {

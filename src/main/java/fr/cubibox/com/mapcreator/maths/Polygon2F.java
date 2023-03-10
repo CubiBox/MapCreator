@@ -1,16 +1,17 @@
 package fr.cubibox.com.mapcreator.maths;
 
 import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.mapObject.Type;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 
 public class Polygon2F {
     private float height;
+    private Type type;
 
     //pour l'Editor
     private ArrayList<Vector2F> points;
@@ -24,6 +25,17 @@ public class Polygon2F {
 
     public Polygon2F(ArrayList<Vector2F> points, float height) {
         this.height = height;
+        this.type = Type.WALL;
+        if (!points.isEmpty()) {
+            this.points = points;
+            setupShapes();
+        }
+        this.showPoint = false;
+    }
+
+    public Polygon2F(ArrayList<Vector2F> points, float height, Type type) {
+        this.height = height;
+        this.type = type;
         if (!points.isEmpty()) {
             this.points = points;
             setupShapes();
@@ -33,6 +45,16 @@ public class Polygon2F {
 
     public Polygon2F(Vector2F... pts) {
         this.height = 0;
+        this.type = Type.WALL;
+        this.points = new ArrayList<>(Arrays.asList(pts));
+        setupShapes();
+
+        this.showPoint = false;
+    }
+
+    public Polygon2F(Type type, Vector2F... pts) {
+        this.height = 0;
+        this.type = type;
         this.points = new ArrayList<>(Arrays.asList(pts));
         setupShapes();
 
@@ -65,11 +87,20 @@ public class Polygon2F {
         ArrayList<Shape> shapes = new ArrayList<>();
         double[] polPoints = new double[points.size()*2];
         Polygon shape = null;
+        float currentHeight = switch (type) {
+            case WALL, FLOOR -> height;
+            case CELLING -> 31;
+        };
+        float currentBase = switch (type) {
+            case WALL, FLOOR -> 0;
+            case CELLING -> height;
+        };
+
 
         //top
         int countP = 0;
         for (Vector2F p : points){
-            float[] v = Main.toScreenIso(p.getX(),p.getY(),height);
+            float[] v = Main.toScreenIso(p.getX(),p.getY(),currentHeight);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
         }
@@ -81,7 +112,7 @@ public class Polygon2F {
         //bottom
         countP = 0;
         for (Vector2F p : points){
-            float[] v = Main.toScreenIso(p.getX(),p.getY(),0);
+            float[] v = Main.toScreenIso(p.getX(),p.getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
         }
@@ -95,18 +126,18 @@ public class Polygon2F {
             polPoints = new double[8];
             countP = 0;
 
-            float[] v = Main.toScreenIso(points.get(i).getX(),points.get(i).getY(),0);
+            float[] v = Main.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
-            float[] v1 = Main.toScreenIso(points.get(i).getX(),points.get(i).getY(),height);
+            float[] v1 = Main.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentHeight);
             polPoints[countP++] = v1[0];
             polPoints[countP++] = v1[1];
 
             int i2 = i+1 < points.size() ? i+1 : 0;
-            v1 = Main.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),height);
+            v1 = Main.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentHeight);
             polPoints[countP++] = v1[0];
             polPoints[countP++] = v1[1];
-            v = Main.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),0);
+            v = Main.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
 
