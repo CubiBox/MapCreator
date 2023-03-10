@@ -288,7 +288,7 @@ public class Controller implements Initializable {
                 (obs, oldval, newVal) -> {
                     height.setValue(newVal.intValue());
                     obj.getPolygon().setHeight((float) height.getValue());
-                    obj.getPolygon().setIsoShape();
+                    obj.getPolygon().setIsoShapes();
                     drawPolygon();
                 }
         );
@@ -511,14 +511,16 @@ public class Controller implements Initializable {
         //draw the polygons
         for (StaticObject obj : Main.getStaticObjects()) {
             Polygon2F pols = obj.getPolygon();
-            coordinateSystem.getChildren().add(pols.getShapeIso());
-            System.out.println(pols.getHeight());
 
+            for (Shape shape : obj.getPolygon().getShapesIso())
+                coordinateSystem.getChildren().addAll(shape);
+
+            /*
             switch (obj.getType()) {
                 case WALL -> pols.getShapeIso().setStroke(Color.CYAN);
                 case FLOOR -> pols.getShapeIso().setStroke(Color.LIME);
                 case CELLING -> pols.getShapeIso().setStroke(Color.RED);
-            }
+            }*/
 
             if (pols.isShowPoint()) {
                 int countP = 0;

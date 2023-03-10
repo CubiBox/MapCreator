@@ -2,10 +2,12 @@ package fr.cubibox.com.mapcreator.maths;
 
 import fr.cubibox.com.mapcreator.Main;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 
 public class Polygon2F {
     private float height;
@@ -13,10 +15,11 @@ public class Polygon2F {
     //pour l'Editor
     private ArrayList<Vector2F> points;
     private boolean showPoint;
-    private javafx.scene.shape.Shape ShapeTop;
-    private javafx.scene.shape.Shape ShapeIso;
-    private javafx.scene.shape.Shape ShapeLeft;
-    private javafx.scene.shape.Shape ShapeRight;
+    private Shape ShapeTop;
+    private Shape ShapeIso;
+    private ArrayList<Shape> ShapesIso;
+    private Shape ShapeLeft;
+    private Shape ShapeRight;
 
 
     public Polygon2F(ArrayList<Vector2F> points, float height) {
@@ -38,8 +41,8 @@ public class Polygon2F {
 
 
     public void setupShapes(){
-        setIsoShape();
         setTopShape();
+        setIsoShapes();
         //setLeftShape();
         //setRightShape();
     }
@@ -61,19 +64,20 @@ public class Polygon2F {
         ArrayList<Double> polPoints = new ArrayList<>();
 
         float[] v = null;
+        float[] v1 = null;
         for (Vector2F p : points){
             v = Main.toScreenIso(p.getX(),p.getY(),height);
+            v1 = Main.toScreenIso(p.getX(),p.getY(),0);
             polPoints.add((double) v[0]);
             polPoints.add((double) v[1]);
 
-            v = Main.toScreenIso(p.getX(),p.getY(),0);
-            polPoints.add((double) v[0]);
-            polPoints.add((double) v[1]);
+            polPoints.add((double) v1[0]);
+            polPoints.add((double) v1[1]);
 
-            v = Main.toScreenIso(p.getX(),p.getY(),height);
             polPoints.add((double) v[0]);
             polPoints.add((double) v[1]);
         }
+
         v = Main.toScreenIso(points.get(0).getX(),points.get(0).getY(),height);
         polPoints.add((double) v[0]);
         polPoints.add((double) v[1]);
@@ -83,6 +87,7 @@ public class Polygon2F {
             polPoints.add((double) v[0]);
             polPoints.add((double) v[1]);
         }
+
         v = Main.toScreenIso(points.get(0).getX(),points.get(0).getY(),0);
         polPoints.add((double) v[0]);
         polPoints.add((double) v[1]);
@@ -96,6 +101,68 @@ public class Polygon2F {
         this.ShapeIso.setFill(Color.TRANSPARENT);
         this.ShapeIso.setStrokeWidth(2.0);
         this.ShapeIso.setStroke(Color.CYAN);
+    }
+
+    public void setIsoShapes(){
+        ArrayList<Shape> shapes = new ArrayList<>();
+        double[] polPoints = new double[points.size()*2];
+        Polygon shape = null;
+
+        //top
+        int countP = 0;
+        for (Vector2F p : points){
+            float[] v = Main.toScreenIso(p.getX(),p.getY(),height);
+            polPoints[countP++] = v[0];
+            polPoints[countP++] = v[1];
+        }
+        shape = new Polygon(polPoints);
+        shape.setFill(new Color(1, 0, 0, 0.3));
+        shapes.add(shape);
+
+
+        //bottom
+        countP = 0;
+        for (Vector2F p : points){
+            float[] v = Main.toScreenIso(p.getX(),p.getY(),0);
+            polPoints[countP++] = v[0];
+            polPoints[countP++] = v[1];
+        }
+        shape = new Polygon(polPoints);
+        shape.setFill(new Color(0, 1, 0, 0.3));
+        shapes.add(shape);
+
+
+        //faces
+        for (int i = 0; i < points.size(); i ++){
+            polPoints = new double[8];
+            countP = 0;
+
+            float[] v = Main.toScreenIso(points.get(i).getX(),points.get(i).getY(),0);
+            polPoints[countP++] = v[0];
+            polPoints[countP++] = v[1];
+            float[] v1 = Main.toScreenIso(points.get(i).getX(),points.get(i).getY(),height);
+            polPoints[countP++] = v1[0];
+            polPoints[countP++] = v1[1];
+
+            int i2 = i+1 < points.size() ? i+1 : 0;
+            v1 = Main.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),height);
+            polPoints[countP++] = v1[0];
+            polPoints[countP++] = v1[1];
+            v = Main.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),0);
+            polPoints[countP++] = v[0];
+            polPoints[countP++] = v[1];
+
+            shape = new Polygon(polPoints);
+            shape.setFill(new Color(0, 1, 1, 0.3));
+            shapes.add(shape);
+        }
+
+
+        for (Shape pol : shapes) {
+            pol.setStrokeWidth(2.0);
+            pol.setStroke(Color.CYAN);
+        }
+        this.ShapesIso = shapes;
     }
 
     public String toName(){
@@ -143,5 +210,9 @@ public class Polygon2F {
 
     public Shape getShapeIso() {
         return ShapeIso;
+    }
+
+    public ArrayList<Shape> getShapesIso() {
+        return ShapesIso;
     }
 }
