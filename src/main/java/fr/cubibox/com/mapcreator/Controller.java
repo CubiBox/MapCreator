@@ -4,6 +4,7 @@ import fr.cubibox.com.mapcreator.iu.Player;
 import fr.cubibox.com.mapcreator.map.Map;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.Type;
+import fr.cubibox.com.mapcreator.maths.MathFunction;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Polygon2F;
 import javafx.event.ActionEvent;
@@ -142,32 +143,47 @@ public class Controller implements Initializable {
         isoAngleSliderHorizontal.valueProperty().addListener((obs, oldval, newVal) ->{
             isoAngleSliderHorizontal.setValue(newVal.intValue());
             Main.setIsoAngleHorizontal(isoAngleSliderHorizontal.getValue());
-            for (StaticObject obj : Main.staticObjects){
-                obj.getPolygon().setIsoShapes();
-            }
+            actuAllPolygons();
             drawPolygon();
         });
         isoview.setOnAction(this::actuView);
 
+        //set polygon by drag and drop
         coordinateSystem.setOnDragDetected(event ->{
             dragPointOrigin = new Vector2F(
-                BigDecimal.valueOf(Main.toPlotX(event.getX()))
-                    .setScale(0, BigDecimal.ROUND_HALF_DOWN)
-                    .floatValue(),
-                BigDecimal.valueOf(Main.toPlotY(event.getY()))
-                    .setScale(0, BigDecimal.ROUND_HALF_DOWN)
-                    .floatValue()
+                    MathFunction.round(Main.toPlotX(event.getX())),
+                    MathFunction.round(Main.toPlotY(event.getY()))
             );
             dragState = true;
         });
+
+        //zoom
+        coordinateSystem.setOnScroll(event ->{
+            double value = event.getDeltaY();
+            if (event.isControlDown() && Main.DIML + value < 2000 && Main.DIML + value > scrollPane.getWidth()+20) {
+                Main.DIML += value;
+                Main.DIMC += value;
+                coordinateSystem.setPrefSize(Main.DIMC,Main.DIML);
+                actuAllPolygons();
+                drawPolygon();
+            }
+        });
+
+        //reset pane dimension if windowed
+        scrollPane.widthProperty().addListener(e -> {
+            scrollPane.setPrefWidth(screenWidth/2);
+            coordinateSystem.setPrefSize(980,980);
+            Main.DIML = 980;
+            Main.DIMC = 980;
+            actuAllPolygons();
+            drawPolygon();
+        });
+
+        //set point by click
         coordinateSystem.setOnMouseClicked(event -> {
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY) && !isoview.isSelected()) {
-                float roundX = BigDecimal.valueOf(Main.toPlotX(event.getX()))
-                        .setScale(0, BigDecimal.ROUND_HALF_DOWN)
-                        .floatValue();
-                float roundY = BigDecimal.valueOf(Main.toPlotY(event.getY()))
-                        .setScale(0, BigDecimal.ROUND_HALF_DOWN)
-                        .floatValue();
+                float roundX = MathFunction.round(Main.toPlotX(event.getX()));
+                float roundY = MathFunction.round(Main.toPlotY(event.getY()));
 
                 if ((roundX >= 0 && roundX <= Main.xSize && roundY >= 0 && roundY <= Main.xSize)) {
                     Vector2F currentPos = new Vector2F(roundX, roundY);
@@ -175,7 +191,6 @@ public class Controller implements Initializable {
                         setPolygon(
                                 currentPos,
                                 new Vector2F(dragPointOrigin.getX(), roundY),
-
                                 dragPointOrigin,
                                 new Vector2F(roundX, dragPointOrigin.getY())
                         );
@@ -191,7 +206,12 @@ public class Controller implements Initializable {
         });
     }
 
-
+    public void actuAllPolygons(){
+        for (StaticObject obj : Main.staticObjects){
+            obj.getPolygon().setIsoShapes();
+            obj.getPolygon().setupShapes();
+        }
+    }
 
     public VBox pointBoard(Vector2F p){
         VBox ptsBoard = new VBox();
