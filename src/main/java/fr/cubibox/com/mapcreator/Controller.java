@@ -80,7 +80,7 @@ public class Controller implements Initializable {
         double screenWidth = Screen.getPrimary().getBounds().getWidth();
         double screenHeight = Screen.getPrimary().getBounds().getHeight();
 
-        isometricRender = new IsometricRender(xSize);
+        isometricRender = new IsometricRender(xSize/2);
 
         scrollPane.setPrefWidth(screenWidth/2);
         coordinateSystem.setPrefSize(980,980);

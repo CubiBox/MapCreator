@@ -31,16 +31,18 @@ public class IsometricRender {
         return toScreenIso(x,y,0);
     }
     public float[] toScreenIso(double x, double y, double height){
-        float heightOffset = (float) ((getDIML()*0.25)-(height*getDIML()/32)*0.25);
-        y *= getDIML()/xSize;
-        x *= getDIML()/xSize;
+        float heightOffset = (float) (getDIML()*0.6-(height*getDIML()/32)*0.5);
 
-        float relativeX = (float) (origin.getX()-x);
-        float relativeY = (float) (origin.getY()-y);
-        float squareOriginDistance = Math.abs(relativeX*relativeX + relativeY*relativeY);
-
+        if (!(x==origin.getX() && y==origin.getY())) {
+            double relativeX = origin.getX() - x;
+            double relativeY = origin.getY() - y;
+            double vectorAngle = xAngle + Math.atan(relativeY / relativeX);
+            double originDistance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
+            x = originDistance * Math.cos(vectorAngle) * getDIML() / xSize * (relativeX < 0 ? -1 : 1);
+            y = originDistance * Math.sin(vectorAngle) * getDIML() / xSize * (relativeX < 0 ? -1 : 1);
+        }
         return new float[] {
-                (float) (getDIML()/2 + (x*0.25 - y*0.25)),
+                (float) (getDIML()/2 + (x*0.5 - y*0.5)),
                 (float) (heightOffset + (y*this.yAngle + x*this.yAngle))
         };
     }
@@ -49,7 +51,7 @@ public class IsometricRender {
         return xAngle;
     }
     public void setxAngle(float xAngle) {
-        this.xAngle = xAngle*0.01f;
+        this.xAngle = xAngle*0.00045f;
     }
 
     public float getyAngle() {
