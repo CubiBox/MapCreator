@@ -1,5 +1,6 @@
 package fr.cubibox.com.mapcreator;
 
+import fr.cubibox.com.mapcreator.graphics.IsometricRender;
 import fr.cubibox.com.mapcreator.iu.Player;
 import fr.cubibox.com.mapcreator.map.Map;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
@@ -33,6 +34,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static fr.cubibox.com.mapcreator.Main.*;
 import static fr.cubibox.com.mapcreator.mapObject.Type.*;
 
 public class Controller implements Initializable {
@@ -77,6 +79,8 @@ public class Controller implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         double screenWidth = Screen.getPrimary().getBounds().getWidth();
         double screenHeight = Screen.getPrimary().getBounds().getHeight();
+
+        isometricRender = new IsometricRender(xSize);
 
         scrollPane.setPrefWidth(screenWidth/2);
         coordinateSystem.setPrefSize(980,980);
@@ -134,7 +138,7 @@ public class Controller implements Initializable {
         });
         isoAngleSlider.valueProperty().addListener((obs, oldval, newVal) ->{
             isoAngleSlider.setValue(newVal.intValue());
-            Main.setIsoAngleVertical(isoAngleSlider.getValue());
+            isometricRender.setyAngle((float) isoAngleSlider.getValue());
             for (StaticObject obj : Main.staticObjects){
                 obj.getPolygon().setIsoShapes();
             }
@@ -142,7 +146,7 @@ public class Controller implements Initializable {
         });
         isoAngleSliderHorizontal.valueProperty().addListener((obs, oldval, newVal) ->{
             isoAngleSliderHorizontal.setValue(newVal.intValue());
-            Main.setIsoAngleHorizontal(isoAngleSliderHorizontal.getValue());
+            isometricRender.setxAngle((float) isoAngleSliderHorizontal.getValue());
             actuAllPolygons();
             drawPolygon();
         });
@@ -185,7 +189,7 @@ public class Controller implements Initializable {
                 float roundX = MathFunction.round(Main.toPlotX(event.getX()));
                 float roundY = MathFunction.round(Main.toPlotY(event.getY()));
 
-                if ((roundX >= 0 && roundX <= Main.xSize && roundY >= 0 && roundY <= Main.xSize)) {
+                if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize)) {
                     Vector2F currentPos = new Vector2F(roundX, roundY);
                     if (dragState && (dragPointOrigin.getX()!=currentPos.getX() && dragPointOrigin.getY()!=currentPos.getY())){
                         setPolygon(
@@ -204,6 +208,7 @@ public class Controller implements Initializable {
             }
             drawPolygon();
         });
+        setPolygon( new Vector2F(xSize/2, xSize/2) );
     }
 
     public void actuAllPolygons(){
@@ -595,7 +600,7 @@ public class Controller implements Initializable {
 
         //draw the points
         for (Vector2F p : points) {
-            float[] v = Main.toScreenIso(p.getX(),p.getY());
+            float[] v = isometricRender.toScreenIso(p.getX(),p.getY());
             coordinateSystem.getChildren().add(new Circle(v[0],v[1], 3, p.getColor()));
         }
 
@@ -619,7 +624,7 @@ public class Controller implements Initializable {
                     int countP = 0;
                     for (Vector2F p : pols.getPoints()) {
                         Label pointName = new Label(countP++ + "");
-                        float[] v = Main.toScreenIso(p.getX(), p.getY(), obj.getPolygon().getHeight());
+                        float[] v = isometricRender.toScreenIso(p.getX(), p.getY(), obj.getPolygon().getHeight());
                         pointName.setLayoutX(v[0] - 5);
                         pointName.setLayoutY(v[1] - 15);
                         pointName.setTextFill(Color.WHITE);
@@ -641,19 +646,19 @@ public class Controller implements Initializable {
         Line line1;
         Line line2;
 
-        for (int i = 0; i <= Main.xSize; i++) {
+        for (int i = 0; i <= xSize; i++) {
             if (isIso) {
-                float[] var1 = Main.toScreenIso(i, 0);
-                float[] var2 = Main.toScreenIso(i, Main.xSize);
-                float[] var3 = Main.toScreenIso(0, i);
-                float[] var4 = Main.toScreenIso(Main.xSize, i);
+                float[] var1 = isometricRender.toScreenIso(i, 0);
+                float[] var2 = isometricRender.toScreenIso(i, xSize);
+                float[] var3 = isometricRender.toScreenIso(0, i);
+                float[] var4 = isometricRender.toScreenIso(xSize, i);
 
                 line1 = new Line(var1[0], var1[1], var2[0], var2[1]);
                 line2 = new Line(var3[0], var3[1], var4[0], var4[1]);
             }
             else {
-                line1 = new Line(Main.toScreenX(i), Main.toScreenY(0), Main.toScreenX(i), Main.toScreenY(Main.xSize));
-                line2 = new Line(Main.toScreenX(0), Main.toScreenY(i), Main.toScreenX(Main.xSize), Main.toScreenY(i));
+                line1 = new Line(Main.toScreenX(i), Main.toScreenY(0), Main.toScreenX(i), Main.toScreenY(xSize));
+                line2 = new Line(Main.toScreenX(0), Main.toScreenY(i), Main.toScreenX(xSize), Main.toScreenY(i));
             }
 
             line1.setStroke(gray1);

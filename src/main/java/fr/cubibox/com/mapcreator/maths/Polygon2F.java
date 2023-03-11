@@ -100,7 +100,7 @@ public class Polygon2F {
         //top
         int countP = 0;
         for (Vector2F p : points){
-            float[] v = Main.toScreenIso(p.getX(),p.getY(),currentHeight);
+            float[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentHeight);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
         }
@@ -112,7 +112,7 @@ public class Polygon2F {
         //bottom
         countP = 0;
         for (Vector2F p : points){
-            float[] v = Main.toScreenIso(p.getX(),p.getY(),currentBase);
+            float[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
         }
@@ -126,18 +126,18 @@ public class Polygon2F {
             polPoints = new double[8];
             countP = 0;
 
-            float[] v = Main.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentBase);
+            float[] v = Main.isometricRender.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
-            float[] v1 = Main.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentHeight);
+            float[] v1 = Main.isometricRender.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentHeight);
             polPoints[countP++] = v1[0];
             polPoints[countP++] = v1[1];
 
             int i2 = i+1 < points.size() ? i+1 : 0;
-            v1 = Main.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentHeight);
+            v1 = Main.isometricRender.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentHeight);
             polPoints[countP++] = v1[0];
             polPoints[countP++] = v1[1];
-            v = Main.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentBase);
+            v = Main.isometricRender.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
 

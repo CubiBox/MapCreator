@@ -1,5 +1,6 @@
 package fr.cubibox.com.mapcreator;
 
+import fr.cubibox.com.mapcreator.graphics.IsometricRender;
 import fr.cubibox.com.mapcreator.iu.Player;
 import fr.cubibox.com.mapcreator.map.Map;
 import fr.cubibox.com.mapcreator.mapObject.LivingEntity;
@@ -25,9 +26,6 @@ public class Main extends Application {
     public static float DIMC = 980;
     public static float xSize = 16f;
 
-    public static float isoAngleVertical = 0.25f;
-    public static float isoAngleHorizontal = 0f;
-
     public static ArrayList<Vector2F> points = new ArrayList<>();
 
     public static ArrayList<StaticObject> staticObjects = new ArrayList<>();
@@ -36,6 +34,7 @@ public class Main extends Application {
 
     public static Player player1;
     public static Map map;
+    public static IsometricRender isometricRender;
 
 
     @Override
@@ -62,7 +61,6 @@ public class Main extends Application {
     public static float toScreenX(double x){
         return (float)(DIMC*(x)/(xSize));
     }
-
     public static float toScreenY(double y){
         return (float)(DIML*(y)/(xSize));
     }
@@ -70,38 +68,13 @@ public class Main extends Application {
     public static float toPlotX(double scrX){
         return (float) ((scrX/DIMC)*(xSize));
     }
-
     public static float toPlotY(double scrY){
         return (float) ((scrY/DIML)*(xSize));
     }
 
-    public static float[] toScreenIso(double x, double y){
-        return toScreenIso(x,y,0);
-    }
-
-    public static float[] toScreenIso(double x, double y, double height){
-        x *= getDIML()/xSize;
-        y *= getDIML()/xSize;
-        float heightOffset = (float) ((getDIML()*0.25)-(height*getDIML()/32)*0.25);
-        return new float[] {
-                (float) (getDIML()/2 + (x*(0.5-isoAngleHorizontal) - y*(0.5+ isoAngleHorizontal))),
-                (float) (heightOffset + (y* isoAngleVertical + x* isoAngleVertical))
-        };
-    }
-
-    public static void setIsoAngleVertical(double val){
-        isoAngleVertical = (float) (0.25 + val*0.01);
-    }
-
-    public static void setIsoAngleHorizontal(double val){
-        isoAngleHorizontal = (float) (val*0.01);
-    }
-
-
     public static ArrayList<StaticObject> getStaticObjects() {
         return staticObjects;
     }
-
     public static void setPolygons(ArrayList<StaticObject> staticObjects) {
         Main.staticObjects = staticObjects;
     }
