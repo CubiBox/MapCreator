@@ -27,7 +27,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +71,7 @@ public class Controller implements Initializable {
 
     private ArrayList<Type> drawablePol;
     private boolean dragState;
-    private Vector2F dragPointOrigin;
+    private final float[] dragPointOrigin = new float[2];
 
 
     @Override
@@ -120,7 +119,7 @@ public class Controller implements Initializable {
         });
 
         polHeightSlide.setBlockIncrement(1);
-        polHeightSlide.setMajorTickUnit(8);
+        polHeightSlide.setMajorTickUnit(1);
         polHeightSlide.setShowTickLabels(true);
         polHeightSlide.valueProperty().addListener(
                 (obs, oldval, newVal) -> polHeightSlide.setValue(newVal.intValue())
@@ -138,7 +137,7 @@ public class Controller implements Initializable {
         });
         isoAngleSlider.valueProperty().addListener((obs, oldval, newVal) ->{
             isoAngleSlider.setValue(newVal.intValue());
-            isometricRender.setyAngle((float) isoAngleSlider.getValue());
+            isometricRender.setyAngleBySlider((float) isoAngleSlider.getValue());
             for (StaticObject obj : Main.staticObjects){
                 obj.getPolygon().setIsoShapes();
             }
@@ -146,20 +145,11 @@ public class Controller implements Initializable {
         });
         isoAngleSliderHorizontal.valueProperty().addListener((obs, oldval, newVal) ->{
             isoAngleSliderHorizontal.setValue(newVal.intValue());
-            isometricRender.setxAngle((float) isoAngleSliderHorizontal.getValue());
+            isometricRender.setxAngleBySlider((float) isoAngleSliderHorizontal.getValue());
             actuAllPolygons();
             drawPolygon();
         });
         isoview.setOnAction(this::actuView);
-
-        //set polygon by drag and drop
-        coordinateSystem.setOnDragDetected(event ->{
-            dragPointOrigin = new Vector2F(
-                    MathFunction.round(Main.toPlotX(event.getX())),
-                    MathFunction.round(Main.toPlotY(event.getY()))
-            );
-            dragState = true;
-        });
 
         //zoom
         coordinateSystem.setOnScroll(event ->{
@@ -183,31 +173,79 @@ public class Controller implements Initializable {
             drawPolygon();
         });
 
-        //set point by click
-        coordinateSystem.setOnMouseClicked(event -> {
-            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY) && !isoview.isSelected()) {
+        //record drag status
+        coordinateSystem.setOnMouseDragged(event ->{
+            if (isoview.isSelected()) {
+                if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75)){
+                    dragPointOrigin[0] = (float) event.getX();
+                    dragPointOrigin[1] = (float) event.getY();
+                }
+
+                isometricRender.setxAngle((float) (isometricRender.getxAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
+                float temp_yAngle = (float) (isometricRender.getyAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
+                if (temp_yAngle >= 0 && temp_yAngle <= 0.35) {
+                    isometricRender.setyAngle(temp_yAngle);
+                }
+                actuAllPolygons();
+                drawPolygon();
+
+                dragPointOrigin[0] = (float) event.getX();
+                dragPointOrigin[1] = (float) event.getY();
+            }
+            else {
                 float roundX = MathFunction.round(Main.toPlotX(event.getX()));
                 float roundY = MathFunction.round(Main.toPlotY(event.getY()));
 
+                if (!dragState) {
+                    dragPointOrigin[0] = roundX;
+                    dragPointOrigin[1] = roundY;
+                }
+
                 if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize)) {
                     Vector2F currentPos = new Vector2F(roundX, roundY);
-                    if (dragState && (dragPointOrigin.getX()!=currentPos.getX() && dragPointOrigin.getY()!=currentPos.getY())){
+                    if (dragState && (dragPointOrigin[0] != currentPos.getX() && dragPointOrigin[1] != currentPos.getY())) {
+                        actuAllPolygons();
+                        drawPolygon(
+                                Polygon2F.topShape(
+                                    currentPos,
+                                    new Vector2F(dragPointOrigin[0], roundY),
+                                    new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
+                                    new Vector2F(roundX, dragPointOrigin[1])
+                                )
+                        );
+                    }
+                }
+            }
+            dragState = true;
+        });
+
+        //set point by click
+        coordinateSystem.setOnMouseClicked(event -> {
+            float roundX = MathFunction.round(Main.toPlotX(event.getX()));
+            float roundY = MathFunction.round(Main.toPlotY(event.getY()));
+            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
+                if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize) && !isoview.isSelected()) {
+                    Vector2F currentPos = new Vector2F(roundX, roundY);
+                    if (dragState && (dragPointOrigin[0] !=currentPos.getX() && dragPointOrigin[1]!=currentPos.getY())){
                         setPolygon(
                                 currentPos,
-                                new Vector2F(dragPointOrigin.getX(), roundY),
-                                dragPointOrigin,
-                                new Vector2F(roundX, dragPointOrigin.getY())
+                                new Vector2F(dragPointOrigin[0], roundY),
+                                new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
+                                new Vector2F(roundX, dragPointOrigin[1])
                         );
                     }
                     else {
                         Main.getPoints().add(currentPos);
                         polyBoard.getChildren().add(pointBoard(currentPos));
                     }
-                    dragState = false;
                 }
+                dragState = false;
+                System.out.println("reset");
+                drawPolygon();
             }
-            drawPolygon();
         });
+
+
         setPolygon( new Vector2F(xSize/2, xSize/2) );
     }
 
@@ -548,10 +586,15 @@ public class Controller implements Initializable {
         drawPolygon();
     }
 
-    public void drawPolygon() {
+    public void drawPolygon(Shape ... tempPol) {
         if (isoview.isSelected()){
             drawPolygonIso();
             return;
+        }
+        else if (tempPol != null){
+            for (Shape pol : tempPol){
+                coordinateSystem.getChildren().add(pol);
+            }
         }
 
         coordinateSystem.getChildren().clear();
@@ -699,19 +742,18 @@ public class Controller implements Initializable {
     }
 
     public void setPolygon(ActionEvent actionEvent) {
-        if (!Main.getPoints().isEmpty()) {
-            StaticObject obj = new StaticObject(new Polygon2F(Main.getPoints(), (float) polHeightSlide.getValue(),selectType(SelectionOption)),selectType(SelectionOption));
-            Main.getStaticObjects().add(obj);
+        if (Main.getPoints().size() >= 2) {
+            setPolygon(Main.getPoints());
             Main.setPoints(new ArrayList<>());
-            polyBoard.getChildren().add(polygonBoard(obj));
-            actuBoard();
         }
-        drawPolygon();
+    }
+    public void setPolygon(Vector2F ... points) {
+        setPolygon(new ArrayList<>(Arrays.asList(points)));
     }
 
-    public void setPolygon(Vector2F ... points) {
+    public void setPolygon(ArrayList<Vector2F> points) {
         StaticObject obj = new StaticObject(
-                new Polygon2F(new ArrayList<>(Arrays.asList(points)), (float) polHeightSlide.getValue(),selectType(SelectionOption))
+                new Polygon2F(points, (float)polHeightSlide.getValue(),selectType(SelectionOption))
                 ,selectType(SelectionOption)
         );
 

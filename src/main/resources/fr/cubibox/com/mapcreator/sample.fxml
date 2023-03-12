@@ -180,7 +180,7 @@
                                     <Button mnemonicParsing="false" text="Ouvrir" />
                                  </children>
                               </HBox>
-                              <Slider fx:id="polHeightSlide" blockIncrement="0.0" majorTickUnit="1.0" max="32.0" minorTickCount="0" snapToTicks="true" value="16.0" />
+                              <Slider fx:id="polHeightSlide" blockIncrement="0.0" majorTickUnit="1.0" max="31.0" minorTickCount="0" snapToTicks="true" value="16.0" />
                            </children>
                         </VBox>
                         <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">

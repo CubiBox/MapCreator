@@ -50,15 +50,23 @@ public class IsometricRender {
     public float getxAngle() {
         return xAngle;
     }
-    public void setxAngle(float xAngle) {
+    public void setxAngleBySlider(float xAngle) {
         this.xAngle = xAngle*0.00045f;
     }
+    public void setxAngle(float xAngle) {
+        this.xAngle = xAngle;
+    }
+
+
 
     public float getyAngle() {
         return yAngle;
     }
-    public void setyAngle(float yAngle) {
+    public void setyAngleBySlider(float yAngle) {
         this.yAngle = 0.25f + yAngle*0.01f;
+    }
+    public void setyAngle(float yAngle) {
+        this.yAngle = yAngle;
     }
 
     public Vector2F getOrigin() {

@@ -16,11 +16,11 @@ public class Polygon2F {
     //pour l'Editor
     private ArrayList<Vector2F> points;
     private boolean showPoint;
-    private Shape ShapeTop;
-    private Shape ShapeIso;
-    private ArrayList<Shape> ShapesIso;
-    private Shape ShapeLeft;
-    private Shape ShapeRight;
+    private Shape shapeTop;
+    private Shape shapeIso;
+    private ArrayList<Shape> shapesIso;
+    private Shape shapeLeft;
+    private Shape shapeRight;
 
 
     public Polygon2F(ArrayList<Vector2F> points, float height) {
@@ -61,6 +61,23 @@ public class Polygon2F {
         this.showPoint = false;
     }
 
+    public static Shape topShape(Vector2F ... pts) {
+        return topShape(new ArrayList<>(Arrays.asList(pts)));
+    }
+    public static Shape topShape(ArrayList<Vector2F> points) {
+        double[] polPoints = new double[points.size()*2];
+        int countP = 0;
+        for (Vector2F p : points){
+            polPoints[countP++] = Main.toScreenX(p.getX());
+            polPoints[countP++] = Main.toScreenY(p.getY());
+        }
+        Shape shape = new javafx.scene.shape.Polygon(polPoints);
+        shape.setFill(Color.TRANSPARENT);
+        shape.setStrokeWidth(2.0);
+        shape.setStroke(Color.CYAN);
+        return shape;
+    }
+
 
     public void setupShapes(){
         setTopShape();
@@ -70,16 +87,7 @@ public class Polygon2F {
     }
 
     private void setTopShape() {
-        double[] polPoints = new double[points.size()*2];
-        int countP = 0;
-        for (Vector2F p : points){
-            polPoints[countP++] = Main.toScreenX(p.getX());
-            polPoints[countP++] = Main.toScreenY(p.getY());
-        }
-        this.ShapeTop = new javafx.scene.shape.Polygon(polPoints);
-        this.ShapeTop.setFill(Color.TRANSPARENT);
-        this.ShapeTop.setStrokeWidth(2.0);
-        this.ShapeTop.setStroke(Color.CYAN);
+        this.shapeTop = topShape(points);
     }
 
 
@@ -151,7 +159,7 @@ public class Polygon2F {
             pol.setStrokeWidth(2.0);
             pol.setStroke(Color.CYAN);
         }
-        this.ShapesIso = shapes;
+        this.shapesIso = shapes;
     }
 
     public String toName(){
@@ -170,7 +178,7 @@ public class Polygon2F {
 
 
     public void setShapeTop(javafx.scene.shape.Shape shapeTop) {
-        this.ShapeTop = shapeTop;
+        this.shapeTop = shapeTop;
     }
 
     public ArrayList<Vector2F> getPoints() {
@@ -182,11 +190,11 @@ public class Polygon2F {
     }
 
     public javafx.scene.shape.Shape getShapeTop() {
-        return ShapeTop;
+        return shapeTop;
     }
 
     public void setPolShape(javafx.scene.shape.Polygon polShape) {
-        this.ShapeTop = polShape;
+        this.shapeTop = polShape;
     }
 
     public float getHeight() {
@@ -198,10 +206,10 @@ public class Polygon2F {
     }
 
     public Shape getShapeIso() {
-        return ShapeIso;
+        return shapeIso;
     }
 
     public ArrayList<Shape> getShapesIso() {
-        return ShapesIso;
+        return shapesIso;
     }
 }

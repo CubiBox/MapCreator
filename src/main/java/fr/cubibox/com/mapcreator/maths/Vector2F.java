@@ -17,10 +17,11 @@ public class Vector2F {
         this.x = x;
         this.y = y;
 
-        int R = (int)(Math.random()*256);
-        int G = (int)(Math.random()*256);
-        int B= (int)(Math.random()*256);
-        this.color = Color.rgb(R, G, B);
+        this.color = Color.rgb(
+                (int) (Math.random()*256),
+                (int)(Math.random()*256),
+                (int)(Math.random()*256)
+        );
         this.circlePoint = new Circle(Main.toScreenX(x), Main.toScreenY(y), 3, this.color);
     }
 
