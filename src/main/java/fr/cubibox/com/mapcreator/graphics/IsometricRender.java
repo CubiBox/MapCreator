@@ -38,10 +38,10 @@ public class IsometricRender {
 
         double relativeX = origin.getX() - x;
         double relativeY = origin.getY() - y;
-        double vectorAngle = xAngle + ((relativeX==0 && relativeY==0) ? 0 : Math.atan(relativeY / relativeX));
+        double newAngle = xAngle + ((relativeX==0 && relativeY==0) ? 0 : Math.atan(relativeY / relativeX));
         double originDistance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
-        x = originDistance * Math.cos(vectorAngle) * getDIML() / xSize * (relativeX < 0 ? -1 : 1) /2;
-        y = originDistance * Math.sin(vectorAngle) * getDIML() / xSize * (relativeX < 0 ? -1 : 1) /2;
+        x = originDistance * Math.cos(newAngle) * getDIML()/xSize * (relativeX < 0 ? -1 : 1) /2;
+        y = originDistance * Math.sin(newAngle) * getDIML()/xSize * (relativeX < 0 ? -1 : 1) /2;
 
         return new float[] {
                 (float) (getDIML()/2 + (x - y)),
