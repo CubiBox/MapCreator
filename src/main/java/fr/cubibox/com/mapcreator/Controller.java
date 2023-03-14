@@ -176,7 +176,7 @@ public class Controller implements Initializable {
 
                 isometricRender.setxAngle((float) (isometricRender.getxAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
                 float temp_yAngle = (float) (isometricRender.getyAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
-                if (temp_yAngle >= 0 && temp_yAngle <= 0.5) {
+                if (temp_yAngle >= 0 && temp_yAngle <= 1) {
                     isometricRender.setyAngle(temp_yAngle);
                 }
                 actuAllPolygons();
