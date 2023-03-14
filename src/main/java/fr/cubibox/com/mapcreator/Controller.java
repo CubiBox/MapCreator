@@ -90,47 +90,40 @@ public class Controller implements Initializable {
         drawablePol.add(FLOOR);
         drawablePol.add(CELLING);
 
-        walls.setOnAction(this::actuView);
         walls.selectedProperty().addListener((obs, oldval, newVal) -> {
             if (newVal && !drawablePol.contains(WALL)){
                 drawablePol.add(WALL);
-            }
-            else if (!newVal){
+            }else if (!newVal){
                 drawablePol.remove(WALL);
             }
         });
-        top.setOnAction(this::actuView);
         top.selectedProperty().addListener((obs, oldval, newVal) -> {
             if (newVal && !drawablePol.contains(CELLING)){
                 drawablePol.add(CELLING);
-            }
-            else if (!newVal){
+            }else if (!newVal){
                 drawablePol.remove(CELLING);
             }
         });
-        bottom.setOnAction(this::actuView);
         bottom.selectedProperty().addListener((obs, oldval, newVal) -> {
             if (newVal && !drawablePol.contains(FLOOR)){
                 drawablePol.add(FLOOR);
-            }
-            else if (!newVal){
+            }else if (!newVal){
                 drawablePol.remove(FLOOR);
             }
         });
+        walls.setOnAction(this::actuView);
+        top.setOnAction(this::actuView);
+        bottom.setOnAction(this::actuView);
 
         polHeightSlide.setBlockIncrement(1);
         polHeightSlide.setMajorTickUnit(1);
         polHeightSlide.setShowTickLabels(true);
-        polHeightSlide.valueProperty().addListener(
-                (obs, oldval, newVal) -> polHeightSlide.setValue(newVal.intValue())
-        );
+        polHeightSlide.valueProperty().addListener((obs, oldval, newVal) -> polHeightSlide.setValue(newVal.intValue()));
 
         mapSizeSlide.setBlockIncrement(1);
         mapSizeSlide.setMajorTickUnit(1);
         mapSizeSlide.setShowTickLabels(true);
-        mapSizeSlide.valueProperty().addListener(
-                (obs, oldval, newVal) -> mapSizeSlide.setValue(newVal.intValue())
-        );
+        mapSizeSlide.valueProperty().addListener((obs, oldval, newVal) -> mapSizeSlide.setValue(newVal.intValue()));
         mapSizeSlide.valueProperty().addListener(event -> {
             Main.setxSize((int) (16*mapSizeSlide.getValue()));
             drawPolygon();
@@ -183,12 +176,13 @@ public class Controller implements Initializable {
 
                 isometricRender.setxAngle((float) (isometricRender.getxAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
                 float temp_yAngle = (float) (isometricRender.getyAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
-                if (temp_yAngle >= 0 && temp_yAngle <= 0.35) {
+                if (temp_yAngle >= 0 && temp_yAngle <= 0.5) {
                     isometricRender.setyAngle(temp_yAngle);
                 }
                 actuAllPolygons();
                 drawPolygon();
 
+                System.out.println(isometricRender.getxAngle() + "; " + isometricRender.getyAngle());
                 dragPointOrigin[0] = (float) event.getX();
                 dragPointOrigin[1] = (float) event.getY();
             }
@@ -196,7 +190,7 @@ public class Controller implements Initializable {
                 float roundX = MathFunction.round(Main.toPlotX(event.getX()));
                 float roundY = MathFunction.round(Main.toPlotY(event.getY()));
 
-                if (!dragState) {
+                if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75)) {
                     dragPointOrigin[0] = roundX;
                     dragPointOrigin[1] = roundY;
                 }
@@ -244,7 +238,6 @@ public class Controller implements Initializable {
                 drawPolygon();
             }
         });
-
 
         setPolygon( new Vector2F(xSize/2, xSize/2) );
     }
@@ -565,10 +558,6 @@ public class Controller implements Initializable {
         drawPolygon();
     }
 
-    public void actuSelection(){
-
-    }
-
     public void actuView(ActionEvent ae){
         ImageView imgSclt = new ImageView();
         ImageView img = new ImageView();
@@ -591,14 +580,8 @@ public class Controller implements Initializable {
             drawPolygonIso();
             return;
         }
-        else if (tempPol != null){
-            for (Shape pol : tempPol){
-                coordinateSystem.getChildren().add(pol);
-            }
-        }
 
         coordinateSystem.getChildren().clear();
-
         ArrayList<Vector2F> points = Main.getPoints();
 
         for (Shape r : drawGrid())
@@ -610,6 +593,13 @@ public class Controller implements Initializable {
         //draw the points
         for (Vector2F p : points) {
             coordinateSystem.getChildren().add(p.getCircle());
+        }
+
+        //draw temp polygon
+        if (tempPol != null && !isoview.isSelected()){
+            for (Shape pol : tempPol){
+                coordinateSystem.getChildren().add(pol);
+            }
         }
 
         //draw the polygons

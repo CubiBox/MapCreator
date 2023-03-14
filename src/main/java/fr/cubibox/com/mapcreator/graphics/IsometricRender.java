@@ -1,5 +1,6 @@
 package fr.cubibox.com.mapcreator.graphics;
 
+import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 
 import static fr.cubibox.com.mapcreator.Main.*;
@@ -31,7 +32,8 @@ public class IsometricRender {
         return toScreenIso(x,y,0);
     }
     public float[] toScreenIso(double x, double y, double height){
-        float heightOffset = (float) (getDIML()*0.6-(height*getDIML()/32)*0.5);
+        double finalH = height-(Math.sin(yAngle)*height);
+        float heightOffset = (float) (getDIML()*0.6 - (finalH * getDIML()/32));
 
         if (!(x==origin.getX() && y==origin.getY())) {
             double relativeX = origin.getX() - x;
@@ -43,7 +45,7 @@ public class IsometricRender {
         }
         return new float[] {
                 (float) (getDIML()/2 + (x*0.5 - y*0.5)),
-                (float) (heightOffset + (y*this.yAngle + x*this.yAngle))
+                (float) (heightOffset + (y*yAngle + x*yAngle))
         };
     }
 
