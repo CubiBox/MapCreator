@@ -3,6 +3,7 @@ package fr.cubibox.com.mapcreator.maths;
 import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.mapObject.Type;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
@@ -14,11 +15,13 @@ import static fr.cubibox.com.mapcreator.mapObject.Type.*;
 public class Polygon2F {
     private float height;
     private final Type type;
+    private boolean selected;
+
 
     //pour l'Editor
     private ArrayList<Vector2F> points;
     private boolean showPoint;
-    private Shape shapeTop;
+    private ArrayList<Shape> shapeTop;
     private Shape shapeIso;
     private ArrayList<Shape> shapesIso;
     private Shape shapeLeft;
@@ -63,32 +66,43 @@ public class Polygon2F {
         this.showPoint = false;
     }
 
-    public static Shape topShape(Type type, Vector2F ... pts) {
+    public static ArrayList<Shape> topShape(Type type, Vector2F ... pts) {
         return topShape(new ArrayList<>(Arrays.asList(pts)),type);
     }
 
-    public static Shape topShape(ArrayList<Vector2F> points, Type ... type) {
+    public static ArrayList<Shape> topShape(ArrayList<Vector2F> points, Type ... type) {
         double[] polPoints = new double[points.size()*2];
-        int countP = 0;
-        for (Vector2F p : points){
-            polPoints[countP++] = Main.toScreenX(p.getX());
-            polPoints[countP++] = Main.toScreenY(p.getY());
-        }
-        Shape shape = new javafx.scene.shape.Polygon(polPoints);
-        shape.setFill(Color.TRANSPARENT);
-        shape.setStrokeWidth(2.0);
-        if (type.length > 0) {
-            Type currentType = Arrays.stream(type).toList().get(0);
-            shape.setStroke(
-                    switch (currentType) {
-                        case FLOOR -> Color.LIME;
-                        case CELLING -> Color.RED;
-                        default -> Color.CYAN;
-                    }
+        ArrayList<Shape> lines = new ArrayList<>();
+
+        Type currentType = Arrays.stream(type).toList().get(0);
+        Color color = Color.CYAN;
+        color = switch (Arrays.stream(type).toList().get(0)) {
+            case FLOOR -> Color.LIME;
+            case CELLING -> Color.RED;
+            default -> Color.CYAN;
+        };
+
+        if (points.size() > 1) {
+            for (int i = 0; i < points.size()-1; ) {
+                Line line = new Line(
+                        Main.toScreenX(points.get(i).getX()), Main.toScreenY(points.get(i).getY()),
+                        Main.toScreenX(points.get(++i).getX()), Main.toScreenY(points.get(i).getY())
+                );
+                line.setFill(Color.TRANSPARENT);
+                line.setStrokeWidth(2.0);
+                line.setStroke(color);
+                lines.add(line);
+            }
+            Line line = new Line(
+                    Main.toScreenX(points.get(points.size()-1).getX()), Main.toScreenY(points.get(points.size()-1).getY()),
+                    Main.toScreenX(points.get(0).getX()), Main.toScreenY(points.get(0).getY())
             );
+            line.setFill(Color.TRANSPARENT);
+            line.setStrokeWidth(2.0);
+            line.setStroke(color);
+            lines.add(line);
         }
-        else shape.setStroke(Color.CYAN);
-        return shape;
+        return lines;
     }
 
 
@@ -194,11 +208,6 @@ public class Polygon2F {
         this.showPoint = showPoint;
     }
 
-
-    public void setShapeTop(javafx.scene.shape.Shape shapeTop) {
-        this.shapeTop = shapeTop;
-    }
-
     public ArrayList<Vector2F> getPoints() {
         return points;
     }
@@ -207,12 +216,8 @@ public class Polygon2F {
         this.points = points;
     }
 
-    public javafx.scene.shape.Shape getShapeTop() {
+    public ArrayList<Shape> getShapeTop() {
         return shapeTop;
-    }
-
-    public void setPolShape(javafx.scene.shape.Polygon polShape) {
-        this.shapeTop = polShape;
     }
 
     public float getHeight() {
@@ -229,5 +234,13 @@ public class Polygon2F {
 
     public ArrayList<Shape> getShapesIso() {
         return shapesIso;
+    }
+
+    public void setSelected(boolean isSelected) {
+        this.selected = isSelected;
+    }
+
+    public boolean isSelected() {
+        return selected;
     }
 }
