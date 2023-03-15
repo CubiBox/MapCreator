@@ -558,13 +558,6 @@ public class Controller implements Initializable {
             }
         }
 
-        //draw temp polygon
-        if (tempPol != null && !isoview.isSelected()){
-            for (Shape pol : tempPol){
-                coordinateSystem.getChildren().add(pol);
-            }
-        }
-
         //draw the polygons
         for (StaticObject obj : Main.getStaticObjects()) {
             if (drawablePol.contains(obj.getType())) {
@@ -581,12 +574,19 @@ public class Controller implements Initializable {
                     for (Vector2F p : pols.getPoints()) {
                         Label pointName = new Label(countP++ + "");
                         if (IsometricView) v = isometricRender.toScreenIso(p.getX(), p.getY(), obj.getPolygon().getHeight());
-                        pointName.setLayoutX((IsometricView ? v[0] : p.getX()) - 5);
-                        pointName.setLayoutY(IsometricView ? v[1] : p.getY() - 15);
+                        pointName.setLayoutX((IsometricView ? v[0] : Main.toScreenX(p.getX())) - 5);
+                        pointName.setLayoutY((IsometricView ? v[1] : Main.toScreenY(p.getY())) - 15);
                         pointName.setTextFill(Color.WHITE);
                         coordinateSystem.getChildren().add(pointName);
                     }
                 }
+            }
+        }
+
+        //draw temp polygon
+        if (tempPol != null && !isoview.isSelected()){
+            for (Shape pol : tempPol){
+                coordinateSystem.getChildren().add(pol);
             }
         }
     }
