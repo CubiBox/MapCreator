@@ -27,7 +27,6 @@ public class Main extends Application {
     public static float xSize = 16f;
 
     public static ArrayList<Vector2F> points = new ArrayList<>();
-
     public static ArrayList<StaticObject> staticObjects = new ArrayList<>();
     public static ArrayList<LivingEntity> mobs = new ArrayList<>();
     public static ArrayList<TileEntity> containers = new ArrayList<>();

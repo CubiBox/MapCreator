@@ -128,20 +128,6 @@ public class Controller implements Initializable {
             Main.setxSize((int) (16*mapSizeSlide.getValue()));
             drawPolygon();
         });
-        isoAngleSlider.valueProperty().addListener((obs, oldval, newVal) ->{
-            isoAngleSlider.setValue(newVal.intValue());
-            isometricRender.setyAngleBySlider((float) isoAngleSlider.getValue());
-            for (StaticObject obj : Main.staticObjects){
-                obj.getPolygon().setIsoShapes();
-            }
-            drawPolygon();
-        });
-        isoAngleSliderHorizontal.valueProperty().addListener((obs, oldval, newVal) ->{
-            isoAngleSliderHorizontal.setValue(newVal.intValue());
-            isometricRender.setxAngleBySlider((float) isoAngleSliderHorizontal.getValue());
-            actuAllPolygons();
-            drawPolygon();
-        });
         isoview.setOnAction(this::actuView);
 
         //zoom
@@ -174,15 +160,15 @@ public class Controller implements Initializable {
                     dragPointOrigin[1] = (float) event.getY();
                 }
 
-                isometricRender.setxAngle((float) (isometricRender.getxAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
-                float temp_yAngle = (float) (isometricRender.getyAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
+                isometricRender.setXAngle((float) (isometricRender.getXAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
+                float temp_yAngle = (float) (isometricRender.getYAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
                 if (temp_yAngle >= 0 && temp_yAngle <= 1) {
-                    isometricRender.setyAngle(temp_yAngle);
+                    isometricRender.setYAngle(temp_yAngle);
                 }
                 actuAllPolygons();
                 drawPolygon();
 
-                System.out.println(isometricRender.getxAngle() + "; " + isometricRender.getyAngle());
+                System.out.println(isometricRender.getXAngle() + "; " + isometricRender.getYAngle());
                 dragPointOrigin[0] = (float) event.getX();
                 dragPointOrigin[1] = (float) event.getY();
             }
@@ -201,10 +187,11 @@ public class Controller implements Initializable {
                         actuAllPolygons();
                         drawPolygon(
                                 Polygon2F.topShape(
-                                    currentPos,
-                                    new Vector2F(dragPointOrigin[0], roundY),
-                                    new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
-                                    new Vector2F(roundX, dragPointOrigin[1])
+                                        selectType(SelectionOption),
+                                        currentPos,
+                                        new Vector2F(dragPointOrigin[0], roundY),
+                                        new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
+                                        new Vector2F(roundX, dragPointOrigin[1])
                                 )
                         );
                     }
@@ -349,7 +336,7 @@ public class Controller implements Initializable {
         });
 
         name.setAlignment(Pos.TOP_LEFT);
-        name.setPrefWidth(240);
+        name.setPrefWidth(120);
         Label labelName = new Label("Point " + pointName);
         labelName.setStyle("-fx-text-fill:WHITE;");
         name.getChildren().add(labelName);
@@ -404,7 +391,6 @@ public class Controller implements Initializable {
         Polygon2F p = obj.getPolygon();
         HBox genericBox = new HBox();
         VBox rightPart = new VBox();
-
         VBox heightBoard = new VBox();
         HBox label = new HBox();
 
@@ -443,37 +429,17 @@ public class Controller implements Initializable {
         // Type RadioButtons
         ToggleGroup choise = new ToggleGroup();
 
-        RadioButton wallButton = new RadioButton("Wall");
-        wallButton.setId("Wall");
-        wallButton.setToggleGroup(choise);
-        wallButton.selectedProperty().addListener(event -> {
-            obj.setType(WALL);
-            drawPolygon();
-        });
-
-        RadioButton floorButton = new RadioButton("Floor");
-        floorButton.setId("Floor");
-        floorButton.setToggleGroup(choise);
-        floorButton.selectedProperty().addListener(event -> {
-            obj.setType(FLOOR);
-            drawPolygon();
-        });
-
-        RadioButton cellingButton = new RadioButton("Celling");
-        cellingButton.setId("Celling");
-        cellingButton.setToggleGroup(choise);
-        cellingButton.selectedProperty().addListener(event -> {
-            obj.setType(CELLING);
-            drawPolygon();
-        });
-
-        switch (obj.getType()) {
-            case WALL -> wallButton.setSelected(true);
-            case FLOOR -> floorButton.setSelected(true);
-            case CELLING -> cellingButton.setSelected(true);
+        for (Type type : Type.values()) {
+            RadioButton typeButton = new RadioButton(type.name().toLowerCase().toUpperCase());
+            typeButton.setId(type.name());
+            typeButton.setToggleGroup(choise);
+            typeButton.selectedProperty().addListener(event -> {
+                obj.setType(type);
+                drawPolygon();
+            });
+            if (obj.getType() == type) typeButton.setSelected(true);
+            rightPart.getChildren().add(typeButton);
         }
-
-        rightPart.getChildren().addAll(wallButton,floorButton,cellingButton);
 
         genericBox.getChildren().addAll(heightBoard,rightPart);
         return genericBox;
@@ -501,7 +467,7 @@ public class Controller implements Initializable {
         });
         HBox delete = new HBox();
         delete.setAlignment(Pos.TOP_RIGHT);
-        delete.setPrefWidth(230);
+        delete.setPrefWidth(120);
         delete.getChildren().add(close);
 
         //showPoint button
@@ -521,7 +487,7 @@ public class Controller implements Initializable {
         // Name Label
         HBox name = new HBox();
         name.setAlignment(Pos.TOP_LEFT);
-        name.setPrefWidth(220);
+        name.setPrefWidth(120);
         name.getChildren().add(new Label(p.toName()));
 
         //add name, delete, show points buttons
@@ -576,19 +542,15 @@ public class Controller implements Initializable {
     }
 
     public void drawPolygon(Shape ... tempPol) {
+        coordinateSystem.getChildren().clear();
+        ArrayList<Vector2F> points = Main.getPoints();
+        for (Shape r : drawGrid())
+            coordinateSystem.getChildren().add(r);
+
         if (isoview.isSelected()){
             drawPolygonIso();
             return;
         }
-
-        coordinateSystem.getChildren().clear();
-        ArrayList<Vector2F> points = Main.getPoints();
-
-        for (Shape r : drawGrid())
-            coordinateSystem.getChildren().add(r);
-
-        //draw the player's point
-        //coordinateSystem.getChildren().add(Main.getPlayer1().getPoint().getCircle());
 
         //draw the points
         for (Vector2F p : points) {
@@ -625,11 +587,6 @@ public class Controller implements Initializable {
     }
 
     public void drawPolygonIso() {
-        coordinateSystem.getChildren().clear();
-        ArrayList<Vector2F> points = Main.getPoints();
-
-        for (Shape r : drawGrid())
-            coordinateSystem.getChildren().add(r);
 
         //draw the points
         for (Vector2F p : points) {
@@ -643,13 +600,6 @@ public class Controller implements Initializable {
                 Polygon2F pols = obj.getPolygon();
 
                 for (Shape shape : obj.getPolygon().getShapesIso()) {
-                    shape.setStroke(
-                            switch (obj.getType()) {
-                                case WALL -> Color.CYAN;
-                                case FLOOR -> Color.LIME;
-                                case CELLING -> Color.RED;
-                            }
-                    );
                     coordinateSystem.getChildren().add(shape);
                 }
 
@@ -669,18 +619,14 @@ public class Controller implements Initializable {
     }
 
     public ArrayList<Shape> drawGrid() {
-        //ToggleButton tb = (ToggleButton) POV.getSelectedToggle();
         ArrayList<Shape> lines = new ArrayList<>();
         ArrayList<Shape> tpmLines = new ArrayList<>();
-        boolean isIso = isoview.isSelected();
+        boolean isIsometricView = isoview.isSelected();
 
-        Color gray1 = Color.rgb(30, 30, 30);
-        Color gray2 = Color.rgb(70, 70, 70);
-        Line line1;
-        Line line2;
+        Line line1,line2;
 
         for (int i = 0; i <= xSize; i++) {
-            if (isIso) {
+            if (isIsometricView) {
                 float[] var1 = isometricRender.toScreenIso(i, 0);
                 float[] var2 = isometricRender.toScreenIso(i, xSize);
                 float[] var3 = isometricRender.toScreenIso(0, i);
@@ -694,11 +640,11 @@ public class Controller implements Initializable {
                 line2 = new Line(Main.toScreenX(0), Main.toScreenY(i), Main.toScreenX(xSize), Main.toScreenY(i));
             }
 
-            line1.setStroke(gray1);
+            line1.setStroke(Color.rgb(30, 30, 30));
             line1.setStrokeWidth(3);
             line1.setSmooth(true);
 
-            line2.setStroke(gray1);
+            line2.setStroke(Color.rgb(30, 30, 30));
             line2.setStrokeWidth(3);
             line2.setSmooth(true);
 
@@ -712,7 +658,7 @@ public class Controller implements Initializable {
         }
 
         for (Shape line : tpmLines) {
-            line.setStroke(gray2);
+            line.setStroke(Color.rgb(70, 70, 70));
             lines.add(line);
         }
         return lines;

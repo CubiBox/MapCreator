@@ -9,9 +9,11 @@ import javafx.scene.shape.Shape;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import static fr.cubibox.com.mapcreator.mapObject.Type.*;
+
 public class Polygon2F {
     private float height;
-    private Type type;
+    private final Type type;
 
     //pour l'Editor
     private ArrayList<Vector2F> points;
@@ -25,7 +27,7 @@ public class Polygon2F {
 
     public Polygon2F(ArrayList<Vector2F> points, float height) {
         this.height = height;
-        this.type = Type.WALL;
+        this.type = WALL;
         if (!points.isEmpty()) {
             this.points = points;
             setupShapes();
@@ -45,7 +47,7 @@ public class Polygon2F {
 
     public Polygon2F(Vector2F... pts) {
         this.height = 0;
-        this.type = Type.WALL;
+        this.type = WALL;
         this.points = new ArrayList<>(Arrays.asList(pts));
         setupShapes();
 
@@ -61,10 +63,11 @@ public class Polygon2F {
         this.showPoint = false;
     }
 
-    public static Shape topShape(Vector2F ... pts) {
-        return topShape(new ArrayList<>(Arrays.asList(pts)));
+    public static Shape topShape(Type type, Vector2F ... pts) {
+        return topShape(new ArrayList<>(Arrays.asList(pts)),type);
     }
-    public static Shape topShape(ArrayList<Vector2F> points) {
+
+    public static Shape topShape(ArrayList<Vector2F> points, Type ... type) {
         double[] polPoints = new double[points.size()*2];
         int countP = 0;
         for (Vector2F p : points){
@@ -74,20 +77,30 @@ public class Polygon2F {
         Shape shape = new javafx.scene.shape.Polygon(polPoints);
         shape.setFill(Color.TRANSPARENT);
         shape.setStrokeWidth(2.0);
-        shape.setStroke(Color.CYAN);
+        if (type.length > 0) {
+            Type currentType = Arrays.stream(type).toList().get(0);
+            shape.setStroke(
+                    switch (currentType) {
+                        case FLOOR -> Color.LIME;
+                        case CELLING -> Color.RED;
+                        default -> Color.CYAN;
+                    }
+            );
+        }
+        else shape.setStroke(Color.CYAN);
         return shape;
     }
 
 
     public void setupShapes(){
-        setTopShape();
+        setTopShape(type);
         setIsoShapes();
         //setLeftShape();
         //setRightShape();
     }
 
-    private void setTopShape() {
-        this.shapeTop = topShape(points);
+    private void setTopShape(Type type) {
+        this.shapeTop = topShape(points,type);
     }
 
 
@@ -103,7 +116,6 @@ public class Polygon2F {
             case WALL, FLOOR -> 0;
             case CELLING -> height;
         };
-
 
         //top
         int countP = 0;
@@ -157,7 +169,13 @@ public class Polygon2F {
         //add global settings
         for (Shape pol : shapes) {
             pol.setStrokeWidth(2.0);
-            pol.setStroke(Color.CYAN);
+            pol.setStroke(
+                    switch (type) {
+                        case FLOOR -> Color.LIME;
+                        case CELLING -> Color.RED;
+                        default -> Color.CYAN;
+                    }
+            );
         }
         this.shapesIso = shapes;
     }

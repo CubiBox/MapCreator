@@ -1,28 +1,27 @@
 package fr.cubibox.com.mapcreator.graphics;
 
-import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 
 import static fr.cubibox.com.mapcreator.Main.*;
 
 
 public class IsometricRender {
-    private float xAngle;
-    private float yAngle;
+    private double xAngle;
+    private double yAngle;
     private Vector2F origin;
 
 
     public IsometricRender(Vector2F origin) {
-        this.xAngle = 0f;
-        this.yAngle = 0.5f;
+        this.xAngle = 0;
+        this.yAngle = 0.5;
         this.origin = origin;
     }
     public IsometricRender(float origin) {
-        this.xAngle = 0f;
-        this.yAngle = 0.5f;
+        this.xAngle = 0;
+        this.yAngle = 0.5;
         this.origin = new Vector2F(origin,origin);
     }
-    public IsometricRender(float xAngle, float yAngle, Vector2F origin) {
+    public IsometricRender(double xAngle, double yAngle, Vector2F origin) {
         this.xAngle = xAngle;
         this.yAngle = yAngle;
         this.origin = origin;
@@ -32,42 +31,34 @@ public class IsometricRender {
         return toScreenIso(x,y,0);
     }
 
-
     public float[] toScreenIso(double x, double y, double height){
-        double heightOffset = getDIML()*0.65 - (Math.sin(Math.PI/2-(yAngle*(Math.PI/2)))*height * getDIML()/64);
-
         double relativeX = origin.getX() - x;
         double relativeY = origin.getY() - y;
         double newAngle = xAngle + ((relativeX==0 && relativeY==0) ? 0 : Math.atan(relativeY / relativeX));
         double originDistance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
-        x = originDistance * Math.cos(newAngle) * getDIML()/xSize * (relativeX < 0 ? -1 : 1) /2;
-        y = originDistance * Math.sin(newAngle) * getDIML()/xSize * (relativeX < 0 ? -1 : 1) /2;
+        double finalX = originDistance * Math.cos(newAngle) * getDIML()/xSize * (relativeX < 0 ? -1 : 1) /2;
+        double finalY = originDistance * Math.sin(newAngle) * getDIML()/xSize * (relativeX < 0 ? -1 : 1) /2;
 
+        double heightOffset = getDIML()*0.65 - (Math.sin(Math.PI/2-(yAngle*(Math.PI/2)))*height * getDIML()/64);
         return new float[] {
-                (float) (getDIML()/2 + (x - y)),
-                (float) (heightOffset + (y*yAngle + x*yAngle))
+                (float) (getDIML()/2 + (finalX - finalY)),
+                (float) (heightOffset + (finalY*yAngle + finalX*yAngle))
         };
     }
 
-    public float getxAngle() {
+    public double getXAngle() {
         return xAngle;
     }
-    public void setxAngleBySlider(float xAngle) {
-        this.xAngle = xAngle*0.00045f;
-    }
-    public void setxAngle(float xAngle) {
+    public void setXAngle(double xAngle) {
         this.xAngle = xAngle;
     }
 
 
 
-    public float getyAngle() {
+    public double getYAngle() {
         return yAngle;
     }
-    public void setyAngleBySlider(float yAngle) {
-        this.yAngle = 0.25f + yAngle*0.01f;
-    }
-    public void setyAngle(float yAngle) {
+    public void setYAngle(double yAngle) {
         this.yAngle = yAngle;
     }
 
