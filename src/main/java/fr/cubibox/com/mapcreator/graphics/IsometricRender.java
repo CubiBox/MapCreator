@@ -53,8 +53,6 @@ public class IsometricRender {
         this.xAngle = xAngle;
     }
 
-
-
     public double getYAngle() {
         return yAngle;
     }

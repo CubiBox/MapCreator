@@ -22,7 +22,6 @@ public class Polygon2F {
     private ArrayList<Vector2F> points;
     private boolean showPoint;
     private ArrayList<Shape> shapeTop;
-    private Shape shapeIso;
     private ArrayList<Shape> shapesIso;
     private Shape shapeLeft;
     private Shape shapeRight;
@@ -66,15 +65,24 @@ public class Polygon2F {
         this.showPoint = false;
     }
 
+    public void setupShapes(){
+        setTopShape();
+        setIsoShapes();
+        //setLeftShape();
+        //setRightShape();
+    }
+
+    private void setTopShape() {
+        this.shapeTop = topShape(points,type);
+    }
+
     public static ArrayList<Shape> topShape(Type type, Vector2F ... pts) {
         return topShape(new ArrayList<>(Arrays.asList(pts)),type);
     }
 
     public static ArrayList<Shape> topShape(ArrayList<Vector2F> points, Type ... type) {
-        double[] polPoints = new double[points.size()*2];
         ArrayList<Shape> lines = new ArrayList<>();
 
-        Type currentType = Arrays.stream(type).toList().get(0);
         Color color = Color.CYAN;
         color = switch (Arrays.stream(type).toList().get(0)) {
             case FLOOR -> Color.LIME;
@@ -83,7 +91,7 @@ public class Polygon2F {
         };
 
         if (points.size() > 1) {
-            for (int i = 0; i < points.size()-1; ) {
+            for (int i = 0; i < points.size() - 1; ) {
                 Line line = new Line(
                         Main.toScreenX(points.get(i).getX()), Main.toScreenY(points.get(i).getY()),
                         Main.toScreenX(points.get(++i).getX()), Main.toScreenY(points.get(i).getY())
@@ -93,43 +101,43 @@ public class Polygon2F {
                 line.setStroke(color);
                 lines.add(line);
             }
-            Line line = new Line(
-                    Main.toScreenX(points.get(points.size()-1).getX()), Main.toScreenY(points.get(points.size()-1).getY()),
-                    Main.toScreenX(points.get(0).getX()), Main.toScreenY(points.get(0).getY())
-            );
-            line.setFill(Color.TRANSPARENT);
-            line.setStrokeWidth(2.0);
-            line.setStroke(color);
-            lines.add(line);
         }
+        Line line = new Line(
+                Main.toScreenX(points.get(points.size()-1).getX()), Main.toScreenY(points.get(points.size()-1).getY()),
+                Main.toScreenX(points.get(0).getX()), Main.toScreenY(points.get(0).getY())
+        );
+        line.setFill(Color.TRANSPARENT);
+        line.setStrokeWidth(2.0);
+        line.setStroke(color);
+        lines.add(line);
+
         return lines;
     }
-
-
-    public void setupShapes(){
-        setTopShape(type);
-        setIsoShapes();
-        //setLeftShape();
-        //setRightShape();
-    }
-
-    private void setTopShape(Type type) {
-        this.shapeTop = topShape(points,type);
-    }
-
 
     public void setIsoShapes(){
         ArrayList<Shape> shapes = new ArrayList<>();
         double[] polPoints = new double[points.size()*2];
-        Polygon shape = null;
-        float currentHeight = switch (type) {
-            case WALL, FLOOR -> height;
-            case CELLING -> 31;
-        };
-        float currentBase = switch (type) {
-            case WALL, FLOOR -> 0;
-            case CELLING -> height;
-        };
+        float currentHeight,currentBase;
+        Polygon shape;
+        Color wallColor;
+
+        switch (type) {
+            case FLOOR -> {
+                wallColor = new Color(0, 1, 0, 0.3);
+                currentHeight = height;
+                currentBase = 0;
+            }
+            case CELLING -> {
+                wallColor = new Color(1, 0, 0, 0.3);
+                currentHeight = 31;
+                currentBase =height;
+            }
+            default -> { //  WALL or null
+                wallColor = new Color(0, 1, 1, 0.3);
+                currentHeight = height;
+                currentBase = 0;
+            }
+        }
 
         //top
         int countP = 0;
@@ -139,7 +147,7 @@ public class Polygon2F {
             polPoints[countP++] = v[1];
         }
         shape = new Polygon(polPoints);
-        shape.setFill(new Color(1, 0, 0, 0.3));
+        shape.setFill(type==FLOOR ? new Color(0, 1, 0, 0.3) : Color.TRANSPARENT);
         shapes.add(shape);
 
 
@@ -151,7 +159,7 @@ public class Polygon2F {
             polPoints[countP++] = v[1];
         }
         shape = new Polygon(polPoints);
-        shape.setFill(new Color(0, 1, 0, 0.3));
+        shape.setFill(type==CELLING ? new Color(1, 0, 0, 0.3) : Color.TRANSPARENT);
         shapes.add(shape);
 
 
@@ -176,7 +184,7 @@ public class Polygon2F {
             polPoints[countP++] = v[1];
 
             shape = new Polygon(polPoints);
-            shape.setFill(new Color(0, 1, 1, 0.3));
+            shape.setFill(wallColor);
             shapes.add(shape);
         }
 
@@ -226,10 +234,6 @@ public class Polygon2F {
 
     public void setHeight(float height) {
         this.height = height;
-    }
-
-    public Shape getShapeIso() {
-        return shapeIso;
     }
 
     public ArrayList<Shape> getShapesIso() {

@@ -8,6 +8,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
@@ -20,10 +21,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
-<BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.Controller">
+<BorderPane style="-fx-background-color: #404040;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.Controller">
    <top>
-      <MenuBar style="-fx-background-color: #555555;" BorderPane.alignment="CENTER">
+      <MenuBar style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
         <menus>
           <Menu mnemonicParsing="false" text="Fichier">
             <items>
@@ -51,14 +51,14 @@
       </MenuBar>
    </top>
    <center>
-      <ScrollPane fx:id="scrollPane" prefHeight="500.0" prefWidth="500.0" BorderPane.alignment="CENTER">
+      <ScrollPane fx:id="scrollPane" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
          <content>
             <Pane fx:id="coordinateSystem" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #000000;" />
          </content>
       </ScrollPane>
    </center>
    <left>
-      <VBox prefHeight="726.0" prefWidth="317.0" spacing="5.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="726.0" prefWidth="317.0" spacing="5.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
          <children>
             <VBox prefHeight="137.0" prefWidth="307.0" style="-fx-background-color: #606060;">
                <children>
@@ -147,40 +147,53 @@
                   </HBox>
                </children>
             </VBox>
-            <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #606060;">
+            <VBox prefHeight="152.0" prefWidth="307.0" style="-fx-background-color: #606060;">
                <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
+                  <VBox prefHeight="149.0" prefWidth="307.0">
                      <children>
                         <Label prefHeight="38.0" prefWidth="293.0" text="Options de la sélection">
                            <font>
                               <Font size="27.0" />
                            </font>
                         </Label>
-                        <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                        <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <RadioButton fx:id="wall" mnemonicParsing="false" selected="true" text="Wall">
-                                 <toggleGroup>
-                                    <ToggleGroup fx:id="SelectionOption" />
-                                 </toggleGroup>
-                              </RadioButton>
-                              <RadioButton fx:id="floor" mnemonicParsing="false" text="Floor" toggleGroup="$SelectionOption" />
-                              <RadioButton fx:id="celling" mnemonicParsing="false" text="Celling" toggleGroup="$SelectionOption" />
-                           </children>
-                        </VBox>
-                        <HBox alignment="CENTER" prefHeight="31.0" prefWidth="317.0">
-                           <children>
-                              <Label text="Texture" />
-                              <Button mnemonicParsing="false" text="Ouvrir" />
+                              <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                                 <children>
+                                    <RadioButton fx:id="wall" mnemonicParsing="false" selected="true" text="Wall">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="SelectionOption" />
+                                       </toggleGroup>
+                                    </RadioButton>
+                                    <RadioButton fx:id="floor" mnemonicParsing="false" text="Floor" toggleGroup="$SelectionOption" />
+                                    <RadioButton fx:id="celling" mnemonicParsing="false" text="Celling" toggleGroup="$SelectionOption" />
+                                    <Separator prefWidth="200.0" />
+                                    <RadioButton fx:id="portal" mnemonicParsing="false" text="Portal" />
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="100.0" prefWidth="206.0" spacing="10.0">
+                                 <children>
+                                    <Slider fx:id="polHeightSlide" blockIncrement="0.0" majorTickUnit="1.0" max="31.0" minorTickCount="0" snapToTicks="true" value="16.0" />
+                                    <HBox alignment="CENTER" prefHeight="31.0" prefWidth="317.0">
+                                       <children>
+                                          <Label text="Texture" />
+                                          <Button mnemonicParsing="false" text="Ouvrir" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                       <children>
+                                          <Button fx:id="setPol" mnemonicParsing="false" onAction="#setPolygon" prefHeight="31.0" prefWidth="91.0" text="Draw Polygon" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
                            </children>
                         </HBox>
-                        <Slider fx:id="polHeightSlide" blockIncrement="0.0" majorTickUnit="1.0" max="31.0" minorTickCount="0" snapToTicks="true" value="16.0" />
                      </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </padding>
                   </VBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
-                     <children>
-                        <Button fx:id="setPol" mnemonicParsing="false" onAction="#setPolygon" prefHeight="31.0" prefWidth="91.0" text="Draw Polygon" />
-                     </children>
-                  </HBox>
                </children>
             </VBox>
             <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #606060;">
@@ -214,7 +227,7 @@
       </VBox>
    </left>
    <right>
-      <VBox prefHeight="726.0" prefWidth="415.0" BorderPane.alignment="CENTER">
+      <VBox prefHeight="726.0" prefWidth="415.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
          <children>
             <ScrollPane prefHeight="668.0" prefWidth="400.0" vbarPolicy="ALWAYS">
                <content>

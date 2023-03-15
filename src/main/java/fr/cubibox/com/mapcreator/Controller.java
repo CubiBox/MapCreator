@@ -138,6 +138,8 @@ public class Controller implements Initializable {
 
         //record drag status
         coordinateSystem.setOnMouseDragged(event ->{
+
+            //change view in isometric view
             if (isoview.isSelected()) {
                 if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75) || (dragPointOrigin[0]-event.getX()<-75 || dragPointOrigin[1]-event.getY()<-75)){
                     dragPointOrigin[0] = (float) event.getX();
@@ -155,6 +157,8 @@ public class Controller implements Initializable {
                 dragPointOrigin[0] = (float) event.getX();
                 dragPointOrigin[1] = (float) event.getY();
             }
+
+            //set polygon preview in 2D view
             else {
                 float roundX = MathFunction.round(Main.toPlotX(event.getX()));
                 float roundY = MathFunction.round(Main.toPlotY(event.getY()));
@@ -166,7 +170,7 @@ public class Controller implements Initializable {
 
                 if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize)) {
                     Vector2F currentPos = new Vector2F(roundX, roundY);
-                    if (dragState && (dragPointOrigin[0] != currentPos.getX() && dragPointOrigin[1] != currentPos.getY())) {
+                    if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())) {
                         actualizeAllPolygons();
                         drawPolygon(
                                 Polygon2F.topShape(
@@ -183,19 +187,23 @@ public class Controller implements Initializable {
             dragState = true;
         });
 
-        //set point by click
+        //set by click
         coordinateSystem.setOnMouseClicked(event -> {
             float roundX = MathFunction.round(Main.toPlotX(event.getX()));
             float roundY = MathFunction.round(Main.toPlotY(event.getY()));
+
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
                 if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize) && !isoview.isSelected()) {
                     Vector2F currentPos = new Vector2F(roundX, roundY);
-                    if (dragState && (dragPointOrigin[0] !=currentPos.getX() && dragPointOrigin[1]!=currentPos.getY())){
-                        setPolygon(
-                                currentPos,
-                                new Vector2F(dragPointOrigin[0], roundY),
-                                new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
-                                new Vector2F(roundX, dragPointOrigin[1])
+                    if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())){
+                        if (dragPointOrigin[0] == currentPos.getX() || dragPointOrigin[1] == currentPos.getY())
+                            setPolygon(currentPos,new Vector2F(dragPointOrigin[0], dragPointOrigin[1]));
+
+                        else setPolygon(
+                                    currentPos,
+                                    new Vector2F(dragPointOrigin[0], roundY),
+                                    new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
+                                    new Vector2F(roundX, dragPointOrigin[1])
                         );
                     }
                     else {
@@ -207,14 +215,12 @@ public class Controller implements Initializable {
                 drawPolygon();
             }
         });
-
-        setPolygon( new Vector2F(xSize/2, xSize/2) );
     }
 
     public void actualizeAllPolygons(){
         for (StaticObject obj : Main.staticObjects){
-            obj.getPolygon().setIsoShapes();
-            obj.getPolygon().setupShapes();
+            if (isoview.isSelected()) obj.getPolygon().setIsoShapes();
+            else obj.getPolygon().setupShapes();
         }
     }
 
@@ -484,6 +490,7 @@ public class Controller implements Initializable {
         return polBoard;
     }
 
+
     public void actuBoard(){
         polyBoard.getChildren().clear();
         for (Vector2F p : Main.getPoints()){
@@ -550,7 +557,7 @@ public class Controller implements Initializable {
                 Polygon2F pols = obj.getPolygon();
 
                 if (IsometricView)
-                    for (Shape shape : obj.getPolygon().getShapeTop())
+                    for (Shape shape : obj.getPolygon().getShapesIso())
                         coordinateSystem.getChildren().add(shape);
                 else {
                     for (Shape shape : obj.getPolygon().getShapeTop()) {
@@ -668,7 +675,6 @@ public class Controller implements Initializable {
                 new Polygon2F(points, (float)polHeightSlide.getValue(),selectType(SelectionOption))
                 ,selectType(SelectionOption)
         );
-
         Main.getStaticObjects().add(obj);
         polyBoard.getChildren().add(polygonBoard(obj));
         actuBoard();
