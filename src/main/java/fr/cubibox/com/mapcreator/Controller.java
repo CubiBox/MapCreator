@@ -542,19 +542,20 @@ public class Controller implements Initializable {
     }
 
     public void drawPolygon(Shape ... tempPol) {
+        boolean IsometricView = isoview.isSelected();
         coordinateSystem.getChildren().clear();
         ArrayList<Vector2F> points = Main.getPoints();
         for (Shape r : drawGrid())
             coordinateSystem.getChildren().add(r);
 
-        if (isoview.isSelected()){
-            drawPolygonIso();
-            return;
-        }
-
         //draw the points
         for (Vector2F p : points) {
-            coordinateSystem.getChildren().add(p.getCircle());
+            if (IsometricView)
+                coordinateSystem.getChildren().add(p.getCircle());
+            else {
+                float[] v = isometricRender.toScreenIso(p.getX(),p.getY());
+                coordinateSystem.getChildren().add(new Circle(v[0],v[1], 3, p.getColor()));
+            }
         }
 
         //draw temp polygon
@@ -566,50 +567,22 @@ public class Controller implements Initializable {
 
         //draw the polygons
         for (StaticObject obj : Main.getStaticObjects()) {
-            Polygon2F pols = obj.getPolygon();
-            coordinateSystem.getChildren().add(pols.getShapeTop());
-            switch (obj.getType()) {
-                case WALL -> pols.getShapeTop().setStroke(Color.CYAN);
-                case FLOOR -> pols.getShapeTop().setStroke(Color.LIME);
-                case CELLING -> pols.getShapeTop().setStroke(Color.RED);
-            }
-            if (pols.isShowPoint()) {
-                int countP = 0;
-                for (Vector2F p : pols.getPoints()) {
-                    Label pointName = new Label(countP++ + "");
-                    pointName.setLayoutX(Main.toScreenX(p.getX()) - 5);
-                    pointName.setLayoutY(Main.toScreenY(p.getY()) - 15);
-                    pointName.setTextFill(Color.WHITE);
-                    coordinateSystem.getChildren().add(pointName);
-                }
-            }
-        }
-    }
-
-    public void drawPolygonIso() {
-
-        //draw the points
-        for (Vector2F p : points) {
-            float[] v = isometricRender.toScreenIso(p.getX(),p.getY());
-            coordinateSystem.getChildren().add(new Circle(v[0],v[1], 3, p.getColor()));
-        }
-
-        //draw the polygons
-        for (StaticObject obj : Main.getStaticObjects()) {
             if (drawablePol.contains(obj.getType())) {
                 Polygon2F pols = obj.getPolygon();
 
-                for (Shape shape : obj.getPolygon().getShapesIso()) {
-                    coordinateSystem.getChildren().add(shape);
-                }
+                if (IsometricView)
+                    for (Shape shape : obj.getPolygon().getShapesIso())
+                        coordinateSystem.getChildren().add(shape);
+                else coordinateSystem.getChildren().add(pols.getShapeTop());
 
                 if (pols.isShowPoint()) {
                     int countP = 0;
+                    float[] v = new float[2];
                     for (Vector2F p : pols.getPoints()) {
                         Label pointName = new Label(countP++ + "");
-                        float[] v = isometricRender.toScreenIso(p.getX(), p.getY(), obj.getPolygon().getHeight());
-                        pointName.setLayoutX(v[0] - 5);
-                        pointName.setLayoutY(v[1] - 15);
+                        if (IsometricView) v = isometricRender.toScreenIso(p.getX(), p.getY(), obj.getPolygon().getHeight());
+                        pointName.setLayoutX((IsometricView ? v[0] : p.getX()) - 5);
+                        pointName.setLayoutY(IsometricView ? v[1] : p.getY() - 15);
                         pointName.setTextFill(Color.WHITE);
                         coordinateSystem.getChildren().add(pointName);
                     }
@@ -617,6 +590,7 @@ public class Controller implements Initializable {
             }
         }
     }
+
 
     public ArrayList<Shape> drawGrid() {
         ArrayList<Shape> lines = new ArrayList<>();
