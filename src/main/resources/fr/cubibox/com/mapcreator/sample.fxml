@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -167,6 +168,7 @@
                                     </RadioButton>
                                     <RadioButton fx:id="floor" mnemonicParsing="false" text="Floor" toggleGroup="$SelectionOption" />
                                     <RadioButton fx:id="celling" mnemonicParsing="false" text="Celling" toggleGroup="$SelectionOption" />
+                                    <RadioButton fx:id="cube" mnemonicParsing="false" text="Cube" toggleGroup="$SelectionOption" />
                                     <Separator prefWidth="200.0" />
                                     <RadioButton fx:id="portal" mnemonicParsing="false" text="Portal" />
                                  </children>
@@ -262,6 +264,7 @@
                   </ScrollPane>
                </children>
             </VBox>
+            <Canvas height="500.0" style="-fx-background-color: #00000000;" width="500.0" />
          </children>
       </VBox>
    </right>

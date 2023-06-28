@@ -1,6 +1,7 @@
 module fr.cubibox.com.mapcreator {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.desktop;
 
 
     opens fr.cubibox.com.mapcreator to javafx.fxml;

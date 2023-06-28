@@ -1,8 +1,13 @@
 package fr.cubibox.com.mapcreator.graphics;
 
 import fr.cubibox.com.mapcreator.maths.Vector2F;
+import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
+
+import java.util.ArrayList;
 
 import static fr.cubibox.com.mapcreator.Main.*;
+import static fr.cubibox.com.mapcreator.graphics.Texture.*;
 
 
 public class IsometricRender {
@@ -27,10 +32,23 @@ public class IsometricRender {
         this.origin = origin;
     }
 
+    /**
+     * Is to convert just one point
+     * @param x
+     * @param y
+     * @return
+     */
     public float[] toScreenIso(double x, double y){
         return toScreenIso(x,y,0);
     }
 
+    /**
+     * Is to convert just one point
+     * @param x
+     * @param y
+     * @param height
+     * @return
+     */
     public float[] toScreenIso(double x, double y, double height){
         double relativeX = origin.getX() - x;
         double relativeY = origin.getY() - y;
@@ -44,6 +62,45 @@ public class IsometricRender {
                 (float) (getDIML()/2 + (finalX - finalY)),
                 (float) (heightOffset + (finalY*yAngle + finalX*yAngle))
         };
+    }
+
+    public ArrayList<Shape> getTextureIso(Texture texture) {
+        ArrayList<Shape> shapes = new ArrayList<>();
+        double width = texture.getWidth();
+        double height = texture.getHeight();
+        int face = texture.getFace();
+
+        switch (face){
+            case NORTH -> { if (xAngle >= angle1 && xAngle <= angle3) return shapes; }
+            case SOUTH -> { if (xAngle >= angle3 || xAngle <= angle1) return shapes; }
+            case WEST -> { if (xAngle >= angle4 || xAngle <= angle2) return shapes; }
+            case EAST -> { if (xAngle >= angle2 && xAngle <= angle4) return shapes; }
+        };
+
+        double heightOffset = Math.sin(Math.PI / 2d - (yAngle * (Math.PI / 2d))) * 0.75;
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int rgb = texture.getTexture().getRGB(x, y);
+                double red = (double)((rgb >> 16) & 0xFF) / 255;
+                double green = (double)((rgb >> 8) & 0xFF) / 255;
+                double blue = (double)(rgb & 0xFF) / 255;
+                double[] coos = switch (face){
+                    case TOP -> texture.toScreenIso(x, y, height, xAngle, yAngle, heightOffset);
+                    case BOTTOM -> texture.toScreenIso(x, y, 0, xAngle, yAngle, heightOffset);
+                    case NORTH -> texture.toScreenIso(y, 0, x, xAngle, yAngle, heightOffset);
+                    case SOUTH -> texture.toScreenIso(y, height, x, xAngle, yAngle, heightOffset);
+                    case EAST -> texture.toScreenIso(0, x, y, xAngle, yAngle, heightOffset);
+                    case WEST -> texture.toScreenIso(height, x, y, xAngle, yAngle, heightOffset);
+                    default -> throw new IllegalStateException("Unexpected value: " + face);
+                };
+                Rectangle rect = new Rectangle(coos[0], coos[1], 1d, 1d);
+                rect.setFill(new javafx.scene.paint.Color(
+                        red, green, blue, 1
+                ));
+                shapes.add(rect);
+            }
+        }
+        return shapes;
     }
 
     public double getXAngle() {

@@ -1,68 +1,48 @@
 package fr.cubibox.com.mapcreator.maths;
 
 import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.graphics.IsometricRender;
+import fr.cubibox.com.mapcreator.graphics.Texture;
 import fr.cubibox.com.mapcreator.mapObject.Type;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import static fr.cubibox.com.mapcreator.mapObject.Type.*;
 
-public class Polygon2F {
-    protected float height;
-    protected Type type;
-    protected boolean selected;
+public class Cube2F extends Polygon2F {
+    private Texture textureTop;
+    private Texture textureNorth;
+    private Texture textureEast;
+    private Texture textureWest;
+    private Texture textureSouth;
 
 
-    //pour l'Editor
-    protected ArrayList<Vector2F> points;
-    protected boolean showPoint;
-    protected ArrayList<Shape> shapeTop;
-    protected ArrayList<Shape> shapesIso;
-    protected Shape shapeLeft;
-    protected Shape shapeRight;
+    public Cube2F(ArrayList<Vector2F> points, float height, Type type) {
+        super(points, height, type);
 
-
-    public Polygon2F(ArrayList<Vector2F> points, float height) {
-        this.height = height;
-        this.type = WALL;
-        if (!points.isEmpty()) {
-            this.points = points;
-            setupShapes();
-        }
-        this.showPoint = false;
+        this.textureTop = new Texture("dirt.png", 4);
+        this.textureNorth = new Texture("dirt.png", 3);
+        this.textureEast = new Texture("dirt.png", 2);
+        this.textureWest = new Texture("dirt.png", 1);
+        this.textureSouth = new Texture("dirt.png", 0);
     }
 
-    public Polygon2F(ArrayList<Vector2F> points, float height, Type type) {
-        this.height = height;
-        this.type = type;
-        if (!points.isEmpty()) {
-            this.points = points;
-            setupShapes();
-        }
-        this.showPoint = false;
+    public Cube2F(ArrayList<Vector2F> points, float height) {
+        this(points, height, WALL);
     }
 
-    public Polygon2F(Vector2F... pts) {
-        this.height = 0;
-        this.type = WALL;
-        this.points = new ArrayList<>(Arrays.asList(pts));
-        setupShapes();
-
-        this.showPoint = false;
+    public Cube2F(Vector2F... pts) {
+        this(new ArrayList<>(Arrays.asList(pts)), 0, WALL);
     }
 
-    public Polygon2F(Type type, Vector2F... pts) {
-        this.height = 0;
-        this.type = type;
-        this.points = new ArrayList<>(Arrays.asList(pts));
-        setupShapes();
-
-        this.showPoint = false;
+    public Cube2F(Type type, Vector2F... pts) {
+        this(new ArrayList<>(Arrays.asList(pts)), 0, type);
     }
 
     public void setupShapes(){
@@ -70,6 +50,7 @@ public class Polygon2F {
         setIsoShapes();
         //setLeftShape();
         //setRightShape();
+        System.out.println("here");
     }
 
     private void setTopShape() {
@@ -113,7 +94,7 @@ public class Polygon2F {
         return lines;
     }
 
-    public void setIsoShapes(){
+    public ArrayList<Shape> getIsoRender(){
         ArrayList<Shape> shapes = new ArrayList<>();
         double[] polPoints = new double[points.size()*2];
         float currentHeight,currentBase;
@@ -130,6 +111,11 @@ public class Polygon2F {
                 wallColor = new Color(1, 0, 0, 0.3);
                 currentHeight = 31;
                 currentBase =height;
+            }
+            case CUBE -> {
+                wallColor = new Color(0, 1, 1, 0.3);
+                currentHeight = 5;
+                currentBase = height;
             }
             default -> { //  WALL or null
                 wallColor = new Color(0, 1, 1, 0.3);
@@ -148,19 +134,6 @@ public class Polygon2F {
         shape = new Polygon(polPoints);
         shape.setFill(type==FLOOR ? new Color(0, 1, 0, 0.3) : Color.TRANSPARENT);
         shapes.add(shape);
-
-
-        //bottom
-        countP = 0;
-        for (Vector2F p : points){
-            float[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentBase);
-            polPoints[countP++] = v[0];
-            polPoints[countP++] = v[1];
-        }
-        shape = new Polygon(polPoints);
-        shape.setFill(type==CELLING ? new Color(1, 0, 0, 0.3) : Color.TRANSPARENT);
-        shapes.add(shape);
-
 
         //faces
         for (int i = 0; i < points.size(); i ++){
@@ -198,52 +171,26 @@ public class Polygon2F {
                     }
             );
         }
+
         this.shapesIso = shapes;
+        return null;
     }
 
     public String toName(){
         String out = "";
-        out += "Polygon";
+        out += "Cube (Polygon)";
         return out;
     }
 
-    public boolean isShowPoint() {
-        return showPoint;
-    }
-
-    public void setShowPoint(boolean showPoint) {
-        this.showPoint = showPoint;
-    }
-
-    public ArrayList<Vector2F> getPoints() {
-        return points;
-    }
-
-    public void setPoints(ArrayList<Vector2F> points) {
-        this.points = points;
-    }
-
-    public ArrayList<Shape> getShapeTop() {
-        return shapeTop;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
-    }
-
     public ArrayList<Shape> getShapesIso() {
-        return shapesIso;
+        ArrayList<Shape> shapes = new ArrayList<>();
+        shapes.addAll(Main.isometricRender.getTextureIso(textureTop));
+        shapes.addAll(Main.isometricRender.getTextureIso(textureNorth));
+        shapes.addAll(Main.isometricRender.getTextureIso(textureEast));
+        shapes.addAll(Main.isometricRender.getTextureIso(textureWest));
+        shapes.addAll(Main.isometricRender.getTextureIso(textureSouth));
+
+        return shapes;
     }
 
-    public void setSelected(boolean isSelected) {
-        this.selected = isSelected;
-    }
-
-    public boolean isSelected() {
-        return selected;
-    }
 }

@@ -5,10 +5,10 @@ import fr.cubibox.com.mapcreator.iu.Player;
 import fr.cubibox.com.mapcreator.map.Map;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.Type;
+import fr.cubibox.com.mapcreator.maths.Cube2F;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Polygon2F;
-import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -18,6 +18,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -138,52 +140,16 @@ public class Controller implements Initializable {
 
         //record drag status
         coordinateSystem.setOnMouseDragged(event ->{
-
             //change view in isometric view
             if (isoview.isSelected()) {
-                if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75) || (dragPointOrigin[0]-event.getX()<-75 || dragPointOrigin[1]-event.getY()<-75)){
-                    dragPointOrigin[0] = (float) event.getX();
-                    dragPointOrigin[1] = (float) event.getY();
-                }
-
-                isometricRender.setXAngle((float) (isometricRender.getXAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
-                float temp_yAngle = (float) (isometricRender.getYAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
-                if (temp_yAngle >= 0 && temp_yAngle <= 1) {
-                    isometricRender.setYAngle(temp_yAngle);
-                }
-                actualizeAllPolygons();
-                drawPolygon();
-
-                dragPointOrigin[0] = (float) event.getX();
-                dragPointOrigin[1] = (float) event.getY();
+                turnCam(event);
             }
 
             //set polygon preview in 2D view
             else {
-                float roundX = MathFunction.round(Main.toPlotX(event.getX()));
-                float roundY = MathFunction.round(Main.toPlotY(event.getY()));
-
-                if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75)) {
-                    dragPointOrigin[0] = roundX;
-                    dragPointOrigin[1] = roundY;
-                }
-
-                if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize)) {
-                    Vector2F currentPos = new Vector2F(roundX, roundY);
-                    if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())) {
-                        actualizeAllPolygons();
-                        drawPolygon(
-                                Polygon2F.topShape(
-                                        selectType(SelectionOption),
-                                        currentPos,
-                                        new Vector2F(dragPointOrigin[0], roundY),
-                                        new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
-                                        new Vector2F(roundX, dragPointOrigin[1])
-                                )
-                        );
-                    }
-                }
+                draggedPolygons(event);
             }
+
             dragState = true;
         });
 
@@ -216,6 +182,49 @@ public class Controller implements Initializable {
             }
         });
     }
+
+    public void draggedPolygons(MouseEvent event) {
+        float roundX = MathFunction.round(Main.toPlotX(event.getX()));
+        float roundY = MathFunction.round(Main.toPlotY(event.getY()));
+
+        if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75)) {
+            dragPointOrigin[0] = roundX;
+            dragPointOrigin[1] = roundY;
+        }
+
+        if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize)){
+            Vector2F currentPos=new Vector2F(roundX,roundY);
+            if(dragState&&!(dragPointOrigin[0]==currentPos.getX()&&dragPointOrigin[1]==currentPos.getY())){
+                actualizeAllPolygons();
+                drawPolygon(Polygon2F.topShape(
+                        selectType(SelectionOption),
+                        currentPos,
+                        new Vector2F(dragPointOrigin[0],roundY),
+                        new Vector2F(dragPointOrigin[0],dragPointOrigin[1]),
+                        new Vector2F(roundX,dragPointOrigin[1])
+                ));
+            }
+        }
+    }
+
+    public void turnCam(MouseEvent event){
+        if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75) || (dragPointOrigin[0]-event.getX()<-75 || dragPointOrigin[1]-event.getY()<-75)){
+            dragPointOrigin[0] = (float) event.getX();
+            dragPointOrigin[1] = (float) event.getY();
+        }
+
+        isometricRender.setXAngle((float) (isometricRender.getXAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
+        float temp_yAngle = (float) (isometricRender.getYAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
+        if (temp_yAngle >= 0 && temp_yAngle <= 1) {
+            isometricRender.setYAngle(temp_yAngle);
+        }
+        actualizeAllPolygons();
+        drawPolygon();
+
+        dragPointOrigin[0] = (float) event.getX();
+        dragPointOrigin[1] = (float) event.getY();
+    }
+
 
     public void actualizeAllPolygons(){
         for (StaticObject obj : Main.staticObjects){
@@ -556,9 +565,9 @@ public class Controller implements Initializable {
             if (drawablePol.contains(obj.getType())) {
                 Polygon2F pols = obj.getPolygon();
 
-                if (IsometricView)
-                    for (Shape shape : obj.getPolygon().getShapesIso())
-                        coordinateSystem.getChildren().add(shape);
+                if (IsometricView) {
+                   coordinateSystem.getChildren().addAll(pols.getShapesIso());
+                }
                 else {
                     for (Shape shape : obj.getPolygon().getShapeTop()) {
                         shape.setOnMousePressed(event -> {
@@ -671,10 +680,18 @@ public class Controller implements Initializable {
     }
 
     public void setPolygon(ArrayList<Vector2F> points) {
-        StaticObject obj = new StaticObject(
-                new Polygon2F(points, (float)polHeightSlide.getValue(),selectType(SelectionOption))
-                ,selectType(SelectionOption)
-        );
+        StaticObject obj = switch (selectType(SelectionOption)) {
+            case CUBE ->
+                 new StaticObject(
+                        new Cube2F(points, (float) polHeightSlide.getValue(), selectType(SelectionOption))
+                        , selectType(SelectionOption)
+                );
+            default ->
+                new StaticObject(
+                        new Polygon2F(points, (float) polHeightSlide.getValue(), selectType(SelectionOption))
+                        , selectType(SelectionOption)
+                );
+        };
         Main.getStaticObjects().add(obj);
         polyBoard.getChildren().add(polygonBoard(obj));
         actuBoard();
