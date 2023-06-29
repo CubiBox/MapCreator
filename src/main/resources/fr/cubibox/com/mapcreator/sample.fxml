@@ -18,7 +18,6 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
@@ -54,7 +53,7 @@
    <center>
       <ScrollPane fx:id="scrollPane" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
          <content>
-            <Pane fx:id="coordinateSystem" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #000000;" />
+            <Canvas fx:id="coordinateSystem" height="500.0" style="-fx-background-color: #00000000;" width="500.0" />
          </content>
       </ScrollPane>
    </center>
@@ -264,7 +263,6 @@
                   </ScrollPane>
                </children>
             </VBox>
-            <Canvas height="500.0" style="-fx-background-color: #00000000;" width="500.0" />
          </children>
       </VBox>
    </right>

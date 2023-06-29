@@ -1,13 +1,24 @@
 package fr.cubibox.com.mapcreator.graphics;
 
+import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.mapObject.StaticObject;
+import fr.cubibox.com.mapcreator.maths.Cube2F;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelWriter;
+import javafx.scene.image.WritableImage;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import static fr.cubibox.com.mapcreator.Main.*;
 import static fr.cubibox.com.mapcreator.graphics.Texture.*;
+import static fr.cubibox.com.mapcreator.mapObject.Type.CUBE;
 
 
 public class IsometricRender {
@@ -64,43 +75,56 @@ public class IsometricRender {
         };
     }
 
-    public ArrayList<Shape> getTextureIso(Texture texture) {
-        ArrayList<Shape> shapes = new ArrayList<>();
+    public void drawIso(StaticObject obj, GraphicsContext gc) {
+        if (obj.getType() == CUBE){
+            Cube2F cube = (Cube2F) obj.getPolygon();
+            int x = (int) obj.getOrigin().getX() * 64;
+            int y = (int) obj.getOrigin().getY() * 64;
+            drawTextureIso(cube.getTextureTop(), gc, x, y, 0);
+            drawTextureIso(cube.getTextureEast(), gc, x, y, 0);
+            drawTextureIso(cube.getTextureWest(), gc, x, y, 0);
+            drawTextureIso(cube.getTextureNorth(), gc, x, y, 0);
+            drawTextureIso(cube.getTextureSouth(), gc, x, y, 0);
+        }
+        else {
+            System.out.println("WIP : " + obj);
+        }
+    }
+
+    public void drawTextureIso(Texture texture, GraphicsContext gc, int x, int y, int z) {
         double width = texture.getWidth();
         double height = texture.getHeight();
         int face = texture.getFace();
 
+        WritableImage wr = new WritableImage(texture.getTexture().getWidth()*2, texture.getTexture().getHeight()*2);
+        PixelWriter pw = wr.getPixelWriter();
+
         switch (face){
-            case NORTH -> { if (xAngle >= angle1 && xAngle <= angle3) return shapes; }
-            case SOUTH -> { if (xAngle >= angle3 || xAngle <= angle1) return shapes; }
-            case WEST -> { if (xAngle >= angle4 || xAngle <= angle2) return shapes; }
-            case EAST -> { if (xAngle >= angle2 && xAngle <= angle4) return shapes; }
+            case NORTH -> { if (xAngle >= angle1 && xAngle <= angle3) return; }
+            case SOUTH -> { if (xAngle >= angle3 || xAngle <= angle1) return; }
+            case WEST -> { if (xAngle >= angle4 || xAngle <= angle2) return; }
+            case EAST -> { if (xAngle >= angle2 && xAngle <= angle4) return; }
         };
 
         double heightOffset = Math.sin(Math.PI / 2d - (yAngle * (Math.PI / 2d))) * 0.75;
-        for (int y = 0; y < height; y++) {
-            for (int x = 0; x < width; x++) {
-                int rgb = texture.getTexture().getRGB(x, y);
-                double red = (double)((rgb >> 16) & 0xFF) / 255;
-                double green = (double)((rgb >> 8) & 0xFF) / 255;
-                double blue = (double)(rgb & 0xFF) / 255;
+        for (int relativeY = 0; relativeY < height; relativeY++) {
+            for (int relativeX = 0; relativeX < width; relativeX++) {
+                int rgba = texture.getTexture().getRGB(relativeX, relativeY);
                 double[] coos = switch (face){
-                    case TOP -> texture.toScreenIso(x, y, height, xAngle, yAngle, heightOffset);
-                    case BOTTOM -> texture.toScreenIso(x, y, 0, xAngle, yAngle, heightOffset);
-                    case NORTH -> texture.toScreenIso(y, 0, x, xAngle, yAngle, heightOffset);
-                    case SOUTH -> texture.toScreenIso(y, height, x, xAngle, yAngle, heightOffset);
-                    case EAST -> texture.toScreenIso(0, x, y, xAngle, yAngle, heightOffset);
-                    case WEST -> texture.toScreenIso(height, x, y, xAngle, yAngle, heightOffset);
+                    case TOP -> texture.toScreenIso(relativeX + x, relativeY + y, height + z, xAngle, yAngle, heightOffset);
+                    case BOTTOM -> texture.toScreenIso(relativeX + x, relativeY + y, 0, xAngle, yAngle, heightOffset);
+                    case NORTH -> texture.toScreenIso(relativeY + y, 0, relativeX + x, xAngle, yAngle, heightOffset);
+                    case SOUTH -> texture.toScreenIso(relativeY + y, height, relativeX + x, xAngle, yAngle, heightOffset);
+                    case EAST -> texture.toScreenIso(0, relativeX + x, relativeY + y, xAngle, yAngle, heightOffset);
+                    case WEST -> texture.toScreenIso(height + z, relativeX + x, relativeY + y, xAngle, yAngle, heightOffset);
                     default -> throw new IllegalStateException("Unexpected value: " + face);
                 };
-                Rectangle rect = new Rectangle(coos[0], coos[1], 1d, 1d);
-                rect.setFill(new javafx.scene.paint.Color(
-                        red, green, blue, 1
-                ));
-                shapes.add(rect);
+                pw.setArgb((int) (coos[0]), (int) (coos[1]) , rgba);
             }
         }
-        return shapes;
+        Image image = new ImageView(wr).getImage();
+        if (image != null)
+            gc.drawImage(new ImageView(wr).getImage(), 0, 0);
     }
 
     public double getXAngle() {
@@ -123,4 +147,6 @@ public class IsometricRender {
     public void setOrigin(Vector2F origin) {
         this.origin = origin;
     }
+
+
 }

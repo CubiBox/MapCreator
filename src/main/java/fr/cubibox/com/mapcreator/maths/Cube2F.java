@@ -182,15 +182,23 @@ public class Cube2F extends Polygon2F {
         return out;
     }
 
-    public ArrayList<Shape> getShapesIso() {
-        ArrayList<Shape> shapes = new ArrayList<>();
-        shapes.addAll(Main.isometricRender.getTextureIso(textureTop));
-        shapes.addAll(Main.isometricRender.getTextureIso(textureNorth));
-        shapes.addAll(Main.isometricRender.getTextureIso(textureEast));
-        shapes.addAll(Main.isometricRender.getTextureIso(textureWest));
-        shapes.addAll(Main.isometricRender.getTextureIso(textureSouth));
-
-        return shapes;
+    public Texture getTextureTop() {
+        return textureTop;
     }
 
+    public Texture getTextureNorth() {
+        return textureNorth;
+    }
+
+    public Texture getTextureEast() {
+        return textureEast;
+    }
+
+    public Texture getTextureWest() {
+        return textureWest;
+    }
+
+    public Texture getTextureSouth() {
+        return textureSouth;
+    }
 }

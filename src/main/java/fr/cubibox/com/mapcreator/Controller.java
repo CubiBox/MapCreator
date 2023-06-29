@@ -15,6 +15,8 @@ import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -40,7 +42,7 @@ public class Controller implements Initializable {
 
     public ScrollPane scrollPane;
     @FXML
-    private Pane coordinateSystem;
+    private Canvas coordinateSystem;
     @FXML
     private ToggleButton walls;
     public ToggleButton bottom;
@@ -76,7 +78,9 @@ public class Controller implements Initializable {
         isometricRender = new IsometricRender(xSize/2);
 
         scrollPane.setPrefWidth(screenWidth/2);
-        coordinateSystem.setPrefSize(980,980);
+        //coordinateSystem.setPrefSize(980,980);
+        coordinateSystem.setWidth(980d);
+        coordinateSystem.setHeight(980d);
 
         drawPolygon();
 
@@ -122,7 +126,9 @@ public class Controller implements Initializable {
             if (event.isControlDown() && Main.DIML + value < 2000 && Main.DIML + value > scrollPane.getWidth()+20) {
                 Main.DIML += value;
                 Main.DIMC += value;
-                coordinateSystem.setPrefSize(Main.DIMC,Main.DIML);
+                //coordinateSystem.setPrefSize(Main.DIMC,Main.DIML);
+                coordinateSystem.setWidth(Main.DIMC);
+                coordinateSystem.setHeight(Main.DIML);
                 actualizeAllPolygons();
                 drawPolygon();
             }
@@ -131,9 +137,10 @@ public class Controller implements Initializable {
         //reset pane dimension if windowed
         scrollPane.widthProperty().addListener(e -> {
             scrollPane.setPrefWidth(screenWidth/2);
-            coordinateSystem.setPrefSize(980,980);
             Main.DIML = 980;
             Main.DIMC = 980;
+            coordinateSystem.setWidth(Main.DIMC);
+            coordinateSystem.setHeight(Main.DIML);
             actualizeAllPolygons();
             drawPolygon();
         });
@@ -544,21 +551,25 @@ public class Controller implements Initializable {
     }
 
     public void drawPolygon(ArrayList<Shape> tempPol) {
+        GraphicsContext gc = coordinateSystem.getGraphicsContext2D();
+        gc.clearRect(0,0,coordinateSystem.getWidth(),coordinateSystem.getHeight());
+
         boolean IsometricView = isoview.isSelected();
-        coordinateSystem.getChildren().clear();
+        //coordinateSystem.getChildren().clear();
         ArrayList<Vector2F> points = Main.getPoints();
-        for (Shape r : drawGrid())
-            coordinateSystem.getChildren().add(r);
+        drawGrid();
+
 
         //draw the points
+        /*
         for (Vector2F p : points) {
             if (IsometricView){
                 float[] v = isometricRender.toScreenIso(p.getX(), p.getY());
                 coordinateSystem.getChildren().add(new Circle(v[0], v[1], 3, p.getColor()));
             }
             else coordinateSystem.getChildren().add(p.getCircle());
-
         }
+        */
 
         //draw the polygons
         for (StaticObject obj : Main.getStaticObjects()) {
@@ -566,8 +577,9 @@ public class Controller implements Initializable {
                 Polygon2F pols = obj.getPolygon();
 
                 if (IsometricView) {
-                   coordinateSystem.getChildren().addAll(pols.getShapesIso());
+                    isometricRender.drawIso(obj, gc);
                 }
+                /*
                 else {
                     for (Shape shape : obj.getPolygon().getShapeTop()) {
                         shape.setOnMousePressed(event -> {
@@ -598,62 +610,63 @@ public class Controller implements Initializable {
                         coordinateSystem.getChildren().add(pointName);
                     }
                 }
+                */
             }
         }
 
+        /*
         //draw temp polygon
         if (!tempPol.isEmpty() && !isoview.isSelected()){
             for (Shape pol : tempPol){
                 coordinateSystem.getChildren().add(pol);
             }
         }
+
+         */
     }
 
 
-    public ArrayList<Shape> drawGrid() {
-        ArrayList<Shape> lines = new ArrayList<>();
-        ArrayList<Shape> tpmLines = new ArrayList<>();
-        boolean isIsometricView = isoview.isSelected();
+    public void drawGrid() {
+        GraphicsContext gc = coordinateSystem.getGraphicsContext2D();
 
-        Line line1,line2;
-
+        float[] line1 = new float[4];
+        float[] line2 = new float[4];
         for (int i = 0; i <= xSize; i++) {
-            if (isIsometricView) {
-                float[] var1 = isometricRender.toScreenIso(i, 0);
-                float[] var2 = isometricRender.toScreenIso(i, xSize);
-                float[] var3 = isometricRender.toScreenIso(0, i);
-                float[] var4 = isometricRender.toScreenIso(xSize, i);
+            if (isoview.isSelected()) {
+                float[] var = isometricRender.toScreenIso(i, 0);
+                line1[0] = var[0];
+                line1[1] = var[1];
 
-                line1 = new Line(var1[0], var1[1], var2[0], var2[1]);
-                line2 = new Line(var3[0], var3[1], var4[0], var4[1]);
+                var = isometricRender.toScreenIso(i, xSize);
+                line1[2] = var[0];
+                line1[3] = var[1];
+
+                var = isometricRender.toScreenIso(0, i);
+                line2[0] = var[0];
+                line2[1] = var[1];
+
+                var = isometricRender.toScreenIso(xSize, i);
+                line2[2] = var[0];
+                line2[3] = var[1];
             }
             else {
-                line1 = new Line(Main.toScreenX(i), Main.toScreenY(0), Main.toScreenX(i), Main.toScreenY(xSize));
-                line2 = new Line(Main.toScreenX(0), Main.toScreenY(i), Main.toScreenX(xSize), Main.toScreenY(i));
+                line1 = new float[]{Main.toScreenX(i), Main.toScreenY(0), Main.toScreenX(i), Main.toScreenY(xSize)};
+                line2 = new float[]{Main.toScreenX(0), Main.toScreenY(i), Main.toScreenX(xSize), Main.toScreenY(i)};
             }
-
-            line1.setStroke(Color.rgb(30, 30, 30));
-            line1.setStrokeWidth(3);
-            line1.setSmooth(true);
-
-            line2.setStroke(Color.rgb(30, 30, 30));
-            line2.setStrokeWidth(3);
-            line2.setSmooth(true);
 
             if (i % 8 != 0) {
-                lines.add(line2);
-                lines.add(line1);
-            } else {
-                tpmLines.add(line1);
-                tpmLines.add(line2);
+                gc.setStroke(Color.rgb(30, 30, 30));
+                gc.setImageSmoothing(false);
+                gc.setLineWidth(3d);
+                gc.strokeLine(line1[0],line1[1],line1[2],line1[3]);
+                gc.strokeLine(line2[0],line2[1],line2[2],line2[3]);
+            }
+            else {
+                gc.setStroke(Color.rgb(70, 70, 70));
+                gc.strokeLine(line2[0],line2[1],line2[2],line2[3]);
+                gc.strokeLine(line1[0],line1[1],line1[2],line1[3]);
             }
         }
-
-        for (Shape line : tpmLines) {
-            line.setStroke(Color.rgb(70, 70, 70));
-            lines.add(line);
-        }
-        return lines;
     }
 
     public void reset(ActionEvent actionEvent) {
