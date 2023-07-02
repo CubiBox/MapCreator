@@ -1,7 +1,10 @@
 package fr.cubibox.com.mapcreator.maths;
 
 import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.graphics.IsometricRender;
+import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.Type;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
@@ -9,6 +12,7 @@ import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.StringJoiner;
 
 import static fr.cubibox.com.mapcreator.mapObject.Type.*;
 
@@ -113,98 +117,116 @@ public class Polygon2F {
         return lines;
     }
 
+
     public void setIsoShapes(){
-        ArrayList<Shape> shapes = new ArrayList<>();
-        double[] polPoints = new double[points.size()*2];
-        float currentHeight,currentBase;
-        Polygon shape;
-        Color wallColor;
-
-        switch (type) {
-            case FLOOR -> {
-                wallColor = new Color(0, 1, 0, 0.3);
-                currentHeight = height;
-                currentBase = 0;
-            }
-            case CELLING -> {
-                wallColor = new Color(1, 0, 0, 0.3);
-                currentHeight = 31;
-                currentBase =height;
-            }
-            default -> { //  WALL or null
-                wallColor = new Color(0, 1, 1, 0.3);
-                currentHeight = height;
-                currentBase = 0;
-            }
-        }
-
-        //top
-        int countP = 0;
-        for (Vector2F p : points){
-            float[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentHeight);
-            polPoints[countP++] = v[0];
-            polPoints[countP++] = v[1];
-        }
-        shape = new Polygon(polPoints);
-        shape.setFill(type==FLOOR ? new Color(0, 1, 0, 0.3) : Color.TRANSPARENT);
-        shapes.add(shape);
-
-
-        //bottom
-        countP = 0;
-        for (Vector2F p : points){
-            float[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentBase);
-            polPoints[countP++] = v[0];
-            polPoints[countP++] = v[1];
-        }
-        shape = new Polygon(polPoints);
-        shape.setFill(type==CELLING ? new Color(1, 0, 0, 0.3) : Color.TRANSPARENT);
-        shapes.add(shape);
-
-
-        //faces
-        for (int i = 0; i < points.size(); i ++){
-            polPoints = new double[8];
-            countP = 0;
-
-            float[] v = Main.isometricRender.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentBase);
-            polPoints[countP++] = v[0];
-            polPoints[countP++] = v[1];
-            float[] v1 = Main.isometricRender.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentHeight);
-            polPoints[countP++] = v1[0];
-            polPoints[countP++] = v1[1];
-
-            int i2 = i+1 < points.size() ? i+1 : 0;
-            v1 = Main.isometricRender.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentHeight);
-            polPoints[countP++] = v1[0];
-            polPoints[countP++] = v1[1];
-            v = Main.isometricRender.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentBase);
-            polPoints[countP++] = v[0];
-            polPoints[countP++] = v[1];
-
-            shape = new Polygon(polPoints);
-            shape.setFill(wallColor);
-            shapes.add(shape);
-        }
-
-        //add global settings
-        for (Shape pol : shapes) {
-            pol.setStrokeWidth(2.0);
-            pol.setStroke(
-                    switch (type) {
-                        case FLOOR -> Color.LIME;
-                        case CELLING -> Color.RED;
-                        default -> Color.CYAN;
-                    }
-            );
-        }
-        this.shapesIso = shapes;
+//        ArrayList<Shape> shapes = new ArrayList<>();
+//        double[] polPoints = new double[points.size()*2];
+//        float currentHeight,currentBase;
+//        Polygon shape;
+//        Color wallColor;
+//
+//        switch (type) {
+//            case FLOOR -> {
+//                wallColor = new Color(0, 1, 0, 0.3);
+//                currentHeight = height;
+//                currentBase = 0;
+//            }
+//            case CELLING -> {
+//                wallColor = new Color(1, 0, 0, 0.3);
+//                currentHeight = 31;
+//                currentBase =height;
+//            }
+//            default -> { //  WALL or null
+//                wallColor = new Color(0, 1, 1, 0.3);
+//                currentHeight = height;
+//                currentBase = 0;
+//            }
+//        }
+//
+//        //top
+//        int countP = 0;
+//        for (Vector2F p : points){
+//            float[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentHeight);
+//            polPoints[countP++] = v[0];
+//            polPoints[countP++] = v[1];
+//        }
+//        shape = new Polygon(polPoints);
+//        shape.setFill(type==FLOOR ? new Color(0, 1, 0, 0.3) : Color.TRANSPARENT);
+//        shapes.add(shape);
+//
+//
+//        //bottom
+//        countP = 0;
+//        for (Vector2F p : points){
+//            float[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentBase);
+//            polPoints[countP++] = v[0];
+//            polPoints[countP++] = v[1];
+//        }
+//        shape = new Polygon(polPoints);
+//        shape.setFill(type==CELLING ? new Color(1, 0, 0, 0.3) : Color.TRANSPARENT);
+//        shapes.add(shape);
+//
+//
+//        //faces
+//        for (int i = 0; i < points.size(); i ++){
+//            polPoints = new double[8];
+//            countP = 0;
+//
+//            float[] v = Main.isometricRender.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentBase);
+//            polPoints[countP++] = v[0];
+//            polPoints[countP++] = v[1];
+//            float[] v1 = Main.isometricRender.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentHeight);
+//            polPoints[countP++] = v1[0];
+//            polPoints[countP++] = v1[1];
+//
+//            int i2 = i+1 < points.size() ? i+1 : 0;
+//            v1 = Main.isometricRender.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentHeight);
+//            polPoints[countP++] = v1[0];
+//            polPoints[countP++] = v1[1];
+//            v = Main.isometricRender.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentBase);
+//            polPoints[countP++] = v[0];
+//            polPoints[countP++] = v[1];
+//
+//            shape = new Polygon(polPoints);
+//            shape.setFill(wallColor);
+//            shapes.add(shape);
+//        }
+//
+//        //add global settings
+//        for (Shape pol : shapes) {
+//            pol.setStrokeWidth(2.0);
+//            pol.setStroke(
+//                    switch (type) {
+//                        case FLOOR -> Color.LIME;
+//                        case CELLING -> Color.RED;
+//                        default -> Color.CYAN;
+//                    }
+//            );
+//        }
+//        this.shapesIso = shapes;
     }
 
     public String toName(){
-        String out = "";
-        out += "Polygon";
-        return out;
+        StringJoiner out = new StringJoiner("\n");
+        out.add("Polygon :");
+        out.add("type : " + type);
+        out.add("height : " + height);
+        out.add("points : ");
+        for (Vector2F p : points)
+            out.add("\t point : [" + p.getX() + "; " + p.getY() + "]");
+        return out.toString();
+    }
+
+    @Override
+    public String toString(){
+        StringJoiner out = new StringJoiner("\n");
+        out.add("Polygon :");
+        out.add("type : " + type);
+        out.add("height : " + height);
+        out.add("points : ");
+        for (Vector2F p : points)
+            out.add("\t point : [" + p.getX() + "; " + p.getY() + "]");
+        return out.toString();
     }
 
     public boolean isShowPoint() {

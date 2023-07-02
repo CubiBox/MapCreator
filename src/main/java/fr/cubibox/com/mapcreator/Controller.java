@@ -220,7 +220,11 @@ public class Controller implements Initializable {
             dragPointOrigin[1] = (float) event.getY();
         }
 
-        isometricRender.setXAngle((float) (isometricRender.getXAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
+        isometricRender.setXAngle((float) (isometricRender.getXAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f) % (Math.PI * 2));
+        if (isometricRender.getXAngle() < 0)
+            isometricRender.setXAngle(Math.PI * 2 - isometricRender.getXAngle());
+        //System.out.println(isometricRender.getXAngle());
+
         float temp_yAngle = (float) (isometricRender.getYAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
         if (temp_yAngle >= 0 && temp_yAngle <= 1) {
             isometricRender.setYAngle(temp_yAngle);
@@ -492,7 +496,7 @@ public class Controller implements Initializable {
         HBox name = new HBox();
         name.setAlignment(Pos.TOP_LEFT);
         name.setPrefWidth(120);
-        name.getChildren().add(new Label(p.toName()));
+        name.getChildren().add(new Label("temp"));  //p.toName()));
 
         //add name, delete, show points buttons
         HBox nameBoard = new HBox();
@@ -553,6 +557,8 @@ public class Controller implements Initializable {
     public void drawPolygon(ArrayList<Shape> tempPol) {
         GraphicsContext gc = coordinateSystem.getGraphicsContext2D();
         gc.clearRect(0,0,coordinateSystem.getWidth(),coordinateSystem.getHeight());
+        gc.setFill(Color.BLACK);
+        gc.fillRect(0,0, coordinateSystem.getWidth(),coordinateSystem.getHeight());
 
         boolean IsometricView = isoview.isSelected();
         //coordinateSystem.getChildren().clear();
@@ -629,11 +635,11 @@ public class Controller implements Initializable {
     public void drawGrid() {
         GraphicsContext gc = coordinateSystem.getGraphicsContext2D();
 
-        float[] line1 = new float[4];
-        float[] line2 = new float[4];
+        double[] line1 = new double[4];
+        double[] line2 = new double[4];
         for (int i = 0; i <= xSize; i++) {
             if (isoview.isSelected()) {
-                float[] var = isometricRender.toScreenIso(i, 0);
+                double[] var = isometricRender.toScreenIso(i, 0);
                 line1[0] = var[0];
                 line1[1] = var[1];
 
@@ -650,8 +656,8 @@ public class Controller implements Initializable {
                 line2[3] = var[1];
             }
             else {
-                line1 = new float[]{Main.toScreenX(i), Main.toScreenY(0), Main.toScreenX(i), Main.toScreenY(xSize)};
-                line2 = new float[]{Main.toScreenX(0), Main.toScreenY(i), Main.toScreenX(xSize), Main.toScreenY(i)};
+                line1 = new double[]{Main.toScreenX(i), Main.toScreenY(0), Main.toScreenX(i), Main.toScreenY(xSize)};
+                line2 = new double[]{Main.toScreenX(0), Main.toScreenY(i), Main.toScreenX(xSize), Main.toScreenY(i)};
             }
 
             if (i % 8 != 0) {

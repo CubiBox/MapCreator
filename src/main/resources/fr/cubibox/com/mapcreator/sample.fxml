@@ -53,7 +53,7 @@
    <center>
       <ScrollPane fx:id="scrollPane" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
          <content>
-            <Canvas fx:id="coordinateSystem" height="500.0" style="-fx-background-color: #00000000;" width="500.0" />
+            <Canvas fx:id="coordinateSystem" height="500.0" style="-fx-background-color: #000000;" width="500.0" />
          </content>
       </ScrollPane>
    </center>
