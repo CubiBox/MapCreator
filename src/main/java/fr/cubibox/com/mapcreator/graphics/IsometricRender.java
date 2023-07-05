@@ -86,11 +86,16 @@ public class IsometricRender {
         if (obj.getType() == CUBE){
             Cube2F cube = (Cube2F) obj.getPolygon();
 
+            /*
             drawTextureIso(cube.getTextureTop(), gc, obj.getPolygon());
             drawTextureIso(cube.getTextureEast(), gc, obj.getPolygon());
             drawTextureIso(cube.getTextureWest(), gc, obj.getPolygon());
             drawTextureIso(cube.getTextureNorth(), gc, obj.getPolygon());
             drawTextureIso(cube.getTextureSouth(), gc, obj.getPolygon());
+            */
+            for (Face face : cube.getFaces()){
+                face.drawTextureIso(this, gc, cube.getHeight());
+            }
         }
         else {
             ArrayList<Vector2F> points = obj.getPolygon().getPoints();
@@ -188,18 +193,18 @@ public class IsometricRender {
             point_x[x_iter++] = v[0];
             point_y[y_iter++] = v[1];
         }
-        //System.out.println( new StringJoiner("\n").add(x_max+"").add(y_max+"").add(x_min+"").add(y_min+"").add(pol_width+"").add(pol_height+""));
+        //System.out.println( new StringJoiner("\n").add(x_max+"").add(y_max+"").add(x_min+"").add(y_min+""));
 
         for (int i = 0; i < points.size(); i ++)
             gc.getPixelWriter().setArgb( (int) (point_x[i]),  (int) (point_y[i]), 150000);
 
         //clipping
-        switch (face){   // will be face.angle checking
-            case NORTH -> { if (xAngle >= angle1 && xAngle <= angle3) return; }
-            case SOUTH -> { if (xAngle >= angle3 || xAngle <= angle1) return; }
-            case WEST -> { if (xAngle >= angle4 || xAngle <= angle2) return; }
-            case EAST -> { if (xAngle >= angle2 && xAngle <= angle4) return; }
-        };
+//        switch (face){   // will be face.angle checking
+//            case NORTH -> { if (xAngle >= angle1 && xAngle <= angle3) return; }
+//            case SOUTH -> { if (xAngle >= angle3 || xAngle <= angle1) return; }
+//            case WEST -> { if (xAngle >= angle4 || xAngle <= angle2) return; }
+//            case EAST -> { if (xAngle >= angle2 && xAngle <= angle4) return; }
+//        };
 
         int sizeH = (int) (textureHeight/16);
         int sizeW = (int) (textureWidth/16);
@@ -240,8 +245,7 @@ public class IsometricRender {
         double pixel_zw = z/polWidth;
         double pixel_zh = z/polHeight;
 
-
-        //if (false)
+        if (false)
         for (double y = y_min; y <= y_max; y += pixel_height){
             for (double x = x_min; x <= x_max; x += pixel_width){
                 //System.out.println((x - x_min)/ pixel_width);
@@ -268,6 +272,110 @@ public class IsometricRender {
                     gc.getPixelWriter().setArgb((int) (coos[0]), (int) (coos[1]) , rgba);
             }
         }
+
+        double[][] bounds = switch (face){
+            case TOP -> new double[][]{
+                    new double[]{0,0},
+                    toScreenIso(x_min, y_min, z),
+                    toScreenIso(x_max, y_max, z)
+            };
+            case BOTTOM -> new double[][]{
+                    new double[]{0,0},
+                    toScreenIso(x_min, y_min, 0),
+                    toScreenIso(x_max, y_max, 0)
+
+            };
+            case NORTH -> new double[][]{
+                    toScreenIso(x_min, y_min, 0),
+                    toScreenIso(x_min, y_min, z),
+                    toScreenIso(x_max, y_min, z)
+            };
+            case SOUTH -> new double[][]{
+                    toScreenIso(x_min, y_max, 0),
+                    toScreenIso(x_min, y_max, z),
+                    toScreenIso(x_max, y_max, z)
+            };
+
+            case EAST -> new double[][]{
+                    toScreenIso(x_min, y_min, 0),
+                    toScreenIso(x_min, y_min, z),
+                    toScreenIso(x_min, y_max, z)
+            };
+            case WEST -> new double[][]{
+                    toScreenIso(x_max, y_min, 0),
+                    toScreenIso(x_max, y_min, z),
+                    toScreenIso(x_max, y_max, z)
+            };
+            default -> throw new IllegalStateException("Unexpected value: " + face);
+        };
+
+        double iso_width = bounds[1][0] - bounds[2][0];
+        double iso_height = bounds[1][1] - bounds[2][1];
+
+        double[] max_x = bounds[1][0] > bounds[2][0] ? bounds[1] : bounds[2];
+        double[] max_y = bounds[1][1] > bounds[2][1] ? bounds[1] : bounds[2];
+        double[] min_x = bounds[1][0] < bounds[2][0] ? bounds[1] : bounds[2];
+        double[] min_y = bounds[1][1] < bounds[2][1] ? bounds[1] : bounds[2];
+
+        double delta_x = iso_width/iso_height;
+        //double delta_y = Math.abs(iso_height/iso_width) * delta_x;
+        double delta_y = 1;
+        double delta_z = bounds[0][1] - bounds[1][1];
+
+        System.out.println(iso_width + "; " + iso_height + "; " + delta_x);
+
+        int rgba = switch (face){
+            case TOP -> 0;
+            case NORTH -> -6481156;
+            case SOUTH -> -343145324;
+            case EAST -> -6848410;
+            case WEST -> -15164433;
+            default -> throw new IllegalStateException("Unexpected value: " + face);
+        };
+
+        //System.out.println(min_y[0] + "; " + max_y[0] + "; " + iso_width + "; " + delta_x);
+        System.out.println("z : " + (min_y[1] <= min_y[1]+delta_z) + " -> " + face);
+        System.out.println("y / z : " + (min_y[0] >= max_y[0]) + " -> " + face);
+        System.out.println("________");
+
+        for (double curr_z = bounds[1][1]; curr_z <= bounds[1][1]+delta_z; curr_z ++){
+            double relat_y = curr_z;
+
+            for (double x = 0; x < iso_width; x += Math.abs(delta_x)){
+                double relat_x = (bounds[1][0] > bounds[2][0]) ? bounds[1][0] - x : bounds[2][0] + x;
+                delta_y = (bounds[1][1] > bounds[2][1]) ? -1 : 1;
+
+                //System.out.println(x + "; " + iso_width + "; " + relat_x + "; " + delta_x);
+                if (relat_y > 0d && relat_x > 0d) {
+                    for (int filler = 0; filler < delta_x; filler -= delta_y) { // < delta_x
+                        if (relat_x + filler < max_x[0] && relat_x + filler > min_x[0]) {
+                            gc.getPixelWriter().setArgb((int) relat_x + filler, (int) relat_y, rgba);
+                        }
+                    }
+                    gc.getPixelWriter().setArgb((int) relat_x, (int) relat_y, 0);
+                }
+
+                relat_y += delta_y;
+            }
+
+
+            //System.out.println("y / z : " + (min_y[0] <= max_y[0]) + " -> " + face);
+//            for (double x = min_y[0]; x <= max_y[0]; x += delta_x){
+//                if (relat_y > 0d && x > 0d)
+//                    for (int filler = 0; filler < delta_x; filler++) // < delta_x
+//                        if (x+filler < max_x[0]) {
+////                            int rgba = (x < textureWidth && relat_y < textureHeight) ?
+////                                    texture.getTexture().getRGB((int) x, (int) relat_y :
+////                                    texture.getTexture().getRGB((int)(textureWidth-1), (int)(textureHeight-1));
+//                            gc.getPixelWriter().setArgb((int) x + filler, (int) relat_y, rgba);
+//                        }
+//
+//                relat_y ++;
+//            }
+        }
+
+        gc.getPixelWriter().setArgb( (int) (bounds[0][0]),  (int) (bounds[0][1]), 150000);
+        gc.getPixelWriter().setArgb( (int) (bounds[1][0]),  (int) (bounds[1][1]), 150000);
     }
 
     public double getXAngle() {

@@ -158,81 +158,6 @@ public class Texture {
         return output;
     }
 
-/*
-    public void trash(){
-        ArrayList<Vector2F> points = obj.getPolygon().getPoints();
-        float currentHeight = obj.getPolygon().getHeight();
-        float currentBase = 0;
-
-        switch (obj.getType()) {
-            case FLOOR -> {
-                gc.setStroke(javafx.scene.paint.Color.rgb(0, 255, 0, 0.3));
-            }
-            case CELLING -> {
-                gc.setStroke(javafx.scene.paint.Color.rgb(255, 0, 0, 0.3));
-                currentHeight = 31;
-            }
-            default -> { //  WALL or null
-                gc.setStroke(javafx.scene.paint.Color.rgb(0, 255, 255, 0.3));
-            }
-        }
-
-        //top
-        double[] point_x = new double[points.size()];
-        double[] point_y = new double[points.size()];
-        int x_iter = 0;
-        int y_iter = 0;
-        for (Vector2F p : points){
-            double[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentHeight);
-            point_x[x_iter++] = v[0];
-            point_y[y_iter++] = v[1];
-        }
-        //gc.setStroke(obj.getType()==FLOOR ? new Color(0, 1, 0, 0.3) : Color.TRANSPARENT);
-        gc.strokePolygon(point_x, point_y, point_x.length);
-
-
-        //bottom
-        point_x = new double[points.size()];
-        point_y = new double[points.size()];
-        x_iter = 0;
-        y_iter = 0;
-        for (Vector2F p : points){
-            double[] v = Main.isometricRender.toScreenIso(p.getX(),p.getY(),currentBase);
-            point_x[x_iter++] = v[0];
-            point_y[y_iter++] = v[1];
-        }
-        gc.strokePolygon(point_x, point_y, point_x.length);
-
-
-        //faces
-        for (int i = 0; i < points.size(); i ++){
-            point_x = new double[points.size()];
-            point_y = new double[points.size()];
-            x_iter = 0;
-            y_iter = 0;
-
-            double[] v = isometricRender.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentBase);
-            point_x[x_iter++] = v[0];
-            point_y[y_iter++] = v[1];
-            double[] v1 = isometricRender.toScreenIso(points.get(i).getX(),points.get(i).getY(),currentHeight);
-            point_x[x_iter++] = v1[0];
-            point_y[y_iter++] = v1[1];
-
-            int i2 = i+1 < points.size() ? i+1 : 0;
-            v1 = isometricRender.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentHeight);
-            point_x[x_iter++] = v1[0];
-            point_y[y_iter++] = v1[1];
-            v = isometricRender.toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentBase);
-            point_x[x_iter++] = v[0];
-            point_y[y_iter++] = v[1];
-
-            gc.strokePolygon(point_x, point_y, point_x.length);
-        }
-    }
-
- */
-
-
     public BufferedImage upscale(BufferedImage image, int width, int height) {
         double widthScale = image.getWidth()/(double)width;
         double heightScale = image.getHeight()/(double)height;
@@ -252,6 +177,19 @@ public class Texture {
         }
         g2.dispose();
         return output;
+    }
+
+    public int getRgba(double xd, double yd, double width, double height){
+        int x = (int)xd;
+        int y = (int)yd;
+        int newX = (int) (x * texture.getWidth() / width);
+        int newY = (int) (y * texture.getHeight() / height);
+        if (newX < 0) newX = 0;
+        if (newY < 0) newY = 0;
+        if (newX >= texture.getWidth()) newX = texture.getWidth()-1;
+        if (newY >= texture.getHeight()) newY = texture.getHeight()-1;
+        //System.out.println(newX + "; " + newY + "\t\t " + x + "; " + y + "; " + width + "; " + height);
+        return texture.getRGB(newX, newY);
     }
 
     public int getWidth() {

@@ -1,6 +1,7 @@
 package fr.cubibox.com.mapcreator.maths;
 
 import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.graphics.Face;
 import fr.cubibox.com.mapcreator.graphics.IsometricRender;
 import fr.cubibox.com.mapcreator.graphics.Texture;
 import fr.cubibox.com.mapcreator.mapObject.Type;
@@ -23,9 +24,12 @@ public class Cube2F extends Polygon2F {
     private Texture textureWest;
     private Texture textureSouth;
 
+    private ArrayList<Face> faces;
+
 
     public Cube2F(ArrayList<Vector2F> points, float height, Type type) {
         super(points, height, type);
+        resetTextures();
 
         this.textureTop = new Texture("dirt.png", 4);
         this.textureNorth = new Texture("dirt.png", 3);
@@ -51,7 +55,16 @@ public class Cube2F extends Polygon2F {
         setIsoShapes();
         //setLeftShape();
         //setRightShape();
+        resetTextures();
         System.out.println("here");
+    }
+
+    private void resetTextures() {
+        faces = new ArrayList<>();
+        for(int pt = 0; pt < points.size() - 1; pt++){
+            faces.add(new Face(points.get(pt), points.get(pt+1), height, new Texture("dirt.png")));
+        }
+        faces.add(new Face(points.get(points.size()-1), points.get(0), height, new Texture("dirt.png")));
     }
 
     private void setTopShape() {
@@ -119,5 +132,9 @@ public class Cube2F extends Polygon2F {
 
     public Texture getTextureSouth() {
         return textureSouth;
+    }
+
+    public ArrayList<Face> getFaces() {
+        return faces;
     }
 }
