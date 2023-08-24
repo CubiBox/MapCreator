@@ -1,8 +1,7 @@
 package fr.cubibox.com.mapcreator;
 
-import fr.cubibox.com.mapcreator.graphics.IsometricRender;
 import fr.cubibox.com.mapcreator.iu.Player;
-import fr.cubibox.com.mapcreator.map.Map;
+import fr.cubibox.com.mapcreator.map_old.Map_old;
 import fr.cubibox.com.mapcreator.mapObject.LivingEntity;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.TileEntity;
@@ -12,7 +11,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.BufferedInputStream;
@@ -32,9 +30,7 @@ public class Main extends Application {
     public static ArrayList<TileEntity> containers = new ArrayList<>();
 
     public static Player player1;
-    public static Map map;
-    public static IsometricRender isometricRender;
-
+    public static Map_old mapOld;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -64,12 +60,6 @@ public class Main extends Application {
         return (float)(DIML*(y)/(xSize));
     }
 
-    public static float toPlotX(double scrX){
-        return (float) ((scrX/DIMC)*(xSize));
-    }
-    public static float toPlotY(double scrY){
-        return (float) ((scrY/DIML)*(xSize));
-    }
 
     public static ArrayList<StaticObject> getStaticObjects() {
         return staticObjects;
@@ -78,8 +68,8 @@ public class Main extends Application {
         Main.staticObjects = staticObjects;
     }
 
-    public static Map getMap() {
-        return map;
+    public static Map_old getMap() {
+        return mapOld;
     }
 /*
     public static void setMap(Map map) {
@@ -168,7 +158,7 @@ public class Main extends Application {
         Main.containers = containers;
     }
 
-    public static void setMap(Map map) {
-        Main.map = map;
+    public static void setMap(Map_old mapOld) {
+        Main.mapOld = mapOld;
     }
 }

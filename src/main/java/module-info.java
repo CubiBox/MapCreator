@@ -5,8 +5,8 @@ module fr.cubibox.com.mapcreator {
 
     opens fr.cubibox.com.mapcreator to javafx.fxml;
 
-    exports fr.cubibox.com.mapcreator.map;
-    opens fr.cubibox.com.mapcreator.map to javafx.fxml;
+    exports fr.cubibox.com.mapcreator.map_old;
+    opens fr.cubibox.com.mapcreator.map_old to javafx.fxml;
 
     exports fr.cubibox.com.mapcreator.iu;
     opens fr.cubibox.com.mapcreator.iu to javafx.fxml;
@@ -20,4 +20,6 @@ module fr.cubibox.com.mapcreator {
     exports fr.cubibox.com.mapcreator;
     exports fr.cubibox.com.mapcreator.mapObject;
     opens fr.cubibox.com.mapcreator.mapObject to javafx.fxml;
+    exports fr.cubibox.com.mapcreator.map;
+    opens fr.cubibox.com.mapcreator.map to javafx.fxml;
 }

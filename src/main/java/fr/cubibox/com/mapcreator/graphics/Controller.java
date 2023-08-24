@@ -1,14 +1,13 @@
-package fr.cubibox.com.mapcreator;
+package fr.cubibox.com.mapcreator.graphics;
 
-import fr.cubibox.com.mapcreator.graphics.IsometricRender;
+import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.iu.Player;
-import fr.cubibox.com.mapcreator.map.Map;
+import fr.cubibox.com.mapcreator.map_old.Map_old;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.Type;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Polygon2F;
-import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -63,20 +62,23 @@ public class Controller implements Initializable {
     @FXML
     private Button importer;
 
+    public static RenderPane renderPane;
+
+
     private ArrayList<Type> drawablePol;
     private boolean dragState;
-    private final float[] dragPointOrigin = new float[2];
+    private float[] dragPointOrigin = new float[2];
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         double screenWidth = Screen.getPrimary().getBounds().getWidth();
         double screenHeight = Screen.getPrimary().getBounds().getHeight();
 
-        isometricRender = new IsometricRender(xSize/2);
+        renderPane = new ClassicRender();
 
         scrollPane.setPrefWidth(screenWidth/2);
         coordinateSystem.setPrefSize(980,980);
 
-        drawPolygon();
+        drawPolygons();
 
         // Toggle view buttons
         drawablePol = new ArrayList<>();
@@ -110,133 +112,87 @@ public class Controller implements Initializable {
         mapSizeSlide.valueProperty().addListener((obs, oldval, newVal) -> mapSizeSlide.setValue(newVal.intValue()));
         mapSizeSlide.valueProperty().addListener(event -> {
             Main.setxSize((int) (16*mapSizeSlide.getValue()));
-            drawPolygon();
+            drawPolygons();
         });
         isoview.setOnAction(this::actuView);
 
-        //zoom
+        //zoom (WIP)
         coordinateSystem.setOnScroll(event ->{
             double value = event.getDeltaY();
             if (event.isControlDown() && Main.DIML + value < 2000 && Main.DIML + value > scrollPane.getWidth()+20) {
                 Main.DIML += value;
                 Main.DIMC += value;
                 coordinateSystem.setPrefSize(Main.DIMC,Main.DIML);
-                actualizeAllPolygons();
-                drawPolygon();
+                drawPolygons();
             }
+            System.out.println("scroll");
         });
 
-        //reset pane dimension if windowed
+        //reset pane dimension if windowed (WIP)
         scrollPane.widthProperty().addListener(e -> {
             scrollPane.setPrefWidth(screenWidth/2);
             coordinateSystem.setPrefSize(980,980);
             Main.DIML = 980;
             Main.DIMC = 980;
-            actualizeAllPolygons();
-            drawPolygon();
+            drawPolygons();
         });
 
         //record drag status
         coordinateSystem.setOnMouseDragged(event ->{
+            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
+                float[] dragPoint = {(float) event.getX(), (float) event.getY()};
 
-            //change view in isometric view
-            if (isoview.isSelected()) {
-                if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75) || (dragPointOrigin[0]-event.getX()<-75 || dragPointOrigin[1]-event.getY()<-75)){
-                    dragPointOrigin[0] = (float) event.getX();
-                    dragPointOrigin[1] = (float) event.getY();
+                if (renderPane.drag(dragState, dragPointOrigin, dragPoint)) {
+                    drawPolygons(renderPane.getTempPolygons());
                 }
 
-                isometricRender.setXAngle((float) (isometricRender.getXAngle() + (dragPointOrigin[0] - event.getX()) * 0.0045f));
-                float temp_yAngle = (float) (isometricRender.getYAngle() - (dragPointOrigin[1] - event.getY()) * 0.001f);
-                if (temp_yAngle >= 0 && temp_yAngle <= 1) {
-                    isometricRender.setYAngle(temp_yAngle);
-                }
-                actualizeAllPolygons();
-                drawPolygon();
-
-                dragPointOrigin[0] = (float) event.getX();
-                dragPointOrigin[1] = (float) event.getY();
+                dragState = true;
             }
-
-            //set polygon preview in 2D view
-            else {
-                float roundX = MathFunction.round(Main.toPlotX(event.getX()));
-                float roundY = MathFunction.round(Main.toPlotY(event.getY()));
-
-                if (!dragState || (dragPointOrigin[0]-event.getX()>75 || dragPointOrigin[1]-event.getY()>75)) {
-                    dragPointOrigin[0] = roundX;
-                    dragPointOrigin[1] = roundY;
-                }
-
-                if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize)) {
-                    Vector2F currentPos = new Vector2F(roundX, roundY);
-                    if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())) {
-                        actualizeAllPolygons();
-                        drawPolygon(
-                                Polygon2F.topShape(
-                                        selectType(SelectionOption),
-                                        currentPos,
-                                        new Vector2F(dragPointOrigin[0], roundY),
-                                        new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
-                                        new Vector2F(roundX, dragPointOrigin[1])
-                                )
-                        );
-                    }
-                }
-            }
-            dragState = true;
         });
 
         //set by click
         coordinateSystem.setOnMouseClicked(event -> {
-            float roundX = MathFunction.round(Main.toPlotX(event.getX()));
-            float roundY = MathFunction.round(Main.toPlotY(event.getY()));
-
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
-                if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize) && !isoview.isSelected()) {
-                    Vector2F currentPos = new Vector2F(roundX, roundY);
-                    if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())){
-                        if (dragPointOrigin[0] == currentPos.getX() || dragPointOrigin[1] == currentPos.getY())
-                            setPolygon(currentPos,new Vector2F(dragPointOrigin[0], dragPointOrigin[1]));
-
-                        else setPolygon(
-                                    currentPos,
-                                    new Vector2F(dragPointOrigin[0], roundY),
-                                    new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
-                                    new Vector2F(roundX, dragPointOrigin[1])
-                        );
+                ArrayList<Vector2F> pts = renderPane.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
+                if (pts != null) {
+                    if (pts.size() > 1) {
+                        setPolygon(pts);
                     }
                     else {
-                        Main.getPoints().add(currentPos);
-                        polyBoard.getChildren().add(pointBoard(currentPos));
+                        Main.getPoints().add(pts.get(0));
+                        polyBoard.getChildren().add(pointBoard(pts.get(0)));
                     }
                 }
+
                 dragState = false;
-                drawPolygon();
+                drawPolygons();
             }
         });
     }
 
     public void actualizeAllPolygons(){
         for (StaticObject obj : Main.staticObjects){
-            if (isoview.isSelected()) obj.getPolygon().setIsoShapes();
-            else obj.getPolygon().setupShapes();
+            renderPane.actualizePolygon(obj.getPolygon());
         }
     }
+
 
     public VBox pointBoard(Vector2F p){
         VBox ptsBoard = new VBox();
         HBox nameBoard = new HBox();
         HBox pointBoard = new HBox();
-        HBox xBoard = new HBox();
-        HBox yBoard = new HBox();
-        HBox name = new HBox();
-        HBox delete = new HBox();
 
         Color c = Color.rgb((int) (p.getColor().getRed()*255), (int) (p.getColor().getGreen()*255), (int) (p.getColor().getBlue()*255),0.2);
         ptsBoard.setBackground(new Background(new BackgroundFill(c, CornerRadii.EMPTY, Insets.EMPTY)));
         ptsBoard.setSpacing(5d);
         ptsBoard.setFillWidth(true);
+
+        /*
+        HBox xBoard = new HBox();
+        HBox yBoard = new HBox();
+        HBox name = new HBox();
+        HBox delete = new HBox();
+
 
         xBoard.setAlignment(Pos.CENTER);
         yBoard.setAlignment(Pos.CENTER);
@@ -286,9 +242,10 @@ public class Controller implements Initializable {
         ySlid.setPrefWidth(250);
         yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
 
+*/
 
         pointBoard.setAlignment(Pos.CENTER);
-        pointBoard.getChildren().addAll(xBoard,yBoard);
+        //pointBoard.getChildren().addAll(xBoard,yBoard);
 
         //main board adds
         ptsBoard.getChildren().addAll(nameBoard,pointBoard);
@@ -319,7 +276,8 @@ public class Controller implements Initializable {
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
             pol.getPoints().remove(p);
-            pol.setupShapes();
+            //pol.setupShapes();
+            renderPane.actualizePolygon(pol);
             actuBoard();
         });
 
@@ -343,8 +301,8 @@ public class Controller implements Initializable {
             p.setX((float) xSlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            pol.setupShapes();
-            drawPolygon();
+            renderPane.actualizePolygon(pol);
+            drawPolygons();
         });
         xSlid.setPrefWidth(220);
         xBoard.getChildren().addAll(new Label("      X : "),xSlid);
@@ -359,8 +317,8 @@ public class Controller implements Initializable {
             p.setY((float) ySlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            pol.setupShapes();
-            drawPolygon();
+            renderPane.actualizePolygon(pol);
+            drawPolygons();
         });
         ySlid.setPrefWidth(220);
         yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
@@ -407,7 +365,7 @@ public class Controller implements Initializable {
                     height.setValue(newVal.intValue());
                     obj.getPolygon().setHeight((float) height.getValue());
                     obj.getPolygon().setIsoShapes();
-                    drawPolygon();
+                    drawPolygons();
                 }
         );
         height.valueProperty().addListener(event -> {
@@ -423,7 +381,7 @@ public class Controller implements Initializable {
             typeButton.setToggleGroup(choise);
             typeButton.selectedProperty().addListener(event -> {
                 obj.setType(type);
-                drawPolygon();
+                drawPolygons();
             });
             if (obj.getType() == type) typeButton.setSelected(true);
             rightPart.getChildren().add(typeButton);
@@ -472,6 +430,18 @@ public class Controller implements Initializable {
             actuBoard();
         });
 
+
+        TreeItem<String> rootItem = new TreeItem<String> ("Points");
+        rootItem.setExpanded(true);
+        int i = 0;
+        for (Vector2F v : obj.getPolygon().getPoints()) {
+            TreeItem<String> item = new TreeItem<String> ("point " + i++ + "\tx : " + v.getX() + "\ty : " + v.getY() );
+            rootItem.getChildren().add(item);
+        }
+        TreeView<String> tree = new TreeView<String> (rootItem);
+        polBoard.getChildren().add(tree);
+
+
         // Name Label
         HBox name = new HBox();
         name.setAlignment(Pos.TOP_LEFT);
@@ -501,6 +471,7 @@ public class Controller implements Initializable {
             Polygon2F p = obj.getPolygon();
             VBox pBoard = polygonBoard(obj);
 
+            /*
             if (p.isShowPoint()) {
                 int countPoint = 0;
                 for (Vector2F pt : p.getPoints()) {
@@ -508,12 +479,17 @@ public class Controller implements Initializable {
                     countPoint++;
                 }
             }
+            */
             polyBoard.getChildren().add(pBoard);
         }
-        drawPolygon();
+        drawPolygons();
     }
 
     public void actuView(ActionEvent ae){
+        renderPane = isoview.isSelected() ?
+                new IsometricRender(xSize/2) :
+                new ClassicRender();
+
         ImageView imgSclt = new ImageView();
         ImageView img = new ImageView();
         try {
@@ -527,80 +503,42 @@ public class Controller implements Initializable {
         imgSclt.setFitWidth(30);
         imgSclt.setFitHeight(30);
 
-        drawPolygon();
+        drawPolygons();
     }
 
-    public void drawPolygon(Shape ... tempPol){
-        drawPolygon(new ArrayList<>(Arrays.asList(tempPol)));
+    public void drawPolygons(Shape ... tempPol){
+        drawPolygons(new ArrayList<>(Arrays.asList(tempPol)));
     }
 
-    public void drawPolygon(ArrayList<Shape> tempPol) {
-        boolean IsometricView = isoview.isSelected();
+    public void drawPolygons(ArrayList<Shape> tempPol) {
+        actualizeAllPolygons();
         coordinateSystem.getChildren().clear();
         ArrayList<Vector2F> points = Main.getPoints();
-        for (Shape r : drawGrid())
-            coordinateSystem.getChildren().add(r);
 
-        //draw the points
-        for (Vector2F p : points) {
-            if (IsometricView){
-                float[] v = isometricRender.toScreenIso(p.getX(), p.getY());
-                coordinateSystem.getChildren().add(new Circle(v[0], v[1], 3, p.getColor()));
-            }
-            else coordinateSystem.getChildren().add(p.getCircle());
+        //draw the grid
+        renderPane.drawGrid(coordinateSystem);
 
+        //draw points
+        for(Vector2F point : points) {
+            renderPane.drawPointShape(coordinateSystem, point);
         }
 
-        //draw the polygons
+        //draw polygons
         for (StaticObject obj : Main.getStaticObjects()) {
             if (drawablePol.contains(obj.getType())) {
-                Polygon2F pols = obj.getPolygon();
-
-                if (IsometricView)
-                    for (Shape shape : obj.getPolygon().getShapesIso())
-                        coordinateSystem.getChildren().add(shape);
-                else {
-                    for (Shape shape : obj.getPolygon().getShapeTop()) {
-                        shape.setOnMousePressed(event -> {
-                            if (event.isSecondaryButtonDown()) {
-                                System.out.println("here " + pols.getHeight());
-                                if (pols.isSelected()) {
-                                    pols.setSelected(false);
-                                    shape.setStrokeWidth(2);
-                                } else {
-                                    pols.setSelected(true);
-                                    shape.setStrokeWidth(5);
-                                }
-                            }
-                        });
-                        coordinateSystem.getChildren().add(shape);
-                    }
-                }
-
-                if (pols.isShowPoint()) {
-                    int countP = 0;
-                    float[] v = new float[2];
-                    for (Vector2F p : pols.getPoints()) {
-                        Label pointName = new Label(countP++ + "");
-                        if (IsometricView) v = isometricRender.toScreenIso(p.getX(), p.getY(), obj.getPolygon().getHeight());
-                        pointName.setLayoutX((IsometricView ? v[0] : Main.toScreenX(p.getX())) - 5);
-                        pointName.setLayoutY((IsometricView ? v[1] : Main.toScreenY(p.getY())) - 15);
-                        pointName.setTextFill(Color.WHITE);
-                        coordinateSystem.getChildren().add(pointName);
-                    }
-                }
+                renderPane.drawPolygon(coordinateSystem, obj);
             }
         }
 
-        //draw temp polygon
-        if (!tempPol.isEmpty() && !isoview.isSelected()){
+        //draw temp polygon (WIP -> move to renderPane)
+        if (tempPol != null && !tempPol.isEmpty() && !isoview.isSelected()){
             for (Shape pol : tempPol){
                 coordinateSystem.getChildren().add(pol);
             }
         }
     }
 
-
+/*
     public ArrayList<Shape> drawGrid() {
         ArrayList<Shape> lines = new ArrayList<>();
         ArrayList<Shape> tpmLines = new ArrayList<>();
@@ -646,13 +584,14 @@ public class Controller implements Initializable {
         }
         return lines;
     }
+*/
 
     public void reset(ActionEvent actionEvent) {
         Main.setPlayer1(new Player(Main.getxSize()/2, Main.getxSize()/2));
         Main.setPoints(new ArrayList<>());
         Main.setPolygons(new ArrayList<>());
         actuBoard();
-        drawPolygon();
+        drawPolygons();
     }
 
     public Type selectType(ToggleGroup tg){
@@ -664,6 +603,7 @@ public class Controller implements Initializable {
         if (Main.getPoints().size() >= 2) {
             setPolygon(Main.getPoints());
             Main.setPoints(new ArrayList<>());
+            actuBoard();
         }
     }
     public void setPolygon(Vector2F ... points) {
@@ -678,7 +618,7 @@ public class Controller implements Initializable {
         Main.getStaticObjects().add(obj);
         polyBoard.getChildren().add(polygonBoard(obj));
         actuBoard();
-        drawPolygon();
+        drawPolygons();
     }
 
 
@@ -719,8 +659,8 @@ public class Controller implements Initializable {
 //                        try {exportMapButton(null);}
 //                        catch (IOException e) {throw new RuntimeException(e);}
 //                    }
-                    Map.importMap(new File("maps\\" + f.getName()));
-                    drawPolygon();
+                    Map_old.importMap(new File("maps\\" + f.getName()));
+                    drawPolygons();
                     actuBoard();
                     stageSave.close();
                 });

@@ -83,4 +83,16 @@ public class MapObject {
     public void setPolShape(Shape polShape) {
         this.polShape = polShape;
     }
+
+    @Override
+    public String toString() {
+        return "MapObject{" +
+                "polygon=" + polygon +
+                ", TextureId='" + TextureId + '\'' +
+                ", origin=" + origin +
+                ", id='" + id + '\'' +
+                ", showPoint=" + showPoint +
+                ", polShape=" + polShape +
+                '}';
+    }
 }

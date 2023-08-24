@@ -1,8 +1,6 @@
-package fr.cubibox.com.mapcreator.map;
+package fr.cubibox.com.mapcreator.map_old;
 
-import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.mapObject.*;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Polygon2F;
 
 import java.util.ArrayList;
