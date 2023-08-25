@@ -13,6 +13,7 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -21,7 +22,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane style="-fx-background-color: #404040;" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.graphics.Controller">
+<BorderPane style="-fx-background-color: #404040;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.graphics.Controller">
    <top>
       <MenuBar style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
         <menus>
@@ -229,9 +230,24 @@
    <right>
       <VBox prefHeight="726.0" prefWidth="415.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
          <children>
-            <ScrollPane prefHeight="668.0" prefWidth="400.0" vbarPolicy="ALWAYS">
+            <ScrollPane prefHeight="524.0" prefWidth="415.0" vbarPolicy="ALWAYS">
                <content>
-                  <VBox fx:id="polyBoard" alignment="TOP_CENTER" prefHeight="529.0" prefWidth="400.0" spacing="10" style="-fx-background-color: #808080;">
+                  <VBox fx:id="polyBoard" alignment="TOP_CENTER" prefHeight="524.0" prefWidth="400.0" spacing="10" style="-fx-background-color: #808080;">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <children>
+                        <TreeView fx:id="sectorTree" prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+            <ScrollPane prefHeight="259.0" prefWidth="415.0">
+               <content>
+                  <VBox fx:id="propertyBoard" alignment="TOP_CENTER" prefHeight="230.0" prefWidth="400.0" spacing="10" style="-fx-background-color: #808080;">
                      <opaqueInsets>
                         <Insets />
                      </opaqueInsets>
@@ -241,27 +257,6 @@
                   </VBox>
                </content>
             </ScrollPane>
-            <VBox prefHeight="586.0" prefWidth="616.0">
-               <children>
-                  <Label prefHeight="38.0" prefWidth="293.0" text="Liste des Textures">
-                     <font>
-                        <Font size="27.0" />
-                     </font>
-                  </Label>
-                  <ScrollPane prefHeight="668.0" prefWidth="616.0">
-                     <content>
-                        <VBox fx:id="vBoxPanel1" alignment="TOP_CENTER" prefHeight="413.0" prefWidth="597.0" spacing="10" style="-fx-background-color: #808080;">
-                           <opaqueInsets>
-                              <Insets />
-                           </opaqueInsets>
-                           <padding>
-                              <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
-                           </padding>
-                        </VBox>
-                     </content>
-                  </ScrollPane>
-               </children>
-            </VBox>
          </children>
       </VBox>
    </right>

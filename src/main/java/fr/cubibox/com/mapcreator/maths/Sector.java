@@ -4,7 +4,6 @@ import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.mapObject.Type;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
@@ -12,12 +11,12 @@ import java.util.Arrays;
 
 import static fr.cubibox.com.mapcreator.mapObject.Type.*;
 
-public class Polygon2F {
+public class Sector {
     private float height;
     private final Type type;
     private boolean selected;
 
-    private ArrayList<Vector2F> points;
+    private ArrayList<Vector> vectors;
     private boolean showPoint;
 
     //shape for views
@@ -30,20 +29,20 @@ public class Polygon2F {
     private ArrayList<Shape> shapes;
 
 
-    public Polygon2F(ArrayList<Vector2F> points, float height) {
-        this(points,height, WALL);
+    public Sector(ArrayList<Vector> vectors, float height) {
+        this(vectors,height, WALL);
     }
-    public Polygon2F(Vector2F... pts) {
+    public Sector(Vector... pts) {
         this(new ArrayList<>(Arrays.asList(pts)),0, WALL);
     }
-    public Polygon2F(Type type, Vector2F... pts) {
+    public Sector(Type type, Vector... pts) {
         this(new ArrayList<>(Arrays.asList(pts)),0, type);
     }
-    public Polygon2F(ArrayList<Vector2F> points, float height, Type type) {
+    public Sector(ArrayList<Vector> vectors, float height, Type type) {
         this.height = height;
         this.type = type;
-        if (!points.isEmpty()) {
-            this.points = points;
+        if (!vectors.isEmpty()) {
+            this.vectors = vectors;
             //setupShapes();
         }
         this.showPoint = false;
@@ -59,14 +58,14 @@ public class Polygon2F {
     */
 
     private void setTopShape() {
-        this.shapeTop = topShape(points,type);
+        this.shapeTop = topShape(vectors,type);
     }
 
-    public static ArrayList<Shape> topShape(Type type, Vector2F ... pts) {
+    public static ArrayList<Shape> topShape(Type type, Vector... pts) {
         return topShape(new ArrayList<>(Arrays.asList(pts)),type);
     }
 
-    public static ArrayList<Shape> topShape(ArrayList<Vector2F> points, Type type) {
+    public static ArrayList<Shape> topShape(ArrayList<Vector> vectors, Type type) {
         ArrayList<Shape> lines = new ArrayList<>();
 
         Color color = Color.CYAN;
@@ -76,11 +75,11 @@ public class Polygon2F {
             default -> Color.CYAN;
         };
 
-        if (points.size() > 1) {
-            for (int i = 0; i < points.size() - 1; ) {
+        if (vectors.size() > 1) {
+            for (int i = 0; i < vectors.size() - 1; ) {
                 Line line = new Line(
-                        Main.toScreenX(points.get(i).getX()), Main.toScreenY(points.get(i).getY()),
-                        Main.toScreenX(points.get(++i).getX()), Main.toScreenY(points.get(i).getY())
+                        Main.toScreenX(vectors.get(i).getX()), Main.toScreenY(vectors.get(i).getY()),
+                        Main.toScreenX(vectors.get(++i).getX()), Main.toScreenY(vectors.get(i).getY())
                 );
                 line.setFill(Color.TRANSPARENT);
                 line.setStrokeWidth(2.0);
@@ -89,8 +88,8 @@ public class Polygon2F {
             }
         }
         Line line = new Line(
-                Main.toScreenX(points.get(points.size()-1).getX()), Main.toScreenY(points.get(points.size()-1).getY()),
-                Main.toScreenX(points.get(0).getX()), Main.toScreenY(points.get(0).getY())
+                Main.toScreenX(vectors.get(vectors.size()-1).getX()), Main.toScreenY(vectors.get(vectors.size()-1).getY()),
+                Main.toScreenX(vectors.get(0).getX()), Main.toScreenY(vectors.get(0).getY())
         );
         line.setFill(Color.TRANSPARENT);
         line.setStrokeWidth(2.0);
@@ -118,12 +117,12 @@ public class Polygon2F {
         this.showPoint = showPoint;
     }
 
-    public ArrayList<Vector2F> getPoints() {
-        return points;
+    public ArrayList<Vector> getPoints() {
+        return vectors;
     }
 
-    public void setPoints(ArrayList<Vector2F> points) {
-        this.points = points;
+    public void setPoints(ArrayList<Vector> vectors) {
+        this.vectors = vectors;
     }
 
     public ArrayList<Shape> getShapeTop() {

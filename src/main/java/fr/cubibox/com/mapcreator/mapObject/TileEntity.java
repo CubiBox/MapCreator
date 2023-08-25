@@ -1,10 +1,10 @@
 package fr.cubibox.com.mapcreator.mapObject;
 
-import fr.cubibox.com.mapcreator.maths.Polygon2F;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Sector;
+import fr.cubibox.com.mapcreator.maths.Vector;
 
 public class TileEntity extends Entity{
-    public TileEntity(Polygon2F polygon, Vector2F origin, String id) {
+    public TileEntity(Sector polygon, Vector origin, String id) {
         super(polygon, origin, id);
     }
 }

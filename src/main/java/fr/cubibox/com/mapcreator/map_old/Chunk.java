@@ -1,7 +1,7 @@
 package fr.cubibox.com.mapcreator.map_old;
 
 import fr.cubibox.com.mapcreator.mapObject.*;
-import fr.cubibox.com.mapcreator.maths.Polygon2F;
+import fr.cubibox.com.mapcreator.maths.Sector;
 
 import java.util.ArrayList;
 
@@ -53,7 +53,7 @@ public class Chunk {
     }
 
 
-    public static ArrayList<Polygon2F> findChunkPols(int x , int y) {
+    public static ArrayList<Sector> findChunkPols(int x , int y) {
         return null;
     }
     /*

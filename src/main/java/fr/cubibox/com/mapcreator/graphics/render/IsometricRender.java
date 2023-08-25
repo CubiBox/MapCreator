@@ -1,8 +1,8 @@
-package fr.cubibox.com.mapcreator.graphics;
+package fr.cubibox.com.mapcreator.graphics.render;
 
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
-import fr.cubibox.com.mapcreator.maths.Polygon2F;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Sector;
+import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -21,15 +21,15 @@ import static fr.cubibox.com.mapcreator.mapObject.Type.FLOOR;
 public class IsometricRender extends RenderPane {
     private double xAngle;
     private double yAngle;
-    private Vector2F origin;
+    private Vector origin;
 
-    public IsometricRender(Vector2F origin) {
+    public IsometricRender(Vector origin) {
         this(0, 0.5,  origin);
     }
     public IsometricRender(float origin) {
-        this(0, 0.5,  new Vector2F(origin,origin));
+        this(0, 0.5,  new Vector(origin,origin));
     }
-    public IsometricRender(double xAngle, double yAngle, Vector2F origin) {
+    public IsometricRender(double xAngle, double yAngle, Vector origin) {
         this.xAngle = xAngle;
         this.yAngle = yAngle;
         this.origin = origin;
@@ -68,7 +68,7 @@ public class IsometricRender extends RenderPane {
     public void drawPolygon(Pane coordinateSystem, StaticObject obj) {
         super.drawPolygon(coordinateSystem, obj);
 
-        Polygon2F pol = obj.getPolygon();
+        Sector pol = obj.getPolygon();
 
         drawShapes(coordinateSystem, pol);
         if (pol.isShowPoint()) {
@@ -77,7 +77,7 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawShapes(Pane coordinateSystem, Polygon2F pol) {
+    public void drawShapes(Pane coordinateSystem, Sector pol) {
         super.drawShapes(coordinateSystem, pol);
 
         //calc here ?
@@ -87,12 +87,12 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawPointsLabel(Pane coordinateSystem, Polygon2F pol) {
+    public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
         super.drawPointsLabel(coordinateSystem, pol);
 
         int countP = 0;
         float[] v;
-        for (Vector2F p : pol.getPoints()) {
+        for (Vector p : pol.getPoints()) {
             Label pointName = new Label(countP++ + "");
             v = toScreenIso(p.getX(), p.getY(), pol.getHeight());
             pointName.setLayoutX(v[0] - 5);
@@ -103,11 +103,11 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawPointShape(Pane coordinateSystem, Vector2F point) {
-        super.drawPointShape(coordinateSystem, point);
+    public void drawPointShape(Pane coordinateSystem, Vector vector) {
+        super.drawPointShape(coordinateSystem, vector);
 
-        float[] v = toScreenIso(point.getX(), point.getY());
-        coordinateSystem.getChildren().add(new Circle(v[0], v[1], 3, point.getColor()));
+        float[] v = toScreenIso(vector.getX(), vector.getY());
+        coordinateSystem.getChildren().add(new Circle(v[0], v[1], 3, vector.getColor()));
     }
 
     @Override
@@ -152,10 +152,10 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void actualizePolygon(Polygon2F pol) {
+    public void actualizePolygon(Sector pol) {
         super.actualizePolygon(pol);
 
-        ArrayList<Vector2F> points = pol.getPoints();
+        ArrayList<Vector> vectors = pol.getPoints();
         ArrayList<Shape> shapes = new ArrayList<>();
 
         float currentHeight,currentBase;
@@ -179,11 +179,11 @@ public class IsometricRender extends RenderPane {
         }
 
 
-        double[] polPoints = new double[points.size()*2];
+        double[] polPoints = new double[vectors.size()*2];
 
         //top
         int countP = 0;
-        for (Vector2F p : points){
+        for (Vector p : vectors){
             float[] v = toScreenIso(p.getX(),p.getY(),currentHeight);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
@@ -195,7 +195,7 @@ public class IsometricRender extends RenderPane {
 
         //bottom
         countP = 0;
-        for (Vector2F p : points){
+        for (Vector p : vectors){
             float[] v = toScreenIso(p.getX(),p.getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
@@ -206,22 +206,22 @@ public class IsometricRender extends RenderPane {
 
 
         //faces
-        for (int i = 0; i < points.size(); i ++){
+        for (int i = 0; i < vectors.size(); i ++){
             polPoints = new double[8];
             countP = 0;
 
-            float[] v = toScreenIso(points.get(i).getX(),points.get(i).getY(),currentBase);
+            float[] v = toScreenIso(vectors.get(i).getX(), vectors.get(i).getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
-            float[] v1 = toScreenIso(points.get(i).getX(),points.get(i).getY(),currentHeight);
+            float[] v1 = toScreenIso(vectors.get(i).getX(), vectors.get(i).getY(),currentHeight);
             polPoints[countP++] = v1[0];
             polPoints[countP++] = v1[1];
 
-            int i2 = i+1 < points.size() ? i+1 : 0;
-            v1 = toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentHeight);
+            int i2 = i+1 < vectors.size() ? i+1 : 0;
+            v1 = toScreenIso(vectors.get(i2).getX(), vectors.get(i2).getY(),currentHeight);
             polPoints[countP++] = v1[0];
             polPoints[countP++] = v1[1];
-            v = toScreenIso(points.get(i2).getX(),points.get(i2).getY(),currentBase);
+            v = toScreenIso(vectors.get(i2).getX(), vectors.get(i2).getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP] = v[1];
 
@@ -278,10 +278,10 @@ public class IsometricRender extends RenderPane {
         this.yAngle = yAngle;
     }
 
-    public Vector2F getOrigin() {
+    public Vector getOrigin() {
         return origin;
     }
-    public void setOrigin(Vector2F origin) {
+    public void setOrigin(Vector origin) {
         this.origin = origin;
     }
 }

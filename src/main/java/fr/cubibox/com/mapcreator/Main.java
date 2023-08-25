@@ -5,7 +5,7 @@ import fr.cubibox.com.mapcreator.map_old.Map_old;
 import fr.cubibox.com.mapcreator.mapObject.LivingEntity;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.TileEntity;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -24,7 +24,7 @@ public class Main extends Application {
     public static float DIMC = 980;
     public static float xSize = 16f;
 
-    public static ArrayList<Vector2F> points = new ArrayList<>();
+    public static ArrayList<Vector> vectors = new ArrayList<>();
     public static ArrayList<StaticObject> staticObjects = new ArrayList<>();
     public static ArrayList<LivingEntity> mobs = new ArrayList<>();
     public static ArrayList<TileEntity> containers = new ArrayList<>();
@@ -122,12 +122,12 @@ public class Main extends Application {
         Main.xSize = xSize;
     }
 
-    public static ArrayList<Vector2F> getPoints() {
-        return points;
+    public static ArrayList<Vector> getPoints() {
+        return vectors;
     }
 
-    public static void setPoints(ArrayList<Vector2F> points) {
-        Main.points = points;
+    public static void setPoints(ArrayList<Vector> vectors) {
+        Main.vectors = vectors;
     }
 
     public static Player getPlayer1() {

@@ -1,13 +1,17 @@
 package fr.cubibox.com.mapcreator.graphics;
 
 import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.graphics.render.ClassicRender;
+import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
+import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
+import fr.cubibox.com.mapcreator.graphics.ui.PropertyBoard;
 import fr.cubibox.com.mapcreator.iu.Player;
 import fr.cubibox.com.mapcreator.map_old.Map_old;
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
 import fr.cubibox.com.mapcreator.mapObject.Type;
-import fr.cubibox.com.mapcreator.maths.MathFunction;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
-import fr.cubibox.com.mapcreator.maths.Polygon2F;
+import fr.cubibox.com.mapcreator.maths.Wall;
+import fr.cubibox.com.mapcreator.maths.Vector;
+import fr.cubibox.com.mapcreator.maths.Sector;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -55,8 +59,19 @@ public class Controller implements Initializable {
     private Slider mapSizeSlide;
     @FXML
     private Slider polHeightSlide;
+
     @FXML
     private VBox polyBoard;
+    @FXML
+    private TreeView<String> sectorTree;
+    private HashMap<TreeItem<String>, StaticObject> sectorMap;
+    private HashMap<TreeItem<String>, Vector> pointMap;
+    private HashMap<TreeItem<String>, Wall> wallMap;
+
+    @FXML
+    private VBox propertyBoard;
+
+    private PropertyBoard property;
     @FXML
     private Button Reset;
     @FXML
@@ -153,7 +168,7 @@ public class Controller implements Initializable {
         //set by click
         coordinateSystem.setOnMouseClicked(event -> {
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
-                ArrayList<Vector2F> pts = renderPane.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
+                ArrayList<Vector> pts = renderPane.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
                 if (pts != null) {
                     if (pts.size() > 1) {
                         setPolygon(pts);
@@ -168,6 +183,41 @@ public class Controller implements Initializable {
                 drawPolygons();
             }
         });
+
+        sectorMap = new HashMap<>();
+        pointMap = new HashMap<>();
+        wallMap = new HashMap<>();
+
+        property = new PropertyBoard(propertyBoard, this);
+
+        TreeItem<String> rootItem = new TreeItem<String> ("Sectors");
+        rootItem.setExpanded(true);
+        sectorTree = new TreeView<String> (rootItem);
+        sectorTree.setMaxHeight(500 + 20);
+        sectorTree.setMinHeight(500 + 20);
+        MultipleSelectionModel<TreeItem<String>> sectorTreeSelectionModel = sectorTree.getSelectionModel();
+        sectorTreeSelectionModel.selectedItemProperty().addListener((item) -> {
+            System.out.println(item.toString());
+            TreeItem<String> currItem = sectorTreeSelectionModel.getSelectedItem();
+            propertyBoard.getChildren().clear();
+
+            if (currItem.getValue().contains("point")){
+                System.out.println(pointMap.get(currItem));
+                property.init(pointMap.get(currItem));
+                propertyBoard.getChildren().add(property.getBoard());
+            }
+            else if (currItem.getValue().contains("wall")){
+                System.out.println(wallMap.get(currItem));
+            }
+            else {
+                System.out.println(sectorMap.get(currItem));
+                property.init(sectorMap.get(currItem));
+                propertyBoard.getChildren().add(property.getBoard());
+            }
+
+            //System.out.println();
+            //renderPane.drawPointShape(coordinateSystem, (Vector2F) item);
+        });
     }
 
     public void actualizeAllPolygons(){
@@ -177,7 +227,7 @@ public class Controller implements Initializable {
     }
 
 
-    public VBox pointBoard(Vector2F p){
+    public VBox pointBoard(Vector p){
         VBox ptsBoard = new VBox();
         HBox nameBoard = new HBox();
         HBox pointBoard = new HBox();
@@ -187,12 +237,10 @@ public class Controller implements Initializable {
         ptsBoard.setSpacing(5d);
         ptsBoard.setFillWidth(true);
 
-        /*
         HBox xBoard = new HBox();
         HBox yBoard = new HBox();
         HBox name = new HBox();
         HBox delete = new HBox();
-
 
         xBoard.setAlignment(Pos.CENTER);
         yBoard.setAlignment(Pos.CENTER);
@@ -222,7 +270,8 @@ public class Controller implements Initializable {
             p.setX((float) xSlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            Main.setPoints(Vector2F.shortPoints(Main.points));
+            Main.setPoints(Vector.shortPoints(Main.vectors));
+            drawPolygons();
         });
         xSlid.setPrefWidth(250);
         xBoard.getChildren().addAll(new Label("      X : "),xSlid);
@@ -237,15 +286,14 @@ public class Controller implements Initializable {
             p.setY((float) ySlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            Main.setPoints(Vector2F.shortPoints(Main.points));
+            Main.setPoints(Vector.shortPoints(Main.vectors));
+            drawPolygons();
         });
         ySlid.setPrefWidth(250);
         yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
 
-*/
-
         pointBoard.setAlignment(Pos.CENTER);
-        //pointBoard.getChildren().addAll(xBoard,yBoard);
+        pointBoard.getChildren().addAll(xBoard,yBoard);
 
         //main board adds
         ptsBoard.getChildren().addAll(nameBoard,pointBoard);
@@ -253,7 +301,7 @@ public class Controller implements Initializable {
         return ptsBoard;
     }
     
-    public VBox pointBoard(Vector2F p, int pointName, Polygon2F pol){
+    public VBox pointBoard(Vector p, int pointName, Sector pol){
         VBox ptsBoard = new VBox();
         HBox nameBoard = new HBox();
         HBox pointBoard = new HBox();
@@ -334,7 +382,7 @@ public class Controller implements Initializable {
     }
 
     public HBox heightBoard(StaticObject obj){
-        Polygon2F p = obj.getPolygon();
+        Sector p = obj.getPolygon();
         HBox genericBox = new HBox();
         VBox rightPart = new VBox();
         VBox heightBoard = new VBox();
@@ -391,17 +439,42 @@ public class Controller implements Initializable {
         return genericBox;
     }
 
-    public VBox polygonBoard(StaticObject obj){
-        Polygon2F p = obj.getPolygon();
+    public TreeItem<String> polygonBoard(StaticObject obj){
+        Sector p = obj.getPolygon();
+
+        TreeItem<String> sectorItem = new TreeItem<>("Sector " + obj.getId());
+        sectorItem.setExpanded(false);
+
+        TreeItem<String> pointItem = new TreeItem<>("Points");
+        pointItem.setExpanded(false);
+        TreeItem<String> wallItem = new TreeItem<>("Walls");
+        pointItem.setExpanded(false);
+        int i = 0;
+        for (Vector v : obj.getPolygon().getPoints()) {
+            TreeItem<String> point = new TreeItem<>("point " + v);
+            TreeItem<String> wall = new TreeItem<>("wall " + v);
+            pointItem.getChildren().add(point);
+            wallItem.getChildren().add(wall);
+            pointMap.put(point, v);
+        }
+        sectorItem.getChildren().add(wallItem);
+        sectorItem.getChildren().add(pointItem);
+
+        //wallMap.put(polItem, obj);
+        return sectorItem;
+    }
+
+    public VBox polygonProperty(StaticObject obj){
+        Sector p = obj.getPolygon();
         VBox polBoard = new VBox();
         VBox pointBoard = new VBox();
 
         // CSS board
         polBoard.setStyle(
                 "-fx-background-radius : 8 8 8 8;" +
-                "-fx-background-color : #656565;" +
-                "-fx-padding : 10px;" +
-                "-fx-spacing : 5px"
+                        "-fx-background-color : #656565;" +
+                        "-fx-padding : 10px;" +
+                        "-fx-spacing : 5px"
         );
 
         //close button
@@ -430,18 +503,6 @@ public class Controller implements Initializable {
             actuBoard();
         });
 
-
-        TreeItem<String> rootItem = new TreeItem<String> ("Points");
-        rootItem.setExpanded(true);
-        int i = 0;
-        for (Vector2F v : obj.getPolygon().getPoints()) {
-            TreeItem<String> item = new TreeItem<String> ("point " + i++ + "\tx : " + v.getX() + "\ty : " + v.getY() );
-            rootItem.getChildren().add(item);
-        }
-        TreeView<String> tree = new TreeView<String> (rootItem);
-        polBoard.getChildren().add(tree);
-
-
         // Name Label
         HBox name = new HBox();
         name.setAlignment(Pos.TOP_LEFT);
@@ -463,25 +524,8 @@ public class Controller implements Initializable {
 
     public void actuBoard(){
         polyBoard.getChildren().clear();
-        for (Vector2F p : Main.getPoints()){
-            polyBoard.getChildren().add(pointBoard(p));
-        }
+        polyBoard.getChildren().add(sectorTree);
 
-        for (StaticObject obj : Main.getStaticObjects()){
-            Polygon2F p = obj.getPolygon();
-            VBox pBoard = polygonBoard(obj);
-
-            /*
-            if (p.isShowPoint()) {
-                int countPoint = 0;
-                for (Vector2F pt : p.getPoints()) {
-                    pBoard.getChildren().add(pointBoard(pt, countPoint, p));
-                    countPoint++;
-                }
-            }
-            */
-            polyBoard.getChildren().add(pBoard);
-        }
         drawPolygons();
     }
 
@@ -513,14 +557,14 @@ public class Controller implements Initializable {
     public void drawPolygons(ArrayList<Shape> tempPol) {
         actualizeAllPolygons();
         coordinateSystem.getChildren().clear();
-        ArrayList<Vector2F> points = Main.getPoints();
+        ArrayList<Vector> vectors = Main.getPoints();
 
         //draw the grid
         renderPane.drawGrid(coordinateSystem);
 
         //draw points
-        for(Vector2F point : points) {
-            renderPane.drawPointShape(coordinateSystem, point);
+        for(Vector vector : vectors) {
+            renderPane.drawPointShape(coordinateSystem, vector);
         }
 
         //draw polygons
@@ -606,17 +650,22 @@ public class Controller implements Initializable {
             actuBoard();
         }
     }
-    public void setPolygon(Vector2F ... points) {
-        setPolygon(new ArrayList<>(Arrays.asList(points)));
+    public void setPolygon(Vector... vectors) {
+        setPolygon(new ArrayList<>(Arrays.asList(vectors)));
     }
 
-    public void setPolygon(ArrayList<Vector2F> points) {
+    public void setPolygon(ArrayList<Vector> vectors) {
         StaticObject obj = new StaticObject(
-                new Polygon2F(points, (float)polHeightSlide.getValue(),selectType(SelectionOption))
+                new Sector(vectors, (float)polHeightSlide.getValue(),selectType(SelectionOption))
                 ,selectType(SelectionOption)
         );
         Main.getStaticObjects().add(obj);
-        polyBoard.getChildren().add(polygonBoard(obj));
+        //polyBoard.getChildren().add(polygonBoard(obj));
+
+        TreeItem<String> polItem = polygonBoard(obj);
+        sectorTree.getRoot().getChildren().add(polItem);
+        sectorMap.put(polItem, obj);
+
         actuBoard();
         drawPolygons();
     }

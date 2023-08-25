@@ -1,14 +1,14 @@
 package fr.cubibox.com.mapcreator.mapObject;
 
-import fr.cubibox.com.mapcreator.maths.Polygon2F;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Sector;
+import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.scene.shape.Shape;
 
 public class MapObject {
 
-    private Polygon2F polygon;
+    private Sector polygon;
     private String TextureId;
-    private Vector2F origin;
+    private Vector origin;
 
 
     //for Editor
@@ -18,13 +18,13 @@ public class MapObject {
     public static int staticId;
 
 
-    public MapObject(Polygon2F polygon, Vector2F origin) {
+    public MapObject(Sector polygon, Vector origin) {
         this.polygon = polygon;
         this.origin = origin;
         this.id = newId();
     }
 
-    public MapObject(Polygon2F polygon, Vector2F origin, String id) {
+    public MapObject(Sector polygon, Vector origin, String id) {
         this.polygon = polygon;
         this.origin = origin;
         this.id = id;
@@ -36,11 +36,11 @@ public class MapObject {
         return "Polygon"+staticId;
     }
 
-    public Polygon2F getPolygon() {
+    public Sector getPolygon() {
         return polygon;
     }
 
-    public void setPolygon(Polygon2F polygon) {
+    public void setPolygon(Sector polygon) {
         this.polygon = polygon;
     }
 
@@ -52,11 +52,11 @@ public class MapObject {
         TextureId = textureId;
     }
 
-    public Vector2F getOrigin() {
+    public Vector getOrigin() {
         return origin;
     }
 
-    public void setOrigin(Vector2F origin) {
+    public void setOrigin(Vector origin) {
         this.origin = origin;
     }
 

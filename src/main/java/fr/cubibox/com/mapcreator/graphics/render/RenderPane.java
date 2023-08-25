@@ -1,8 +1,8 @@
-package fr.cubibox.com.mapcreator.graphics;
+package fr.cubibox.com.mapcreator.graphics.render;
 
 import fr.cubibox.com.mapcreator.mapObject.StaticObject;
-import fr.cubibox.com.mapcreator.maths.Polygon2F;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Sector;
+import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 
@@ -20,21 +20,21 @@ public abstract class RenderPane {
     }
 
 
-    public void drawShapes(Pane coordinateSystem, Polygon2F pol) {
+    public void drawShapes(Pane coordinateSystem, Sector pol) {
     }
 
     public void drawPolygon(Pane coordinateSystem, StaticObject obj) {
     }
 
-    public void drawPointsLabel(Pane coordinateSystem, Polygon2F pol) {
+    public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
     }
-    public void drawPointShape(Pane coordinateSystem, Vector2F point) {
+    public void drawPointShape(Pane coordinateSystem, Vector vector) {
     }
 
     public void drawGrid(Pane coordinateSystem) {
     }
 
-    public void actualizePolygon(Polygon2F pol) {
+    public void actualizePolygon(Sector pol) {
     }
 
 
@@ -42,7 +42,7 @@ public abstract class RenderPane {
         return tempPolygons;
     }
 
-    public ArrayList<Vector2F> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
+    public ArrayList<Vector> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
         return null;
     }
 }

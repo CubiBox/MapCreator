@@ -22,4 +22,6 @@ module fr.cubibox.com.mapcreator {
     opens fr.cubibox.com.mapcreator.mapObject to javafx.fxml;
     exports fr.cubibox.com.mapcreator.map;
     opens fr.cubibox.com.mapcreator.map to javafx.fxml;
+    exports fr.cubibox.com.mapcreator.graphics.render;
+    opens fr.cubibox.com.mapcreator.graphics.render to javafx.fxml;
 }
