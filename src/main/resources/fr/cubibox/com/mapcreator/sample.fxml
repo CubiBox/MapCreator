@@ -90,7 +90,7 @@
                               <Font size="17.0" />
                            </font>
                         </Label>
-                        <ToggleButton fx:id="topView" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#actuView" selected="true">
+                        <ToggleButton fx:id="topView" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#actualizeView" selected="true">
                            <graphic>
                               <ImageView fx:id="topViewImage" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
@@ -108,7 +108,7 @@
                               <ToggleGroup fx:id="POV" />
                            </toggleGroup>
                         </ToggleButton>
-                        <ToggleButton fx:id="horizontalView" mnemonicParsing="false" onAction="#actuView" toggleGroup="$POV">
+                        <ToggleButton fx:id="horizontalView" mnemonicParsing="false" onAction="#actualizeView" toggleGroup="$POV">
                            <graphic>
                               <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                                  <image>

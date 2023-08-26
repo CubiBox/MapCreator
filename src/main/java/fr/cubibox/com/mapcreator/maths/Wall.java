@@ -1,16 +1,16 @@
 package fr.cubibox.com.mapcreator.maths;
 
 public class Wall {
+    private String id;
+    public static int staticId;
+
     private Vector a;
     private Vector b;
 
     public Wall(Vector a, Vector b) {
         this.a = a;
         this.b = b;
-    }
-
-    public String toString() {
-        return "\t\t@[" + (int) a.getX() + ";" + (int) a.getY() + "]-[" + (int) b.getX() + ";" + (int) b.getY() + "]\n";
+        this.id = newId();
     }
 
     public Vector getA() {
@@ -60,5 +60,30 @@ public class Wall {
         float d = (x2 - x1) * (y3 - y1) - (x3 - x1) * (y2 - y1);
 
         return (d == 0);
+    }
+
+    public static String newId(){
+        staticId++;
+        return "Polygon"+staticId;
+    }
+
+    public String getId() {
+        return id;
+    }
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String toString() {
+        return
+                "\t\t@[" + (int) a.getX() +
+                ";" +
+                (int) a.getY() +
+                "]-[" +
+                (int) b.getX() +
+                ";" +
+                (int) b.getY() +
+                "], id='" +
+                id + '\'';
     }
 }

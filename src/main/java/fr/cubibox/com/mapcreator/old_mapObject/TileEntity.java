@@ -1,4 +1,4 @@
-package fr.cubibox.com.mapcreator.mapObject;
+package fr.cubibox.com.mapcreator.old_mapObject;
 
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector;

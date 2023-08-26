@@ -1,6 +1,6 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.mapObject.StaticObject;
+import fr.cubibox.com.mapcreator.old_mapObject.Wall;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector;
@@ -16,7 +16,7 @@ import java.util.List;
 import static fr.cubibox.com.mapcreator.Main.xSize;
 import static fr.cubibox.com.mapcreator.Main.DIML;
 import static fr.cubibox.com.mapcreator.Main.DIMC;
-import static fr.cubibox.com.mapcreator.mapObject.Type.WALL;
+import static fr.cubibox.com.mapcreator.old_mapObject.Type.WALL;
 
 public class ClassicRender extends RenderPane {
 
@@ -59,7 +59,7 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public void drawPolygon(Pane coordinateSystem, StaticObject obj) {
+    public void drawPolygon(Pane coordinateSystem, Wall obj) {
         super.drawPolygon(coordinateSystem, obj);
 
         Sector pol = obj.getPolygon();

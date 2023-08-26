@@ -6,10 +6,12 @@ import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
 import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
 import fr.cubibox.com.mapcreator.graphics.ui.PropertyBoard;
 import fr.cubibox.com.mapcreator.iu.Player;
+import fr.cubibox.com.mapcreator.map.repositories.SectorRepository;
+import fr.cubibox.com.mapcreator.map.repositories.VectorRepository;
+import fr.cubibox.com.mapcreator.map.repositories.WallRepository;
 import fr.cubibox.com.mapcreator.map_old.Map_old;
-import fr.cubibox.com.mapcreator.mapObject.StaticObject;
-import fr.cubibox.com.mapcreator.mapObject.Type;
 import fr.cubibox.com.mapcreator.maths.Wall;
+import fr.cubibox.com.mapcreator.old_mapObject.Type;
 import fr.cubibox.com.mapcreator.maths.Vector;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import javafx.event.ActionEvent;
@@ -35,7 +37,7 @@ import java.net.URL;
 import java.util.*;
 
 import static fr.cubibox.com.mapcreator.Main.*;
-import static fr.cubibox.com.mapcreator.mapObject.Type.*;
+import static fr.cubibox.com.mapcreator.old_mapObject.Type.*;
 
 public class Controller implements Initializable {
 
@@ -64,9 +66,13 @@ public class Controller implements Initializable {
     private VBox polyBoard;
     @FXML
     private TreeView<String> sectorTree;
-    private HashMap<TreeItem<String>, StaticObject> sectorMap;
+    private HashMap<TreeItem<String>, Wall> sectorMap;
     private HashMap<TreeItem<String>, Vector> pointMap;
-    private HashMap<TreeItem<String>, Wall> wallMap;
+    private HashMap<TreeItem<String>, fr.cubibox.com.mapcreator.maths.Wall> wallMap;
+
+    private SectorRepository sectors;
+    private VectorRepository points;
+    private WallRepository wallsMap;
 
     @FXML
     private VBox propertyBoard;
@@ -112,9 +118,9 @@ public class Controller implements Initializable {
                 }
             });
         }
-        walls.setOnAction(this::actuView);
-        top.setOnAction(this::actuView);
-        bottom.setOnAction(this::actuView);
+        walls.setOnAction(this::actualizeView);
+        top.setOnAction(this::actualizeView);
+        bottom.setOnAction(this::actualizeView);
 
         polHeightSlide.setBlockIncrement(1);
         polHeightSlide.setMajorTickUnit(1);
@@ -129,7 +135,7 @@ public class Controller implements Initializable {
             Main.setxSize((int) (16*mapSizeSlide.getValue()));
             drawPolygons();
         });
-        isoview.setOnAction(this::actuView);
+        isoview.setOnAction(this::actualizeView);
 
         //zoom (WIP)
         coordinateSystem.setOnScroll(event ->{
@@ -184,9 +190,9 @@ public class Controller implements Initializable {
             }
         });
 
-        sectorMap = new HashMap<>();
-        pointMap = new HashMap<>();
-        wallMap = new HashMap<>();
+        sectors = new SectorRepository();
+        wallsMap = new WallRepository();
+        points = new VectorRepository();
 
         property = new PropertyBoard(propertyBoard, this);
 
@@ -200,9 +206,10 @@ public class Controller implements Initializable {
             System.out.println(item.toString());
             TreeItem<String> currItem = sectorTreeSelectionModel.getSelectedItem();
             propertyBoard.getChildren().clear();
+            int id = currItem.hashCode();
 
             if (currItem.getValue().contains("point")){
-                System.out.println(pointMap.get(currItem));
+                System.out.println(points.getByID(currItem.hashCode()));
                 property.init(pointMap.get(currItem));
                 propertyBoard.getChildren().add(property.getBoard());
             }
@@ -210,8 +217,8 @@ public class Controller implements Initializable {
                 System.out.println(wallMap.get(currItem));
             }
             else {
-                System.out.println(sectorMap.get(currItem));
-                property.init(sectorMap.get(currItem));
+                System.out.println(sectors.getByID(currItem.hashCode()));
+                property.init(sectors.getByID(currItem.hashCode()));
                 propertyBoard.getChildren().add(property.getBoard());
             }
 
@@ -221,7 +228,7 @@ public class Controller implements Initializable {
     }
 
     public void actualizeAllPolygons(){
-        for (StaticObject obj : Main.staticObjects){
+        for (Wall obj : Main.walls){
             renderPane.actualizePolygon(obj.getPolygon());
         }
     }
@@ -249,7 +256,7 @@ public class Controller implements Initializable {
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
             Main.getPoints().remove(p);
-            actuBoard();
+            actualizeBoard();
         });
 
         name.setAlignment(Pos.TOP_LEFT);
@@ -326,7 +333,7 @@ public class Controller implements Initializable {
             pol.getPoints().remove(p);
             //pol.setupShapes();
             renderPane.actualizePolygon(pol);
-            actuBoard();
+            actualizeBoard();
         });
 
         name.setAlignment(Pos.TOP_LEFT);
@@ -381,8 +388,7 @@ public class Controller implements Initializable {
         return ptsBoard;
     }
 
-    public HBox heightBoard(StaticObject obj){
-        Sector p = obj.getPolygon();
+    public HBox heightBoard(Sector sector){
         HBox genericBox = new HBox();
         VBox rightPart = new VBox();
         VBox heightBoard = new VBox();
@@ -403,7 +409,7 @@ public class Controller implements Initializable {
         });
         label.getChildren().addAll(lName,help);
 
-        Slider height = new Slider(0, 31, obj.getPolygon().getHeight());
+        Slider height = new Slider(0, 31, sector.getHeight());
         height.setPrefWidth(256d);
         height.setBlockIncrement(1);
         height.setMajorTickUnit(8);
@@ -411,8 +417,8 @@ public class Controller implements Initializable {
         height.valueProperty().addListener(
                 (obs, oldval, newVal) -> {
                     height.setValue(newVal.intValue());
-                    obj.getPolygon().setHeight((float) height.getValue());
-                    obj.getPolygon().setIsoShapes();
+                    sector.getPolygon().setHeight((float) height.getValue());
+                    sector.getPolygon().setIsoShapes();
                     drawPolygons();
                 }
         );
@@ -428,10 +434,10 @@ public class Controller implements Initializable {
             typeButton.setId(type.name());
             typeButton.setToggleGroup(choise);
             typeButton.selectedProperty().addListener(event -> {
-                obj.setType(type);
+                sector.setType(type);
                 drawPolygons();
             });
-            if (obj.getType() == type) typeButton.setSelected(true);
+            if (sector.getType() == type) typeButton.setSelected(true);
             rightPart.getChildren().add(typeButton);
         }
 
@@ -439,7 +445,7 @@ public class Controller implements Initializable {
         return genericBox;
     }
 
-    public TreeItem<String> polygonBoard(StaticObject obj){
+    public TreeItem<String> polygonBoard(Wall obj){
         Sector p = obj.getPolygon();
 
         TreeItem<String> sectorItem = new TreeItem<>("Sector " + obj.getId());
@@ -455,7 +461,7 @@ public class Controller implements Initializable {
             TreeItem<String> wall = new TreeItem<>("wall " + v);
             pointItem.getChildren().add(point);
             wallItem.getChildren().add(wall);
-            pointMap.put(point, v);
+            points.add(point.hashCode(), v);
         }
         sectorItem.getChildren().add(wallItem);
         sectorItem.getChildren().add(pointItem);
@@ -464,72 +470,14 @@ public class Controller implements Initializable {
         return sectorItem;
     }
 
-    public VBox polygonProperty(StaticObject obj){
-        Sector p = obj.getPolygon();
-        VBox polBoard = new VBox();
-        VBox pointBoard = new VBox();
-
-        // CSS board
-        polBoard.setStyle(
-                "-fx-background-radius : 8 8 8 8;" +
-                        "-fx-background-color : #656565;" +
-                        "-fx-padding : 10px;" +
-                        "-fx-spacing : 5px"
-        );
-
-        //close button
-        Button close = new Button("X");
-        close.setPrefSize(10d,10d);
-        close.setOnMouseReleased(event -> {
-            Main.getStaticObjects().remove(obj);
-            actuBoard();
-        });
-        HBox delete = new HBox();
-        delete.setAlignment(Pos.TOP_RIGHT);
-        delete.setPrefWidth(120);
-        delete.getChildren().add(close);
-
-        //showPoint button
-        Button showP = new Button("Show Points");
-        showP.setPrefSize(100d,10d);
-        showP.setOnMouseReleased(event -> {
-            if (p.isShowPoint()) {
-                showP.setText("Hide Points");
-                p.setShowPoint(false);
-            }else {
-                showP.setText("Show Points");
-                p.setShowPoint(true);
-            }
-            actuBoard();
-        });
-
-        // Name Label
-        HBox name = new HBox();
-        name.setAlignment(Pos.TOP_LEFT);
-        name.setPrefWidth(120);
-        name.getChildren().add(new Label(p.toName()));
-
-        //add name, delete, show points buttons
-        HBox nameBoard = new HBox();
-        nameBoard.getChildren().addAll(name,delete,showP);
-
-        //Height Board
-        polBoard.getChildren().addAll(heightBoard(obj));
-
-        //main board adds
-        polBoard.getChildren().addAll(nameBoard,pointBoard);
-        return polBoard;
-    }
-
-
-    public void actuBoard(){
+    public void actualizeBoard(){
         polyBoard.getChildren().clear();
         polyBoard.getChildren().add(sectorTree);
 
         drawPolygons();
     }
 
-    public void actuView(ActionEvent ae){
+    public void actualizeView(ActionEvent ae){
         renderPane = isoview.isSelected() ?
                 new IsometricRender(xSize/2) :
                 new ClassicRender();
@@ -568,7 +516,7 @@ public class Controller implements Initializable {
         }
 
         //draw polygons
-        for (StaticObject obj : Main.getStaticObjects()) {
+        for (Wall obj : Main.getStaticObjects()) {
             if (drawablePol.contains(obj.getType())) {
                 renderPane.drawPolygon(coordinateSystem, obj);
             }
@@ -582,59 +530,11 @@ public class Controller implements Initializable {
         }
     }
 
-/*
-    public ArrayList<Shape> drawGrid() {
-        ArrayList<Shape> lines = new ArrayList<>();
-        ArrayList<Shape> tpmLines = new ArrayList<>();
-        boolean isIsometricView = isoview.isSelected();
-
-        Line line1,line2;
-
-        for (int i = 0; i <= xSize; i++) {
-            if (isIsometricView) {
-                float[] var1 = isometricRender.toScreenIso(i, 0);
-                float[] var2 = isometricRender.toScreenIso(i, xSize);
-                float[] var3 = isometricRender.toScreenIso(0, i);
-                float[] var4 = isometricRender.toScreenIso(xSize, i);
-
-                line1 = new Line(var1[0], var1[1], var2[0], var2[1]);
-                line2 = new Line(var3[0], var3[1], var4[0], var4[1]);
-            }
-            else {
-                line1 = new Line(Main.toScreenX(i), Main.toScreenY(0), Main.toScreenX(i), Main.toScreenY(xSize));
-                line2 = new Line(Main.toScreenX(0), Main.toScreenY(i), Main.toScreenX(xSize), Main.toScreenY(i));
-            }
-
-            line1.setStroke(Color.rgb(30, 30, 30));
-            line1.setStrokeWidth(3);
-            line1.setSmooth(true);
-
-            line2.setStroke(Color.rgb(30, 30, 30));
-            line2.setStrokeWidth(3);
-            line2.setSmooth(true);
-
-            if (i % 8 != 0) {
-                lines.add(line2);
-                lines.add(line1);
-            } else {
-                tpmLines.add(line1);
-                tpmLines.add(line2);
-            }
-        }
-
-        for (Shape line : tpmLines) {
-            line.setStroke(Color.rgb(70, 70, 70));
-            lines.add(line);
-        }
-        return lines;
-    }
-*/
-
     public void reset(ActionEvent actionEvent) {
         Main.setPlayer1(new Player(Main.getxSize()/2, Main.getxSize()/2));
         Main.setPoints(new ArrayList<>());
         Main.setPolygons(new ArrayList<>());
-        actuBoard();
+        actualizeBoard();
         drawPolygons();
     }
 
@@ -647,7 +547,7 @@ public class Controller implements Initializable {
         if (Main.getPoints().size() >= 2) {
             setPolygon(Main.getPoints());
             Main.setPoints(new ArrayList<>());
-            actuBoard();
+            actualizeBoard();
         }
     }
     public void setPolygon(Vector... vectors) {
@@ -655,7 +555,7 @@ public class Controller implements Initializable {
     }
 
     public void setPolygon(ArrayList<Vector> vectors) {
-        StaticObject obj = new StaticObject(
+        Wall obj = new Wall(
                 new Sector(vectors, (float)polHeightSlide.getValue(),selectType(SelectionOption))
                 ,selectType(SelectionOption)
         );
@@ -664,9 +564,10 @@ public class Controller implements Initializable {
 
         TreeItem<String> polItem = polygonBoard(obj);
         sectorTree.getRoot().getChildren().add(polItem);
-        sectorMap.put(polItem, obj);
+        sectors.add(polItem.hashCode(), obj.getPolygon());
+        //sectorMap.put(polItem, obj);
 
-        actuBoard();
+        actualizeBoard();
         drawPolygons();
     }
 
@@ -710,7 +611,7 @@ public class Controller implements Initializable {
 //                    }
                     Map_old.importMap(new File("maps\\" + f.getName()));
                     drawPolygons();
-                    actuBoard();
+                    actualizeBoard();
                     stageSave.close();
                 });
                 Button button3 = new Button("supprimer");

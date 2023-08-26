@@ -2,9 +2,9 @@ package fr.cubibox.com.mapcreator;
 
 import fr.cubibox.com.mapcreator.iu.Player;
 import fr.cubibox.com.mapcreator.map_old.Map_old;
-import fr.cubibox.com.mapcreator.mapObject.LivingEntity;
-import fr.cubibox.com.mapcreator.mapObject.StaticObject;
-import fr.cubibox.com.mapcreator.mapObject.TileEntity;
+import fr.cubibox.com.mapcreator.old_mapObject.LivingEntity;
+import fr.cubibox.com.mapcreator.old_mapObject.Wall;
+import fr.cubibox.com.mapcreator.old_mapObject.TileEntity;
 import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +25,7 @@ public class Main extends Application {
     public static float xSize = 16f;
 
     public static ArrayList<Vector> vectors = new ArrayList<>();
-    public static ArrayList<StaticObject> staticObjects = new ArrayList<>();
+    public static ArrayList<Wall> walls = new ArrayList<>();
     public static ArrayList<LivingEntity> mobs = new ArrayList<>();
     public static ArrayList<TileEntity> containers = new ArrayList<>();
 
@@ -61,11 +61,11 @@ public class Main extends Application {
     }
 
 
-    public static ArrayList<StaticObject> getStaticObjects() {
-        return staticObjects;
+    public static ArrayList<Wall> getStaticObjects() {
+        return walls;
     }
-    public static void setPolygons(ArrayList<StaticObject> staticObjects) {
-        Main.staticObjects = staticObjects;
+    public static void setPolygons(ArrayList<Wall> walls) {
+        Main.walls = walls;
     }
 
     public static Map_old getMap() {
@@ -138,8 +138,8 @@ public class Main extends Application {
         Main.player1 = player1;
     }
 
-    public static void setStaticObjects(ArrayList<StaticObject> staticObjects) {
-        Main.staticObjects = staticObjects;
+    public static void setStaticObjects(ArrayList<Wall> walls) {
+        Main.walls = walls;
     }
 
     public static ArrayList<LivingEntity> getMobs() {

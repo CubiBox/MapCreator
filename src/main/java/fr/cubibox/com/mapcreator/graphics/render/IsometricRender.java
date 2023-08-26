@@ -1,6 +1,6 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.mapObject.StaticObject;
+import fr.cubibox.com.mapcreator.old_mapObject.Wall;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.scene.control.Label;
@@ -14,8 +14,8 @@ import javafx.scene.shape.Shape;
 import java.util.ArrayList;
 
 import static fr.cubibox.com.mapcreator.Main.*;
-import static fr.cubibox.com.mapcreator.mapObject.Type.CELLING;
-import static fr.cubibox.com.mapcreator.mapObject.Type.FLOOR;
+import static fr.cubibox.com.mapcreator.old_mapObject.Type.CELLING;
+import static fr.cubibox.com.mapcreator.old_mapObject.Type.FLOOR;
 
 
 public class IsometricRender extends RenderPane {
@@ -65,7 +65,7 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawPolygon(Pane coordinateSystem, StaticObject obj) {
+    public void drawPolygon(Pane coordinateSystem, Wall obj) {
         super.drawPolygon(coordinateSystem, obj);
 
         Sector pol = obj.getPolygon();

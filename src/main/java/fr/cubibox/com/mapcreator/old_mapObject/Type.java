@@ -1,4 +1,4 @@
-package fr.cubibox.com.mapcreator.mapObject;
+package fr.cubibox.com.mapcreator.old_mapObject;
 
 public enum Type {
     WALL, FLOOR, CELLING;

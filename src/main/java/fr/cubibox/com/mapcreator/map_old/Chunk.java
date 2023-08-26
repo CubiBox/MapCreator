@@ -1,6 +1,6 @@
 package fr.cubibox.com.mapcreator.map_old;
 
-import fr.cubibox.com.mapcreator.mapObject.*;
+import fr.cubibox.com.mapcreator.old_mapObject.*;
 import fr.cubibox.com.mapcreator.maths.Sector;
 
 import java.util.ArrayList;
@@ -20,11 +20,11 @@ public class Chunk {
         this.originY = y;
     }
 
-    public ArrayList<StaticObject> getStaticObjects(){
-        ArrayList<StaticObject> so = new ArrayList<>();
+    public ArrayList<Wall> getStaticObjects(){
+        ArrayList<Wall> so = new ArrayList<>();
         for (MapObject mo : mapObjects)
-            if (mo instanceof StaticObject)
-                so.add((StaticObject) mo);
+            if (mo instanceof Wall)
+                so.add((Wall) mo);
         return so;
     }
 

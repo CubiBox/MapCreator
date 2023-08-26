@@ -1,5 +1,7 @@
 package fr.cubibox.com.mapcreator.map;
 
+import fr.cubibox.com.mapcreator.old_mapObject.MapObject;
+
 public class Wall {
     public final int id;
     public final double xA, xB, yA, yB;

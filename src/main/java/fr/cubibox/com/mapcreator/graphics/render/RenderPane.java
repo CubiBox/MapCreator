@@ -1,6 +1,6 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.mapObject.StaticObject;
+import fr.cubibox.com.mapcreator.old_mapObject.Wall;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.scene.layout.Pane;
@@ -23,7 +23,7 @@ public abstract class RenderPane {
     public void drawShapes(Pane coordinateSystem, Sector pol) {
     }
 
-    public void drawPolygon(Pane coordinateSystem, StaticObject obj) {
+    public void drawPolygon(Pane coordinateSystem, Wall obj) {
     }
 
     public void drawPointsLabel(Pane coordinateSystem, Sector pol) {

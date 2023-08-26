@@ -1,7 +1,7 @@
 package fr.cubibox.com.mapcreator.maths;
 
 import fr.cubibox.com.mapcreator.Main;
-import fr.cubibox.com.mapcreator.mapObject.Type;
+import fr.cubibox.com.mapcreator.old_mapObject.Type;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
@@ -9,11 +9,11 @@ import javafx.scene.shape.Shape;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import static fr.cubibox.com.mapcreator.mapObject.Type.*;
+import static fr.cubibox.com.mapcreator.old_mapObject.Type.*;
 
 public class Sector {
     private float height;
-    private final Type type;
+    private Type type;
     private boolean selected;
 
     private ArrayList<Vector> vectors;
@@ -151,6 +151,10 @@ public class Sector {
 
     public Type getType() {
         return type;
+    }
+
+    public void setType(Type type) {
+        this.type = type;
     }
 
     public void setShapesIso(ArrayList<Shape> shapesIso) {

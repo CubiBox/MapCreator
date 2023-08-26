@@ -18,10 +18,12 @@ module fr.cubibox.com.mapcreator {
     opens fr.cubibox.com.mapcreator.graphics to javafx.fxml;
 
     exports fr.cubibox.com.mapcreator;
-    exports fr.cubibox.com.mapcreator.mapObject;
-    opens fr.cubibox.com.mapcreator.mapObject to javafx.fxml;
+    exports fr.cubibox.com.mapcreator.old_mapObject;
+    opens fr.cubibox.com.mapcreator.old_mapObject to javafx.fxml;
     exports fr.cubibox.com.mapcreator.map;
     opens fr.cubibox.com.mapcreator.map to javafx.fxml;
     exports fr.cubibox.com.mapcreator.graphics.render;
     opens fr.cubibox.com.mapcreator.graphics.render to javafx.fxml;
+    exports fr.cubibox.com.mapcreator.map.repositories;
+    opens fr.cubibox.com.mapcreator.map.repositories to javafx.fxml;
 }

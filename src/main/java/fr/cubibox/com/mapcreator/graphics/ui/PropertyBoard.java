@@ -3,10 +3,9 @@ package fr.cubibox.com.mapcreator.graphics.ui;
 
 import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.graphics.Controller;
-import fr.cubibox.com.mapcreator.mapObject.StaticObject;
-import fr.cubibox.com.mapcreator.mapObject.Type;
-import fr.cubibox.com.mapcreator.maths.Wall;
 import fr.cubibox.com.mapcreator.maths.Sector;
+import fr.cubibox.com.mapcreator.maths.Wall;
+import fr.cubibox.com.mapcreator.old_mapObject.Type;
 import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -25,8 +24,8 @@ public class PropertyBoard {
         this.board = new VBox();
     }
 
-    public void init (StaticObject obj){
-        Sector p = obj.getPolygon();
+    public void init (Sector sector){
+        //Sector p = obj.getPolygon();
         VBox polBoard = new VBox();
         VBox pointBoard = new VBox();
 
@@ -42,8 +41,8 @@ public class PropertyBoard {
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            Main.getStaticObjects().remove(obj);
-            this.controller.actuBoard();
+            Main.getStaticObjects().remove(sector);
+            this.controller.actualizeBoard();
         });
         HBox delete = new HBox();
         delete.setAlignment(Pos.TOP_RIGHT);
@@ -54,14 +53,14 @@ public class PropertyBoard {
         Button showP = new Button("Show Points");
         showP.setPrefSize(100d,10d);
         showP.setOnMouseReleased(event -> {
-            if (p.isShowPoint()) {
+            if (sector.isShowPoint()) {
                 showP.setText("Hide Points");
-                p.setShowPoint(false);
+                sector.setShowPoint(false);
             }else {
                 showP.setText("Show Points");
-                p.setShowPoint(true);
+                sector.setShowPoint(true);
             }
-            this.controller.actuBoard();
+            this.controller.actualizeBoard();
         });
 
 
@@ -85,7 +84,7 @@ public class PropertyBoard {
         });
         label.getChildren().addAll(lName,help);
 
-        Slider height = new Slider(0, 31, obj.getPolygon().getHeight());
+        Slider height = new Slider(0, 31, sector.getHeight());
         height.setPrefWidth(256d);
         height.setBlockIncrement(1);
         height.setMajorTickUnit(8);
@@ -93,8 +92,8 @@ public class PropertyBoard {
         height.valueProperty().addListener(
                 (obs, oldval, newVal) -> {
                     height.setValue(newVal.intValue());
-                    obj.getPolygon().setHeight((float) height.getValue());
-                    obj.getPolygon().setIsoShapes();
+                    sector.setHeight((float) height.getValue());
+                    sector.setIsoShapes();
                     this.controller.drawPolygons();
                 }
         );
@@ -110,10 +109,10 @@ public class PropertyBoard {
             typeButton.setId(type.name());
             typeButton.setToggleGroup(choise);
             typeButton.selectedProperty().addListener(event -> {
-                obj.setType(type);
+                sector.setType(type);
                 this.controller.drawPolygons();
             });
-            if (obj.getType() == type) typeButton.setSelected(true);
+            if (sector.getType() == type) typeButton.setSelected(true);
             rightPart.getChildren().add(typeButton);
         }
 
@@ -123,7 +122,7 @@ public class PropertyBoard {
         HBox name = new HBox();
         name.setAlignment(Pos.TOP_LEFT);
         name.setPrefWidth(120);
-        name.getChildren().add(new Label(p.toName()));
+        name.getChildren().add(new Label(sector.toName()));
 
         //add name, delete, show points buttons
         HBox nameBoard = new HBox();
@@ -161,7 +160,7 @@ public class PropertyBoard {
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
             Main.getPoints().remove(p);
-            this.controller.actuBoard();
+            this.controller.actualizeBoard();
         });
 
         name.setAlignment(Pos.TOP_LEFT);
