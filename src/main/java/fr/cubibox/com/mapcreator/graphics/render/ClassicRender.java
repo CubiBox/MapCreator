@@ -4,12 +4,14 @@ import fr.cubibox.com.mapcreator.graphics.Controller;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Wall;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,23 +152,23 @@ public class ClassicRender extends RenderPane {
     public void actualizePolygon(Sector pol) {
         super.actualizePolygon(pol);
 
-        ArrayList<Vector2F> vectors = controller.repositories.getVectors(pol);
+        ArrayList<Wall> walls = controller.repositories.getWalls(pol);
         ArrayList<Shape> lines = new ArrayList<>();
 
         Color color = Color.CYAN;
-        color = switch (pol.getType()) {
-            case FLOOR -> Color.LIME;
-            case CELLING -> Color.RED;
-            default -> Color.CYAN;
-        };
+//        color = switch (pol.getType()) {
+//            case FLOOR -> Color.LIME;
+//            case CELLING -> Color.RED;
+//            default -> Color.CYAN;
+//        };
 
-        //draw by element (wall ptd etc..)
-
-        if (vectors.size() > 1) {
-            for (int i = 0; i < vectors.size() - 1; ) {
+        if (walls.size() > 1) {
+            for (Wall wall : walls) {
+                Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+                Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
                 Line line = new Line(
-                        toScreenX(vectors.get(i).getX()), toScreenY(vectors.get(i).getY()),
-                        toScreenX(vectors.get(++i).getX()), toScreenY(vectors.get(i).getY())
+                        toScreenX(vec1.getX()), toScreenY(vec1.getY()),
+                        toScreenX(vec2.getX()), toScreenY(vec2.getY())
                 );
                 line.setFill(Color.TRANSPARENT);
                 line.setStrokeWidth(2.0);
@@ -174,14 +176,6 @@ public class ClassicRender extends RenderPane {
                 lines.add(line);
             }
         }
-        Line line = new Line(
-                toScreenX(vectors.get(vectors.size()-1).getX()), toScreenY(vectors.get(vectors.size()-1).getY()),
-                toScreenX(vectors.get(0).getX()), toScreenY(vectors.get(0).getY())
-        );
-        line.setFill(Color.TRANSPARENT);
-        line.setStrokeWidth(2.0);
-        line.setStroke(color);
-        lines.add(line);
 
         pol.setShapes(lines);
     }

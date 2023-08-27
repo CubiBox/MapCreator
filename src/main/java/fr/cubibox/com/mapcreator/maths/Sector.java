@@ -79,6 +79,7 @@ public class Sector {
                 Main.toScreenX(vectors.get(vectors.size()-1).getX()), Main.toScreenY(vectors.get(vectors.size()-1).getY()),
                 Main.toScreenX(vectors.get(0).getX()), Main.toScreenY(vectors.get(0).getY())
         );
+
         line.setFill(Color.TRANSPARENT);
         line.setStrokeWidth(2.0);
         line.setStroke(color);

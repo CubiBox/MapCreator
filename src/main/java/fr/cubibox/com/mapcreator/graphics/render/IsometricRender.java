@@ -3,6 +3,7 @@ package fr.cubibox.com.mapcreator.graphics.render;
 import fr.cubibox.com.mapcreator.graphics.Controller;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.maths.Wall;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -11,6 +12,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import static fr.cubibox.com.mapcreator.Main.*;
@@ -155,90 +157,65 @@ public class IsometricRender extends RenderPane {
         super.actualizePolygon(pol);
 
         ArrayList<Vector2F> vectors = controller.repositories.getVectors(pol);
+        ArrayList<Wall> walls = controller.repositories.getWalls(pol);
         ArrayList<Shape> shapes = new ArrayList<>();
 
-        float currentHeight,currentBase;
-        Color wallColor;
-        switch (pol.getType()) {
-            case FLOOR -> {
-                wallColor = new Color(0, 1, 0, 0.3);
-                currentHeight = pol.getCeilHeight();
-                currentBase = 0;
+        float currentHeight = pol.getCeilHeight();
+        float currentBase = pol.getFloorHeight();
+        Color wallColor = new Color(0, 1, 1, 0.3);
+        Color color = Color.DARKGRAY;
+
+        if (walls.size() > 1) {
+            ArrayList<float[]> topFace = new ArrayList<>();
+            ArrayList<float[]> bottomFace = new ArrayList<>();
+
+            for (Wall wall : walls) {
+                double[] polPoints = new double[8];
+
+                Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+                Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+                float[] v1 = toScreenIso(vec1.getX(),vec1.getY(),currentHeight);
+                float[] v2 = toScreenIso(vec2.getX(),vec2.getY(),currentHeight);
+                float[] v3 = toScreenIso(vec2.getX(),vec2.getY(),currentBase);
+                float[] v4 = toScreenIso(vec1.getX(),vec1.getY(),currentBase);
+                polPoints[0] = v1[0];
+                polPoints[1] = v1[1];
+                polPoints[2] = v2[0];
+                polPoints[3] = v2[1];
+                polPoints[4] = v3[0];
+                polPoints[5] = v3[1];
+                polPoints[6] = v4[0];
+                polPoints[7] = v4[1];
+
+                shapes.add(new Polygon(polPoints));
+
+                if (!topFace.contains(v1)) topFace.add(v1);
+                if (!bottomFace.contains(v3)) bottomFace.add(v3);
             }
-            case CELLING -> {
-                wallColor = new Color(1, 0, 0, 0.3);
-                currentHeight = 31;
-                currentBase = pol.getCeilHeight();
+
+            /**top / bottom faces*/
+            /*
+            double[] polPoints = new double[topFace.size()*2];
+            int i = 0;
+            for (float[] vec : topFace){
+                polPoints[i++] = vec[0];
+                polPoints[i++] = vec[1];
             }
-            default -> { //  WALL or null
-                wallColor = new Color(0, 1, 1, 0.3);
-                currentHeight = pol.getCeilHeight();
-                currentBase = 0;
+            shapes.add(new Polygon(polPoints));
+
+            i = 0;
+            for (float[] vec : bottomFace){
+                polPoints[i++] = vec[0];
+                polPoints[i++] = vec[1];
             }
-        }
+            shapes.add(new Polygon(polPoints));
+             */
 
-
-        double[] polPoints = new double[vectors.size()*2];
-
-        //top
-        int countP = 0;
-        for (Vector2F p : vectors){
-            float[] v = toScreenIso(p.getX(),p.getY(),currentHeight);
-            polPoints[countP++] = v[0];
-            polPoints[countP++] = v[1];
-        }
-        Polygon shape = new Polygon(polPoints);
-        shape.setFill(pol.getType() == FLOOR ? new Color(0, 1, 0, 0.3) : Color.TRANSPARENT);
-        shapes.add(shape);
-
-
-        //bottom
-        countP = 0;
-        for (Vector2F p : vectors){
-            float[] v = toScreenIso(p.getX(),p.getY(),currentBase);
-            polPoints[countP++] = v[0];
-            polPoints[countP++] = v[1];
-        }
-        shape = new Polygon(polPoints);
-        shape.setFill(pol.getType() == CELLING ? new Color(1, 0, 0, 0.3) : Color.TRANSPARENT);
-        shapes.add(shape);
-
-
-        //faces
-        for (int i = 0; i < vectors.size(); i ++){
-            polPoints = new double[8];
-            countP = 0;
-
-            float[] v = toScreenIso(vectors.get(i).getX(), vectors.get(i).getY(),currentBase);
-            polPoints[countP++] = v[0];
-            polPoints[countP++] = v[1];
-            float[] v1 = toScreenIso(vectors.get(i).getX(), vectors.get(i).getY(),currentHeight);
-            polPoints[countP++] = v1[0];
-            polPoints[countP++] = v1[1];
-
-            int i2 = i+1 < vectors.size() ? i+1 : 0;
-            v1 = toScreenIso(vectors.get(i2).getX(), vectors.get(i2).getY(),currentHeight);
-            polPoints[countP++] = v1[0];
-            polPoints[countP++] = v1[1];
-            v = toScreenIso(vectors.get(i2).getX(), vectors.get(i2).getY(),currentBase);
-            polPoints[countP++] = v[0];
-            polPoints[countP] = v[1];
-
-            shape = new Polygon(polPoints);
-            shape.setFill(wallColor);
-            shapes.add(shape);
-        }
-
-        //add global settings
-        for (Shape polShape : shapes) {
-            polShape.setStrokeWidth(2.0);
-            polShape.setStroke(
-                    switch (pol.getType()) {
-                        case FLOOR -> Color.LIME;
-                        case CELLING -> Color.RED;
-                        default -> Color.CYAN;
-                    }
-            );
+            for (Shape shape : shapes) {
+                shape.setFill(wallColor);
+                shape.setStrokeWidth(1.0);
+                shape.setStroke(color);
+            }
         }
         pol.setShapes(shapes);
     }

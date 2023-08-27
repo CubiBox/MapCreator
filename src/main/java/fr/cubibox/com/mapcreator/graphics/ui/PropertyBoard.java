@@ -138,6 +138,88 @@ public class PropertyBoard {
         this.board = polBoard;
     }
 
+/*
+    public VBox pointBoard(Vector2F p, int pointName, Sector pol){
+        VBox ptsBoard = new VBox();
+        HBox nameBoard = new HBox();
+        HBox pointBoard = new HBox();
+        HBox xBoard = new HBox();
+        HBox yBoard = new HBox();
+        HBox name = new HBox();
+        HBox delete = new HBox();
+
+        ptsBoard.setStyle(
+                "-fx-padding: 3px;" +
+                        "-fx-spacing: 5px;" +
+                        "-fx-background-color: #707070; " +
+                        "-fx-background-radius : 3 3 3 3;"
+        );
+
+        xBoard.setAlignment(Pos.CENTER);
+        yBoard.setAlignment(Pos.CENTER);
+
+        Button close = new Button("X");
+        close.setPrefSize(10d,10d);
+        close.setOnMouseReleased(event -> {
+            repositories.remove(p);
+            //pol.setupShapes();
+            renderPane.actualizePolygon(pol);
+            actualizeBoard();
+        });
+
+        name.setAlignment(Pos.TOP_LEFT);
+        name.setPrefWidth(120);
+        Label labelName = new Label("Point " + pointName);
+        labelName.setStyle("-fx-text-fill:WHITE;");
+        name.getChildren().add(labelName);
+        delete.setAlignment(Pos.TOP_RIGHT);
+        delete.setPrefWidth(230);
+        delete.getChildren().add(close);
+        nameBoard.getChildren().addAll(name,delete);
+
+        // X cursor
+        Slider xSlid = new Slider(0,Main.getxSize(),p.getX());
+        xSlid.setBlockIncrement(1);
+        xSlid.setMajorTickUnit(8);
+        xSlid.setShowTickLabels(true);
+        xSlid.valueProperty().addListener((obs, oldval, newVal) -> xSlid.setValue(newVal.intValue()));
+        xSlid.valueProperty().addListener(event -> {
+            p.setX((float) xSlid.getValue());
+            p.getCircle().setCenterX(Main.toScreenX(p.getX()));
+            p.getCircle().setCenterY(Main.toScreenY(p.getY()));
+            renderPane.actualizePolygon(pol);
+            drawPolygons();
+        });
+        xSlid.setPrefWidth(220);
+        xBoard.getChildren().addAll(new Label("      X : "),xSlid);
+
+        //Y cursor
+        Slider ySlid = new Slider(0,Main.getxSize(),p.getY());
+        ySlid.setBlockIncrement(1);
+        ySlid.setMajorTickUnit(8);
+        ySlid.setShowTickLabels(true);
+        ySlid.valueProperty().addListener((obs, oldval, newVal) -> ySlid.setValue(newVal.intValue()));
+        ySlid.valueProperty().addListener(event -> {
+            p.setY((float) ySlid.getValue());
+            p.getCircle().setCenterX(Main.toScreenX(p.getX()));
+            p.getCircle().setCenterY(Main.toScreenY(p.getY()));
+            renderPane.actualizePolygon(pol);
+            drawPolygons();
+        });
+        ySlid.setPrefWidth(220);
+        yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
+
+
+        pointBoard.setAlignment(Pos.CENTER);
+        pointBoard.getChildren().addAll(xBoard,yBoard);
+
+        //main board adds
+        ptsBoard.getChildren().addAll(nameBoard,pointBoard);
+
+        return ptsBoard;
+    }
+*/
+
 
     public void init (Vector2F p){
         VBox ptsBoard = new VBox();

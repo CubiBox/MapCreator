@@ -111,7 +111,17 @@ public class Repositories {
     }
 
     public ArrayList<Vector2F> getVectors(Sector sector){
-        return new ArrayList<>(this.vectors.values());
+        ArrayList<Vector2F> vectors = new ArrayList<>();
+        for (int wallId : sector.getWallIds()){
+            ArrayList<Vector2F> vec = getVectors(walls.get(wallId));
+            if (!vectors.contains(vec.get(0))){
+                vectors.add(vec.get(0));
+            }
+            if (!vectors.contains(vec.get(1))){
+                vectors.add(vec.get(1));
+            }
+        }
+        return vectors;
     }
 
 
