@@ -1,38 +1,37 @@
 package fr.cubibox.com.mapcreator.maths;
 
+import javafx.scene.control.TreeItem;
+
 public class Wall {
-    private String id;
+    private final int id;
     public static int staticId;
 
-    private Vector a;
-    private Vector b;
+    private final int idVec1;
+    private final int idVec2;
 
-    public Wall(Vector a, Vector b) {
-        this.a = a;
-        this.b = b;
-        this.id = newId();
-    }
+    private final TreeItem<String> treeItem;
 
-    public Vector getA() {
-        return a;
-    }
-    public void setA(Vector a) {
-        this.a = a;
+    public Wall(int idVec1, int idVec2) {
+        this.idVec1 = idVec1;
+        this.idVec2 = idVec2;
+        this.treeItem = new TreeItem<>("wall");
+        this.id = treeItem.hashCode();
     }
 
-    public Vector getB() {
-        return b;
+    public int getVector1ID() {
+        return idVec1;
     }
-    public void setB(Vector b) {
-        this.b = b;
+    public int getVector2ID() {
+        return idVec2;
     }
 
-    public Vector getNormal() {
-        return new Vector(b.getY() - a.getY(), a.getX() - b.getX());
+    /*
+    public Vector2F getNormal() {
+        return new Vector2F(b.getY() - a.getY(), a.getX() - b.getX());
     }
 
     public float getLength() {
-        Vector length = new Vector(
+        Vector2F length = new Vector2F(
                 this.getB().getX() - this.getA().getX(),
                 this.getB().getY() - this.getA().getY()
         );
@@ -41,7 +40,7 @@ public class Wall {
     }
 
     public float getSqLength() {
-        Vector length = new Vector(
+        Vector2F length = new Vector2F(
                 this.getB().getX() - this.getA().getX(),
                 this.getB().getY() - this.getA().getY()
         );
@@ -49,7 +48,7 @@ public class Wall {
         return length.dot(length);
     }
 
-    public boolean isPointOnLine(Vector intersectionVector) {
+    public boolean isPointOnLine(Vector2F intersectionVector) {
         float x1 = this.getA().getX();
         float y1 = this.getA().getY();
         float x2 = this.getB().getX();
@@ -61,29 +60,27 @@ public class Wall {
 
         return (d == 0);
     }
+     */
 
-    public static String newId(){
+    public static int newId(){
         staticId++;
-        return "Polygon"+staticId;
+        return staticId;
     }
 
-    public String getId() {
+    public int getId() {
         return id;
     }
-    public void setId(String id) {
-        this.id = id;
+
+    public TreeItem<String> getTreeItem() {
+        return treeItem;
     }
 
+    @Override
     public String toString() {
-        return
-                "\t\t@[" + (int) a.getX() +
-                ";" +
-                (int) a.getY() +
-                "]-[" +
-                (int) b.getX() +
-                ";" +
-                (int) b.getY() +
-                "], id='" +
-                id + '\'';
+        return "Wall{" +
+                "id=" + id +
+                ", idVec1=" + idVec1 +
+                ", idVec2=" + idVec2 +
+                '}';
     }
 }

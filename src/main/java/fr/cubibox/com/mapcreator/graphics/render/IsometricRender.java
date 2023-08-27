@@ -1,8 +1,8 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.old_mapObject.Wall;
+import fr.cubibox.com.mapcreator.graphics.Controller;
 import fr.cubibox.com.mapcreator.maths.Sector;
-import fr.cubibox.com.mapcreator.maths.Vector;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -14,22 +14,23 @@ import javafx.scene.shape.Shape;
 import java.util.ArrayList;
 
 import static fr.cubibox.com.mapcreator.Main.*;
-import static fr.cubibox.com.mapcreator.old_mapObject.Type.CELLING;
-import static fr.cubibox.com.mapcreator.old_mapObject.Type.FLOOR;
+import static fr.cubibox.com.mapcreator.map.Type.CELLING;
+import static fr.cubibox.com.mapcreator.map.Type.FLOOR;
 
 
 public class IsometricRender extends RenderPane {
     private double xAngle;
     private double yAngle;
-    private Vector origin;
+    private Vector2F origin;
 
-    public IsometricRender(Vector origin) {
-        this(0, 0.5,  origin);
+    public IsometricRender(Vector2F origin, Controller controller) {
+        this(0, 0.5,  origin, controller);
     }
-    public IsometricRender(float origin) {
-        this(0, 0.5,  new Vector(origin,origin));
+    public IsometricRender(float origin, Controller controller) {
+        this(0, 0.5,  new Vector2F(origin,origin), controller);
     }
-    public IsometricRender(double xAngle, double yAngle, Vector origin) {
+    public IsometricRender(double xAngle, double yAngle, Vector2F origin, Controller controller) {
+        super(controller);
         this.xAngle = xAngle;
         this.yAngle = yAngle;
         this.origin = origin;
@@ -65,10 +66,8 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawPolygon(Pane coordinateSystem, Wall obj) {
-        super.drawPolygon(coordinateSystem, obj);
-
-        Sector pol = obj.getPolygon();
+    public void drawPolygon(Pane coordinateSystem, Sector pol) {
+        super.drawPolygon(coordinateSystem, pol);
 
         drawShapes(coordinateSystem, pol);
         if (pol.isShowPoint()) {
@@ -92,9 +91,9 @@ public class IsometricRender extends RenderPane {
 
         int countP = 0;
         float[] v;
-        for (Vector p : pol.getPoints()) {
+        for (Vector2F p : controller.repositories.getVectors(pol)) {
             Label pointName = new Label(countP++ + "");
-            v = toScreenIso(p.getX(), p.getY(), pol.getHeight());
+            v = toScreenIso(p.getX(), p.getY(), pol.getCeilHeight());
             pointName.setLayoutX(v[0] - 5);
             pointName.setLayoutY(v[1] - 15);
             pointName.setTextFill(Color.WHITE);
@@ -103,7 +102,7 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawPointShape(Pane coordinateSystem, Vector vector) {
+    public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
         super.drawPointShape(coordinateSystem, vector);
 
         float[] v = toScreenIso(vector.getX(), vector.getY());
@@ -155,7 +154,7 @@ public class IsometricRender extends RenderPane {
     public void actualizePolygon(Sector pol) {
         super.actualizePolygon(pol);
 
-        ArrayList<Vector> vectors = pol.getPoints();
+        ArrayList<Vector2F> vectors = controller.repositories.getVectors(pol);
         ArrayList<Shape> shapes = new ArrayList<>();
 
         float currentHeight,currentBase;
@@ -163,17 +162,17 @@ public class IsometricRender extends RenderPane {
         switch (pol.getType()) {
             case FLOOR -> {
                 wallColor = new Color(0, 1, 0, 0.3);
-                currentHeight = pol.getHeight();
+                currentHeight = pol.getCeilHeight();
                 currentBase = 0;
             }
             case CELLING -> {
                 wallColor = new Color(1, 0, 0, 0.3);
                 currentHeight = 31;
-                currentBase = pol.getHeight();
+                currentBase = pol.getCeilHeight();
             }
             default -> { //  WALL or null
                 wallColor = new Color(0, 1, 1, 0.3);
-                currentHeight = pol.getHeight();
+                currentHeight = pol.getCeilHeight();
                 currentBase = 0;
             }
         }
@@ -183,7 +182,7 @@ public class IsometricRender extends RenderPane {
 
         //top
         int countP = 0;
-        for (Vector p : vectors){
+        for (Vector2F p : vectors){
             float[] v = toScreenIso(p.getX(),p.getY(),currentHeight);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
@@ -195,7 +194,7 @@ public class IsometricRender extends RenderPane {
 
         //bottom
         countP = 0;
-        for (Vector p : vectors){
+        for (Vector2F p : vectors){
             float[] v = toScreenIso(p.getX(),p.getY(),currentBase);
             polPoints[countP++] = v[0];
             polPoints[countP++] = v[1];
@@ -278,10 +277,10 @@ public class IsometricRender extends RenderPane {
         this.yAngle = yAngle;
     }
 
-    public Vector getOrigin() {
+    public Vector2F getOrigin() {
         return origin;
     }
-    public void setOrigin(Vector origin) {
+    public void setOrigin(Vector2F origin) {
         this.origin = origin;
     }
 }

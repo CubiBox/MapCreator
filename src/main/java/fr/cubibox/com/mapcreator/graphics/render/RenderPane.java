@@ -1,8 +1,8 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.old_mapObject.Wall;
+import fr.cubibox.com.mapcreator.graphics.Controller;
 import fr.cubibox.com.mapcreator.maths.Sector;
-import fr.cubibox.com.mapcreator.maths.Vector;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 
@@ -10,6 +10,11 @@ import java.util.ArrayList;
 
 public abstract class RenderPane {
     protected ArrayList<Shape> tempPolygons;
+    protected Controller controller;
+
+    public RenderPane(Controller controller) {
+        this.controller = controller;
+    }
 
     public void render(){
 
@@ -23,12 +28,12 @@ public abstract class RenderPane {
     public void drawShapes(Pane coordinateSystem, Sector pol) {
     }
 
-    public void drawPolygon(Pane coordinateSystem, Wall obj) {
+    public void drawPolygon(Pane coordinateSystem, Sector obj) {
     }
 
     public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
     }
-    public void drawPointShape(Pane coordinateSystem, Vector vector) {
+    public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
     }
 
     public void drawGrid(Pane coordinateSystem) {
@@ -42,7 +47,7 @@ public abstract class RenderPane {
         return tempPolygons;
     }
 
-    public ArrayList<Vector> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
+    public ArrayList<Vector2F> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
         return null;
     }
 }

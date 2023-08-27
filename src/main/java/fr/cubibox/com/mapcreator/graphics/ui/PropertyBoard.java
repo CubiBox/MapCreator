@@ -5,13 +5,15 @@ import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.graphics.Controller;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Wall;
-import fr.cubibox.com.mapcreator.old_mapObject.Type;
-import fr.cubibox.com.mapcreator.maths.Vector;
+import fr.cubibox.com.mapcreator.map.Type;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+
+import java.util.ArrayList;
 
 public class PropertyBoard {
     private Controller controller;
@@ -41,7 +43,7 @@ public class PropertyBoard {
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            Main.getStaticObjects().remove(sector);
+            //Main.getStaticObjects().remove(sector);
             this.controller.actualizeBoard();
         });
         HBox delete = new HBox();
@@ -84,7 +86,7 @@ public class PropertyBoard {
         });
         label.getChildren().addAll(lName,help);
 
-        Slider height = new Slider(0, 31, sector.getHeight());
+        Slider height = new Slider(0, 31, sector.getCeilHeight());
         height.setPrefWidth(256d);
         height.setBlockIncrement(1);
         height.setMajorTickUnit(8);
@@ -92,8 +94,7 @@ public class PropertyBoard {
         height.valueProperty().addListener(
                 (obs, oldval, newVal) -> {
                     height.setValue(newVal.intValue());
-                    sector.setHeight((float) height.getValue());
-                    sector.setIsoShapes();
+                    sector.setCeilHeight((float) height.getValue());
                     this.controller.drawPolygons();
                 }
         );
@@ -138,7 +139,7 @@ public class PropertyBoard {
     }
 
 
-    public void init (Vector p){
+    public void init (Vector2F p){
         VBox ptsBoard = new VBox();
         HBox nameBoard = new HBox();
         HBox pointBoard = new HBox();
@@ -159,13 +160,13 @@ public class PropertyBoard {
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            Main.getPoints().remove(p);
+            controller.tpmPoints.remove(p);
             this.controller.actualizeBoard();
         });
 
         name.setAlignment(Pos.TOP_LEFT);
         name.setPrefWidth(240);
-        name.getChildren().add(new Label("Point " + Main.getPoints().size()));
+        name.getChildren().add(new Label("Point " + controller.tpmPoints.size()));
         delete.setAlignment(Pos.TOP_RIGHT);
         delete.setPrefWidth(230);
         delete.getChildren().add(close);
@@ -181,7 +182,7 @@ public class PropertyBoard {
             p.setX((float) xSlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            Main.setPoints(Vector.shortPoints(Main.vectors));
+            controller.tpmPoints = new ArrayList<>(Vector2F.shortPoints(controller.tpmPoints));
             this.controller.drawPolygons();
         });
         xSlid.setPrefWidth(250);
@@ -197,7 +198,7 @@ public class PropertyBoard {
             p.setY((float) ySlid.getValue());
             p.getCircle().setCenterX(Main.toScreenX(p.getX()));
             p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            Main.setPoints(Vector.shortPoints(Main.vectors));
+            controller.tpmPoints = new ArrayList<>(Vector2F.shortPoints(controller.tpmPoints));
             this.controller.drawPolygons();
         });
         ySlid.setPrefWidth(250);

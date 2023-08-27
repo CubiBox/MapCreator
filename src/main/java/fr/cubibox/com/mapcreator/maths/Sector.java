@@ -1,23 +1,31 @@
 package fr.cubibox.com.mapcreator.maths;
 
 import fr.cubibox.com.mapcreator.Main;
-import fr.cubibox.com.mapcreator.old_mapObject.Type;
+import fr.cubibox.com.mapcreator.map.Type;
+import javafx.scene.control.TreeItem;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 
-import static fr.cubibox.com.mapcreator.old_mapObject.Type.*;
+import static fr.cubibox.com.mapcreator.map.Type.*;
 
 public class Sector {
-    private float height;
+    public static int staticId;
+
+    private final TreeItem<String> treeItem;
+    private final int id;
+    private float ceilHeight;
+    private float floorHeight;
+    private final HashSet<Integer> wallIds;
+
+
     private Type type;
     private boolean selected;
-
-    private ArrayList<Vector> vectors;
     private boolean showPoint;
+
+
 
     //shape for views
     private ArrayList<Shape> shapesIso;
@@ -29,43 +37,23 @@ public class Sector {
     private ArrayList<Shape> shapes;
 
 
-    public Sector(ArrayList<Vector> vectors, float height) {
-        this(vectors,height, WALL);
+    public Sector(float ceilHeight, float floorHeight) {
+        this(ceilHeight, floorHeight, WALL);
     }
-    public Sector(Vector... pts) {
-        this(new ArrayList<>(Arrays.asList(pts)),0, WALL);
-    }
-    public Sector(Type type, Vector... pts) {
-        this(new ArrayList<>(Arrays.asList(pts)),0, type);
-    }
-    public Sector(ArrayList<Vector> vectors, float height, Type type) {
-        this.height = height;
+    public Sector(float ceilHeight, float floorHeight, Type type) {
+        this.treeItem = new TreeItem<>("sector");
+        this.id = treeItem.hashCode();
+        this.ceilHeight = ceilHeight;
+        this.floorHeight = floorHeight;
+        this.wallIds = new HashSet<>();
         this.type = type;
-        if (!vectors.isEmpty()) {
-            this.vectors = vectors;
-            //setupShapes();
-        }
-        this.showPoint = false;
     }
 
-/*
-    public void setupShapes(){
-        setTopShape();
-        setIsoShapes();
-        //setLeftShape();
-        //setRightShape();
-    }
-    */
-
-    private void setTopShape() {
-        this.shapeTop = topShape(vectors,type);
-    }
-
-    public static ArrayList<Shape> topShape(Type type, Vector... pts) {
+    public static ArrayList<Shape> topShape(Type type, Vector2F... pts) {
         return topShape(new ArrayList<>(Arrays.asList(pts)),type);
     }
 
-    public static ArrayList<Shape> topShape(ArrayList<Vector> vectors, Type type) {
+    public static ArrayList<Shape> topShape(ArrayList<Vector2F> vectors, Type type) {
         ArrayList<Shape> lines = new ArrayList<>();
 
         Color color = Color.CYAN;
@@ -99,14 +87,29 @@ public class Sector {
         return lines;
     }
 
-    public void setIsoShapes(){
-        this.shapesIso = shapes;
-    }
-
     public String toName(){
         String out = "";
         out += "Polygon";
         return out;
+    }
+
+    public void addWallIds(Integer... wallIds) {
+        this.wallIds.addAll(Arrays.asList(wallIds));
+    }
+    public void addWallId(Integer wallIds) {
+        this.wallIds.add(wallIds);
+    }
+    public void addWallIds(HashSet<Integer> wallID) {
+        this.wallIds.addAll(wallID);
+    }
+
+    public static int newId(){
+        staticId++;
+        return staticId;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public boolean isShowPoint() {
@@ -117,24 +120,8 @@ public class Sector {
         this.showPoint = showPoint;
     }
 
-    public ArrayList<Vector> getPoints() {
-        return vectors;
-    }
-
-    public void setPoints(ArrayList<Vector> vectors) {
-        this.vectors = vectors;
-    }
-
     public ArrayList<Shape> getShapeTop() {
         return shapeTop;
-    }
-
-    public float getHeight() {
-        return height;
-    }
-
-    public void setHeight(float height) {
-        this.height = height;
     }
 
     public ArrayList<Shape> getShapesIso() {
@@ -172,4 +159,30 @@ public class Sector {
     public void setShapes(ArrayList<Shape> shapes) {
         this.shapes = shapes;
     }
+
+    public float getCeilHeight() {
+        return ceilHeight;
+    }
+
+    public float getFloorHeight() {
+        return floorHeight;
+    }
+
+    public HashSet<Integer> getWallIds() {
+        return wallIds;
+    }
+
+    public void setCeilHeight(float ceilHeight) {
+        this.ceilHeight = ceilHeight;
+    }
+
+    public void setFloorHeight(float floorHeight) {
+        this.floorHeight = floorHeight;
+    }
+
+    public TreeItem<String> getTreeItem() {
+        return treeItem;
+    }
+
+
 }

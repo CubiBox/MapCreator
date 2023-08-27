@@ -1,9 +1,9 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.old_mapObject.Wall;
+import fr.cubibox.com.mapcreator.graphics.Controller;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
 import fr.cubibox.com.mapcreator.maths.Sector;
-import fr.cubibox.com.mapcreator.maths.Vector;
+import fr.cubibox.com.mapcreator.maths.Vector2F;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
@@ -16,12 +16,12 @@ import java.util.List;
 import static fr.cubibox.com.mapcreator.Main.xSize;
 import static fr.cubibox.com.mapcreator.Main.DIML;
 import static fr.cubibox.com.mapcreator.Main.DIMC;
-import static fr.cubibox.com.mapcreator.old_mapObject.Type.WALL;
+import static fr.cubibox.com.mapcreator.map.Type.WALL;
 
 public class ClassicRender extends RenderPane {
 
-    public ClassicRender() {
-
+    public ClassicRender(Controller controller) {
+        super(controller);
     }
 
     @Override
@@ -42,15 +42,15 @@ public class ClassicRender extends RenderPane {
         }
 
         if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize)) {
-            Vector currentPos = new Vector(roundX, roundY);
+            Vector2F currentPos = new Vector2F(roundX, roundY);
             if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())) {
                 tempPolygons = Sector.topShape(
                         //selectType(SelectionOption),
                         WALL,
                         currentPos,
-                        new Vector(dragPointOrigin[0], roundY),
-                        new Vector(dragPointOrigin[0], dragPointOrigin[1]),
-                        new Vector(roundX, dragPointOrigin[1])
+                        new Vector2F(dragPointOrigin[0], roundY),
+                        new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
+                        new Vector2F(roundX, dragPointOrigin[1])
                 );
                 return true;
             }
@@ -59,14 +59,12 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public void drawPolygon(Pane coordinateSystem, Wall obj) {
+    public void drawPolygon(Pane coordinateSystem, Sector obj) {
         super.drawPolygon(coordinateSystem, obj);
 
-        Sector pol = obj.getPolygon();
-
-        drawShapes(coordinateSystem, pol);
-        if (pol.isShowPoint()) {
-            drawPointsLabel(coordinateSystem, pol);
+        drawShapes(coordinateSystem, obj);
+        if (obj.isShowPoint()) {
+            drawPointsLabel(coordinateSystem, obj);
         }
     }
 
@@ -78,7 +76,7 @@ public class ClassicRender extends RenderPane {
         for (Shape shape : pol.getShapes()) {
             shape.setOnMousePressed(event -> {
                 if (event.isSecondaryButtonDown()) {
-                    System.out.println("here " + pol.getHeight());
+                    System.out.println("here " + pol.getCeilHeight());
                     if (pol.isSelected()) {
                         pol.setSelected(false);
                         shape.setStrokeWidth(2);
@@ -98,7 +96,7 @@ public class ClassicRender extends RenderPane {
 
         int countP = 0;
         float[] v = new float[2];
-        for (Vector p : pol.getPoints()) {
+        for (Vector2F p : controller.repositories.getVectors(pol)) {
             Label pointName = new Label(countP++ + "");
             pointName.setLayoutX(toScreenX(p.getX()) - 5);
             pointName.setLayoutY(toScreenY(p.getY()) - 15);
@@ -108,7 +106,7 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public void drawPointShape(Pane coordinateSystem, Vector vector) {
+    public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
         super.drawPointShape(coordinateSystem, vector);
 
         coordinateSystem.getChildren().add(vector.getCircle());
@@ -152,7 +150,7 @@ public class ClassicRender extends RenderPane {
     public void actualizePolygon(Sector pol) {
         super.actualizePolygon(pol);
 
-        ArrayList<Vector> vectors = pol.getPoints();
+        ArrayList<Vector2F> vectors = controller.repositories.getVectors(pol);
         ArrayList<Shape> lines = new ArrayList<>();
 
         Color color = Color.CYAN;
@@ -161,6 +159,8 @@ public class ClassicRender extends RenderPane {
             case CELLING -> Color.RED;
             default -> Color.CYAN;
         };
+
+        //draw by element (wall ptd etc..)
 
         if (vectors.size() > 1) {
             for (int i = 0; i < vectors.size() - 1; ) {
@@ -187,21 +187,21 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public ArrayList<Vector> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
-        Vector currentPos = new Vector(MathFunction.round(toPlotX(x)), MathFunction.round(toPlotY(y)));
-        ArrayList<Vector> pts = new ArrayList<>();
+    public ArrayList<Vector2F> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
+        Vector2F currentPos = new Vector2F(MathFunction.round(toPlotX(x)), MathFunction.round(toPlotY(y)));
+        ArrayList<Vector2F> pts = new ArrayList<>();
         pts.add(currentPos);
 
         if (currentPos.getX() >= 0 && currentPos.getX() <= xSize && currentPos.getY() >= 0 && currentPos.getY() <= xSize) {
 
             if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())) {
                 if (dragPointOrigin[0] == currentPos.getX() || dragPointOrigin[1] == currentPos.getY())
-                    pts.add(new Vector(dragPointOrigin[0], dragPointOrigin[1]));
+                    pts.add(new Vector2F(dragPointOrigin[0], dragPointOrigin[1]));
 
                 else pts.addAll(List.of(
-                                new Vector(dragPointOrigin[0], currentPos.getY()),
-                                new Vector(dragPointOrigin[0], dragPointOrigin[1]),
-                                new Vector(currentPos.getX(), dragPointOrigin[1])
+                                new Vector2F(dragPointOrigin[0], currentPos.getY()),
+                                new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
+                                new Vector2F(currentPos.getX(), dragPointOrigin[1])
                         )
                 );
             }

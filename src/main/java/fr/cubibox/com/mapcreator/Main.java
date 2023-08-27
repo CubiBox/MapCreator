@@ -1,11 +1,6 @@
 package fr.cubibox.com.mapcreator;
 
 import fr.cubibox.com.mapcreator.iu.Player;
-import fr.cubibox.com.mapcreator.map_old.Map_old;
-import fr.cubibox.com.mapcreator.old_mapObject.LivingEntity;
-import fr.cubibox.com.mapcreator.old_mapObject.Wall;
-import fr.cubibox.com.mapcreator.old_mapObject.TileEntity;
-import fr.cubibox.com.mapcreator.maths.Vector;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,7 +11,6 @@ import javafx.stage.Stage;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Objects;
 
 public class Main extends Application {
@@ -24,13 +18,7 @@ public class Main extends Application {
     public static float DIMC = 980;
     public static float xSize = 16f;
 
-    public static ArrayList<Vector> vectors = new ArrayList<>();
-    public static ArrayList<Wall> walls = new ArrayList<>();
-    public static ArrayList<LivingEntity> mobs = new ArrayList<>();
-    public static ArrayList<TileEntity> containers = new ArrayList<>();
-
     public static Player player1;
-    public static Map_old mapOld;
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -61,43 +49,6 @@ public class Main extends Application {
     }
 
 
-    public static ArrayList<Wall> getStaticObjects() {
-        return walls;
-    }
-    public static void setPolygons(ArrayList<Wall> walls) {
-        Main.walls = walls;
-    }
-
-    public static Map_old getMap() {
-        return mapOld;
-    }
-/*
-    public static void setMap(Map map) {
-        Main.map = map;
-        ArrayList<Polygon2F> allPol = new ArrayList<>();
-
-        ArrayList<Integer> counPol = new ArrayList<>();
-        int xChunk = 0;
-        int yChunk = 0;
-        for (Chunk[] chunkL : map.getChunks()){
-            for (Chunk chunk : chunkL){
-                if (chunk.getPols() != null)
-                    for (Polygon2F pol : chunk.getPols()){
-                        if (!counPol.contains(Integer.parseInt(pol.getId()))){
-                            allPol.add(pol);
-                            counPol.add(Integer.parseInt(pol.getId()));
-                        }
-                    }
-                xChunk++;
-            }
-            yChunk++;
-            xChunk=0;
-        }
-        Main.setPolygons(allPol);
-    }
-
- */
-
     public static float getDIML() {
         return DIML;
     }
@@ -122,43 +73,11 @@ public class Main extends Application {
         Main.xSize = xSize;
     }
 
-    public static ArrayList<Vector> getPoints() {
-        return vectors;
-    }
-
-    public static void setPoints(ArrayList<Vector> vectors) {
-        Main.vectors = vectors;
-    }
-
     public static Player getPlayer1() {
         return player1;
     }
 
     public static void setPlayer1(Player player1) {
         Main.player1 = player1;
-    }
-
-    public static void setStaticObjects(ArrayList<Wall> walls) {
-        Main.walls = walls;
-    }
-
-    public static ArrayList<LivingEntity> getMobs() {
-        return mobs;
-    }
-
-    public static void setMobs(ArrayList<LivingEntity> mobs) {
-        Main.mobs = mobs;
-    }
-
-    public static ArrayList<TileEntity> getContainers() {
-        return containers;
-    }
-
-    public static void setContainers(ArrayList<TileEntity> containers) {
-        Main.containers = containers;
-    }
-
-    public static void setMap(Map_old mapOld) {
-        Main.mapOld = mapOld;
     }
 }
