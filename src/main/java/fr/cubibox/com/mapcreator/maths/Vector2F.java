@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class Vector2F {
     private final int id;
-    public static int staticId;
+    private boolean selected;
 
     private float x;
     private float y;
@@ -30,6 +30,8 @@ public class Vector2F {
         this.circlePoint = new Circle(Main.toScreenX(x), Main.toScreenY(y), 3, this.color);
         this.treeItem = new TreeItem<>("vector2f");
         this.id = treeItem.hashCode();
+        this.treeItem.setValue("vector2F " + this.id);
+        this.selected = false;
     }
 
     public static ArrayList<Vector2F> shortPoints(ArrayList<Vector2F> currentVectors){
@@ -133,12 +135,15 @@ public class Vector2F {
         return treeItem;
     }
 
-    public static int newId(){
-        staticId++;
-        return staticId;
-    }
-
     public int getId() {
         return id;
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

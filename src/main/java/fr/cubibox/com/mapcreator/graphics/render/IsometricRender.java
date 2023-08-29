@@ -78,13 +78,50 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawShapes(Pane coordinateSystem, Sector pol) {
-        super.drawShapes(coordinateSystem, pol);
+    public void drawShapes(Pane coordinateSystem, Sector sec) {
+        super.drawShapes(coordinateSystem, sec);
 
-        //calc here ?
-        //for (Shape shape : pol.getShapesIso())
-        for (Shape shape : pol.getShapes())
-            coordinateSystem.getChildren().add(shape);
+        Vector2F showPoint = null;
+        for (Wall wall : controller.repositories.getWalls(sec)){
+            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            float[] v1 = toScreenIso(vec1.getX(),vec1.getY(),sec.getCeilHeight());
+            float[] v2 = toScreenIso(vec2.getX(),vec2.getY(),sec.getCeilHeight());
+            float[] v3 = toScreenIso(vec2.getX(),vec2.getY(),sec.getFloorHeight());
+            float[] v4 = toScreenIso(vec1.getX(),vec1.getY(),sec.getFloorHeight());
+            double[] secPoints = {v1[0],v1[1],v2[0],v2[1],v3[0],v3[1],v4[0],v4[1]};
+            Polygon pol = new Polygon(secPoints);
+            if (wall.isSelected()) {
+                pol.setFill(new Color(0, 1, 1, 0.5));
+                pol.setStrokeWidth(2);
+                pol.setStroke(new Color(0.8, 0.8, 0.8, 1));
+            }
+            else {
+                pol.setFill(new Color(0, 1, 1, 0.3));
+                pol.setStrokeWidth(0.7);
+                pol.setStroke(new Color(0.5, 0.5, 0.5, 1));
+            }
+            coordinateSystem.getChildren().add(pol);
+
+            if (vec1.isSelected()) showPoint = vec1;
+            if (vec2.isSelected()) showPoint = vec2;
+        }
+
+        if (showPoint != null) {
+            Label pointName = new Label(" v");
+            float[] v = toScreenIso(showPoint.getX(), showPoint.getY(), sec.getCeilHeight());
+            pointName.setLayoutX(v[0] - 5);
+            pointName.setLayoutY(v[1] - 15);
+            pointName.setTextFill(Color.WHITE);
+            coordinateSystem.getChildren().add(pointName);
+
+            float[] v1 = toScreenIso(showPoint.getX(),showPoint.getY(),sec.getCeilHeight());
+            float[] v2 = toScreenIso(showPoint.getX(),showPoint.getY(),sec.getFloorHeight());
+            Line line = new Line(v1[0],v1[1],v2[0],v2[1]);
+            line.setStrokeWidth(2);
+            line.setStroke(new Color(0.8, 0.8, 0.8, 1));
+            coordinateSystem.getChildren().add(line);
+        }
     }
 
     @Override
@@ -156,14 +193,11 @@ public class IsometricRender extends RenderPane {
     public void actualizePolygon(Sector pol) {
         super.actualizePolygon(pol);
 
-        ArrayList<Vector2F> vectors = controller.repositories.getVectors(pol);
         ArrayList<Wall> walls = controller.repositories.getWalls(pol);
         ArrayList<Shape> shapes = new ArrayList<>();
 
         float currentHeight = pol.getCeilHeight();
         float currentBase = pol.getFloorHeight();
-        Color wallColor = new Color(0, 1, 1, 0.3);
-        Color color = Color.DARKGRAY;
 
         if (walls.size() > 1) {
             ArrayList<float[]> topFace = new ArrayList<>();
@@ -212,12 +246,11 @@ public class IsometricRender extends RenderPane {
              */
 
             for (Shape shape : shapes) {
-                shape.setFill(wallColor);
-                shape.setStrokeWidth(1.0);
-                shape.setStroke(color);
+                shape.setFill(new Color(0, 1, 1, 0.3));
+                shape.setStrokeWidth(0.7);
+                shape.setStroke(new Color(0.5, 0.5, 0.5, 1));
             }
         }
-        pol.setShapes(shapes);
     }
 
 

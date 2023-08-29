@@ -14,6 +14,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class PropertyBoard {
     private Controller controller;
@@ -23,27 +24,24 @@ public class PropertyBoard {
     public PropertyBoard(VBox propertyBoard, Controller controller) {
         this.propertyBoard = propertyBoard;
         this.controller = controller;
-        this.board = new VBox();
+        VBox board = new VBox();
+        board.setStyle(
+                "-fx-background-radius : 8 8 8 8;" +
+                "-fx-background-color : #656565;" +
+                "-fx-padding : 10px;" +
+                "-fx-spacing : 5px"
+        );
+        this.board = board;
     }
 
     public void init (Sector sector){
-        //Sector p = obj.getPolygon();
-        VBox polBoard = new VBox();
-        VBox pointBoard = new VBox();
-
-        // CSS board
-        polBoard.setStyle(
-                "-fx-background-radius : 8 8 8 8;" +
-                        "-fx-background-color : #656565;" +
-                        "-fx-padding : 10px;" +
-                        "-fx-spacing : 5px"
-        );
+        board.getChildren().clear();
 
         //close button
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            //Main.getStaticObjects().remove(sector);
+            this.controller.repositories.remove(sector);
             this.controller.actualizeBoard();
         });
         HBox delete = new HBox();
@@ -56,13 +54,14 @@ public class PropertyBoard {
         showP.setPrefSize(100d,10d);
         showP.setOnMouseReleased(event -> {
             if (sector.isShowPoint()) {
-                showP.setText("Hide Points");
-                sector.setShowPoint(false);
-            }else {
                 showP.setText("Show Points");
+                sector.setShowPoint(false);
+            }
+            else {
+                showP.setText("Hide Points");
                 sector.setShowPoint(true);
             }
-            this.controller.actualizeBoard();
+            this.controller.drawPolygons();
         });
 
 
@@ -73,11 +72,10 @@ public class PropertyBoard {
 
         heightBoard.setStyle(
                 "-fx-background-radius: 8 0 0 8;" +
-                        "-fx-background-color: #757575;" +
-                        "-fx-padding: 10px;" +
-                        "-fx-spacing: 10px;"
+                "-fx-background-color: #757575;" +
+                "-fx-padding: 10px;" +
+                "-fx-spacing: 10px;"
         );
-
         Label lName = new Label("Height");
         Button help = new Button("?");
         help.setPrefSize(10d,10d);
@@ -98,8 +96,6 @@ public class PropertyBoard {
                     this.controller.drawPolygons();
                 }
         );
-        height.valueProperty().addListener(event -> {
-        });
         heightBox.getChildren().addAll(label,height);
 
         // Type RadioButtons
@@ -130,12 +126,7 @@ public class PropertyBoard {
         nameBoard.getChildren().addAll(name,delete,showP);
 
         //Height Board
-        polBoard.getChildren().add(heightBox);
-
-        //main board adds
-        polBoard.getChildren().addAll(nameBoard,pointBoard);
-
-        this.board = polBoard;
+        board.getChildren().addAll(heightBox,nameBoard);
     }
 
 /*

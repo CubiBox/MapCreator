@@ -34,7 +34,6 @@ public class Sector {
     private Shape shapeLeft;
     private Shape shapeRight;
 
-    private ArrayList<Shape> shapes;
 
 
     public Sector(float ceilHeight, float floorHeight) {
@@ -43,49 +42,11 @@ public class Sector {
     public Sector(float ceilHeight, float floorHeight, Type type) {
         this.treeItem = new TreeItem<>("sector");
         this.id = treeItem.hashCode();
+        this.treeItem.setValue("sector " + this.id);
         this.ceilHeight = ceilHeight;
         this.floorHeight = floorHeight;
         this.wallIds = new HashSet<>();
         this.type = type;
-    }
-
-    public static ArrayList<Shape> topShape(Type type, Vector2F... pts) {
-        return topShape(new ArrayList<>(Arrays.asList(pts)),type);
-    }
-
-    public static ArrayList<Shape> topShape(ArrayList<Vector2F> vectors, Type type) {
-        ArrayList<Shape> lines = new ArrayList<>();
-
-        Color color = Color.CYAN;
-        color = switch (type) {
-            case FLOOR -> Color.LIME;
-            case CELLING -> Color.RED;
-            default -> Color.CYAN;
-        };
-
-        if (vectors.size() > 1) {
-            for (int i = 0; i < vectors.size() - 1; ) {
-                Line line = new Line(
-                        Main.toScreenX(vectors.get(i).getX()), Main.toScreenY(vectors.get(i).getY()),
-                        Main.toScreenX(vectors.get(++i).getX()), Main.toScreenY(vectors.get(i).getY())
-                );
-                line.setFill(Color.TRANSPARENT);
-                line.setStrokeWidth(2.0);
-                line.setStroke(color);
-                lines.add(line);
-            }
-        }
-        Line line = new Line(
-                Main.toScreenX(vectors.get(vectors.size()-1).getX()), Main.toScreenY(vectors.get(vectors.size()-1).getY()),
-                Main.toScreenX(vectors.get(0).getX()), Main.toScreenY(vectors.get(0).getY())
-        );
-
-        line.setFill(Color.TRANSPARENT);
-        line.setStrokeWidth(2.0);
-        line.setStroke(color);
-        lines.add(line);
-
-        return lines;
     }
 
     public String toName(){
@@ -151,14 +112,6 @@ public class Sector {
 
     public void setShapeTop(ArrayList<Shape> shapeTop) {
         this.shapeTop = shapeTop;
-    }
-
-    public ArrayList<Shape> getShapes() {
-        return shapes;
-    }
-
-    public void setShapes(ArrayList<Shape> shapes) {
-        this.shapes = shapes;
     }
 
     public float getCeilHeight() {

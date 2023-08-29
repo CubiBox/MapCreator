@@ -192,26 +192,35 @@ public class Controller implements Initializable {
         sectorTree = new TreeView<String> (rootItem);
         sectorTree.setMaxHeight(500 + 20);
         sectorTree.setMinHeight(500 + 20);
+
         MultipleSelectionModel<TreeItem<String>> sectorTreeSelectionModel = sectorTree.getSelectionModel();
         sectorTreeSelectionModel.selectedItemProperty().addListener((item) -> {
             System.out.println(item.toString());
             TreeItem<String> currItem = sectorTreeSelectionModel.getSelectedItem();
-            propertyBoard.getChildren().clear();
-            int id = currItem.hashCode();
 
+            for (Wall wall : repositories.getAllWalls()){
+                if (wall.isSelected()) wall.setSelected(false);
+            }
+            for (Vector2F vec : repositories.getAllVectors()){
+                if (vec.isSelected()) vec.setSelected(false);
+            }
+
+            propertyBoard.getChildren().clear();
             if (currItem.getValue().contains("vector")){
                 System.out.println(repositories.getVectorByID(currItem.hashCode()));
+                repositories.getVectorByID(currItem.hashCode()).setSelected(true);
                 property.init(repositories.getVectorByID(currItem.hashCode()));
                 propertyBoard.getChildren().add(property.getBoard());
             }
             else if (currItem.getValue().contains("wall")){
-
+                repositories.getWallByID(currItem.hashCode()).setSelected(true);
             }
             else {
                 System.out.println(repositories.getSectorByID(currItem.hashCode()));
                 property.init(repositories.getSectorByID(currItem.hashCode()));
                 propertyBoard.getChildren().add(property.getBoard());
             }
+            drawPolygons();
 
             //System.out.println();
             //renderPane.drawPointShape(coordinateSystem, (Vector2F) item);
@@ -303,14 +312,12 @@ public class Controller implements Initializable {
 
     public TreeItem<String> polygonBoard(Sector obj){
         //Sector p = obj.getPolygon();
-
-        obj.getTreeItem().setValue("Sector " + obj.getId());
         obj.getTreeItem().setExpanded(false);
 
         TreeItem<String> pointItem = new TreeItem<>("Points");
         pointItem.setExpanded(false);
         TreeItem<String> wallItem = new TreeItem<>("Walls");
-        pointItem.setExpanded(false);
+        wallItem.setExpanded(false);
         int i = 0;
         for (Vector2F v : repositories.getVectors(obj)) {
             pointItem.getChildren().add(v.getTreeItem());
@@ -329,6 +336,11 @@ public class Controller implements Initializable {
 
     public void actualizeBoard(){
         polyBoard.getChildren().clear();
+
+        sectorTree.getRoot().getChildren().removeIf(
+                obj -> !repositories.contains(obj.hashCode())
+        );
+
         polyBoard.getChildren().add(sectorTree);
 
         drawPolygons();
@@ -431,15 +443,23 @@ public class Controller implements Initializable {
                 selectType(SelectionOption)
         );
         obj.addWallIds(wallsID);
-        //polyBoard.getChildren().add(polygonBoard(obj));
 
-        for (int id : wallsID) {
-            obj.getTreeItem().getChildren().add(repositories.getWallByID(id).getTreeItem());
-        }
+        TreeItem<String> pointItem = new TreeItem<>("Vectors");
+        pointItem.setExpanded(false);
+        TreeItem<String> wallItem = new TreeItem<>("Walls");
+        wallItem.setExpanded(false);
+
+        for (Vector2F v : repositories.getVectors(obj))
+            pointItem.getChildren().add(v.getTreeItem());
+
+        for (Wall w : repositories.getWalls(obj))
+            wallItem.getChildren().add(w.getTreeItem());
+
+        obj.getTreeItem().getChildren().add(wallItem);
+        obj.getTreeItem().getChildren().add(pointItem);
 
         sectorTree.getRoot().getChildren().add(obj.getTreeItem());
         repositories.add(obj.getId(), obj);
-        //sectorMap.put(polItem, obj);
 
         actualizeBoard();
         drawPolygons();

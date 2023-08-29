@@ -63,6 +63,25 @@ public class Repositories {
     }
 
 
+    public boolean contains(int id){
+        return (
+                sectors.containsKey(id) ||
+                        vectors.containsKey(id) ||
+                        walls.containsKey(id)
+        );
+    }
+
+    public boolean contains(Sector sector){
+        return (sectors.containsValue(sector));
+    }
+    public boolean contains(Vector2F vector){
+        return (vectors.containsValue(vector));
+    }
+    public boolean contains(Wall wall){
+        return (walls.containsValue(wall));
+    }
+
+
     public Sector getSectorByID(int id){
         return sectors.get(id);
     }

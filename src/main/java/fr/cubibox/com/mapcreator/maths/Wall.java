@@ -4,10 +4,11 @@ import javafx.scene.control.TreeItem;
 
 public class Wall {
     private final int id;
-    public static int staticId;
+    private boolean selected;
 
     private final int idVec1;
     private final int idVec2;
+
 
     private final TreeItem<String> treeItem;
 
@@ -16,6 +17,8 @@ public class Wall {
         this.idVec2 = idVec2;
         this.treeItem = new TreeItem<>("wall");
         this.id = treeItem.hashCode();
+        this.treeItem.setValue("wall " + this.id);
+        this.selected = false;
     }
 
     public int getVector1ID() {
@@ -62,11 +65,6 @@ public class Wall {
     }
      */
 
-    public static int newId(){
-        staticId++;
-        return staticId;
-    }
-
     public int getId() {
         return id;
     }
@@ -82,5 +80,13 @@ public class Wall {
                 ", idVec1=" + idVec1 +
                 ", idVec2=" + idVec2 +
                 '}';
+    }
+
+    public boolean isSelected() {
+        return selected;
+    }
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
     }
 }

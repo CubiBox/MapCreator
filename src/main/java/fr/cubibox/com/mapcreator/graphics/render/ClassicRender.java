@@ -1,6 +1,8 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
+import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.graphics.Controller;
+import fr.cubibox.com.mapcreator.map.Type;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
@@ -9,10 +11,12 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static fr.cubibox.com.mapcreator.Main.xSize;
@@ -46,14 +50,32 @@ public class ClassicRender extends RenderPane {
         if ((roundX >= 0 && roundX <= xSize && roundY >= 0 && roundY <= xSize)) {
             Vector2F currentPos = new Vector2F(roundX, roundY);
             if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())) {
-                tempPolygons = Sector.topShape(
-                        //selectType(SelectionOption),
-                        WALL,
-                        currentPos,
-                        new Vector2F(dragPointOrigin[0], roundY),
-                        new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
-                        new Vector2F(roundX, dragPointOrigin[1])
-                );
+                Type type = WALL;
+                tempPolygons = new ArrayList<>();
+                ArrayList<Vector2F> vectors = new ArrayList<>(Arrays.asList(
+                                currentPos,
+                                new Vector2F(dragPointOrigin[0], roundY),
+                                new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
+                                new Vector2F(roundX, dragPointOrigin[1])
+                        ));
+                Vector2F buff = vectors.get(vectors.size()-1);
+                for (Vector2F vec : vectors) {
+                    tempPolygons.add(new Line(
+                            Main.toScreenX(buff.getX()), Main.toScreenY(buff.getY()),
+                            Main.toScreenX(vec.getX()), Main.toScreenY(vec.getY())
+                    ));
+                    buff = vec;
+                }
+
+                for (Shape shape : tempPolygons){
+                    shape.setFill(Color.TRANSPARENT);
+                    shape.setStrokeWidth(2.0);
+                    shape.setStroke(switch (type) {
+                        case FLOOR -> Color.LIME;
+                        case CELLING -> Color.RED;
+                        default -> Color.CYAN;
+                    });
+                }
                 return true;
             }
         }
@@ -71,10 +93,41 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public void drawShapes(Pane coordinateSystem, Sector pol) {
-        super.drawShapes(coordinateSystem, pol);
+    public void drawShapes(Pane coordinateSystem, Sector sec) {
+        super.drawShapes(coordinateSystem, sec);
 
-        //for (Shape shape : pol.getShapeTop()) {
+        Vector2F showPoint = null;
+        for (Wall wall : controller.repositories.getWalls(sec)) {
+            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Line line = new Line(
+                    Main.toScreenX(vec1.getX()),
+                    Main.toScreenY(vec1.getY()),
+                    Main.toScreenX(vec2.getX()),
+                    Main.toScreenY(vec2.getY())
+            );
+            line.setFill(new Color(0, 1, 1, 0.3));
+            line.setStrokeWidth(wall.isSelected() ? 3.5 : 1.2);
+            line.setStroke(Color.CYAN);
+
+            coordinateSystem.getChildren().add(line);
+
+            if (vec1.isSelected()) showPoint = vec1;
+            if (vec2.isSelected()) showPoint = vec2;
+        }
+
+        if (showPoint != null) {
+            Label pointName = new Label(" v");
+            pointName.setLayoutX(Main.toScreenX(showPoint.getX()) - 5);
+            pointName.setLayoutY(Main.toScreenX(showPoint.getY()) - 20);
+            pointName.setTextFill(Color.WHITE);
+            coordinateSystem.getChildren().add(pointName);
+
+            coordinateSystem.getChildren().add(showPoint.getCirclePoint());
+        }
+
+
+        /*
         for (Shape shape : pol.getShapes()) {
             shape.setOnMousePressed(event -> {
                 if (event.isSecondaryButtonDown()) {
@@ -90,6 +143,8 @@ public class ClassicRender extends RenderPane {
             });
             coordinateSystem.getChildren().add(shape);
         }
+
+         */
     }
 
     @Override
@@ -177,7 +232,7 @@ public class ClassicRender extends RenderPane {
             }
         }
 
-        pol.setShapes(lines);
+        //pol.setShapes(lines);
     }
 
     @Override
