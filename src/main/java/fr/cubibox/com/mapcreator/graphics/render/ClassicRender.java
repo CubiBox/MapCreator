@@ -203,37 +203,6 @@ public class ClassicRender extends RenderPane {
         }
     }
 
-    @Override
-    public void actualizePolygon(Sector pol) {
-        super.actualizePolygon(pol);
-
-        ArrayList<Wall> walls = controller.repositories.getWalls(pol);
-        ArrayList<Shape> lines = new ArrayList<>();
-
-        Color color = Color.CYAN;
-//        color = switch (pol.getType()) {
-//            case FLOOR -> Color.LIME;
-//            case CELLING -> Color.RED;
-//            default -> Color.CYAN;
-//        };
-
-        if (walls.size() > 1) {
-            for (Wall wall : walls) {
-                Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-                Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
-                Line line = new Line(
-                        toScreenX(vec1.getX()), toScreenY(vec1.getY()),
-                        toScreenX(vec2.getX()), toScreenY(vec2.getY())
-                );
-                line.setFill(Color.TRANSPARENT);
-                line.setStrokeWidth(2.0);
-                line.setStroke(color);
-                lines.add(line);
-            }
-        }
-
-        //pol.setShapes(lines);
-    }
 
     @Override
     public ArrayList<Vector2F> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {

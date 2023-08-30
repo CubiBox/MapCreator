@@ -39,9 +39,6 @@ public abstract class RenderPane {
     public void drawGrid(Pane coordinateSystem) {
     }
 
-    public void actualizePolygon(Sector pol) {
-    }
-
 
     public ArrayList<Shape> getTempPolygons() {
         return tempPolygons;

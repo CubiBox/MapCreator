@@ -70,12 +70,6 @@ public class PropertyBoard {
         VBox heightBox = new VBox();
         HBox label = new HBox();
 
-        heightBoard.setStyle(
-                "-fx-background-radius: 8 0 0 8;" +
-                "-fx-background-color: #757575;" +
-                "-fx-padding: 10px;" +
-                "-fx-spacing: 10px;"
-        );
         Label lName = new Label("Height");
         Button help = new Button("?");
         help.setPrefSize(10d,10d);
@@ -113,8 +107,6 @@ public class PropertyBoard {
             rightPart.getChildren().add(typeButton);
         }
 
-        heightBoard.getChildren().addAll(heightBox,rightPart);
-
         // Name Label
         HBox name = new HBox();
         name.setAlignment(Pos.TOP_LEFT);
@@ -126,101 +118,14 @@ public class PropertyBoard {
         nameBoard.getChildren().addAll(name,delete,showP);
 
         //Height Board
-        board.getChildren().addAll(heightBox,nameBoard);
+        board.getChildren().addAll(heightBox,nameBoard,rightPart);
     }
-
-/*
-    public VBox pointBoard(Vector2F p, int pointName, Sector pol){
-        VBox ptsBoard = new VBox();
-        HBox nameBoard = new HBox();
-        HBox pointBoard = new HBox();
-        HBox xBoard = new HBox();
-        HBox yBoard = new HBox();
-        HBox name = new HBox();
-        HBox delete = new HBox();
-
-        ptsBoard.setStyle(
-                "-fx-padding: 3px;" +
-                        "-fx-spacing: 5px;" +
-                        "-fx-background-color: #707070; " +
-                        "-fx-background-radius : 3 3 3 3;"
-        );
-
-        xBoard.setAlignment(Pos.CENTER);
-        yBoard.setAlignment(Pos.CENTER);
-
-        Button close = new Button("X");
-        close.setPrefSize(10d,10d);
-        close.setOnMouseReleased(event -> {
-            repositories.remove(p);
-            //pol.setupShapes();
-            renderPane.actualizePolygon(pol);
-            actualizeBoard();
-        });
-
-        name.setAlignment(Pos.TOP_LEFT);
-        name.setPrefWidth(120);
-        Label labelName = new Label("Point " + pointName);
-        labelName.setStyle("-fx-text-fill:WHITE;");
-        name.getChildren().add(labelName);
-        delete.setAlignment(Pos.TOP_RIGHT);
-        delete.setPrefWidth(230);
-        delete.getChildren().add(close);
-        nameBoard.getChildren().addAll(name,delete);
-
-        // X cursor
-        Slider xSlid = new Slider(0,Main.getxSize(),p.getX());
-        xSlid.setBlockIncrement(1);
-        xSlid.setMajorTickUnit(8);
-        xSlid.setShowTickLabels(true);
-        xSlid.valueProperty().addListener((obs, oldval, newVal) -> xSlid.setValue(newVal.intValue()));
-        xSlid.valueProperty().addListener(event -> {
-            p.setX((float) xSlid.getValue());
-            p.getCircle().setCenterX(Main.toScreenX(p.getX()));
-            p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            renderPane.actualizePolygon(pol);
-            drawPolygons();
-        });
-        xSlid.setPrefWidth(220);
-        xBoard.getChildren().addAll(new Label("      X : "),xSlid);
-
-        //Y cursor
-        Slider ySlid = new Slider(0,Main.getxSize(),p.getY());
-        ySlid.setBlockIncrement(1);
-        ySlid.setMajorTickUnit(8);
-        ySlid.setShowTickLabels(true);
-        ySlid.valueProperty().addListener((obs, oldval, newVal) -> ySlid.setValue(newVal.intValue()));
-        ySlid.valueProperty().addListener(event -> {
-            p.setY((float) ySlid.getValue());
-            p.getCircle().setCenterX(Main.toScreenX(p.getX()));
-            p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            renderPane.actualizePolygon(pol);
-            drawPolygons();
-        });
-        ySlid.setPrefWidth(220);
-        yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
-
-
-        pointBoard.setAlignment(Pos.CENTER);
-        pointBoard.getChildren().addAll(xBoard,yBoard);
-
-        //main board adds
-        ptsBoard.getChildren().addAll(nameBoard,pointBoard);
-
-        return ptsBoard;
-    }
-*/
-
 
     public void init (Vector2F p){
-        VBox ptsBoard = new VBox();
-        HBox nameBoard = new HBox();
-        HBox pointBoard = new HBox();
+        board.getChildren().clear();
 
-        Color c = Color.rgb((int) (p.getColor().getRed()*255), (int) (p.getColor().getGreen()*255), (int) (p.getColor().getBlue()*255),0.2);
-        ptsBoard.setBackground(new Background(new BackgroundFill(c, CornerRadii.EMPTY, Insets.EMPTY)));
-        ptsBoard.setSpacing(5d);
-        ptsBoard.setFillWidth(true);
+        HBox nameBoard = new HBox();
+        VBox pointBoard = new VBox();
 
         HBox xBoard = new HBox();
         HBox yBoard = new HBox();
@@ -233,13 +138,13 @@ public class PropertyBoard {
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            controller.tpmPoints.remove(p);
+            //controller.tpmPoints.remove(p);
             this.controller.actualizeBoard();
         });
 
         name.setAlignment(Pos.TOP_LEFT);
         name.setPrefWidth(240);
-        name.getChildren().add(new Label("Point " + controller.tpmPoints.size()));
+        name.getChildren().add(new Label("vector " + p.getId()));
         delete.setAlignment(Pos.TOP_RIGHT);
         delete.setPrefWidth(230);
         delete.getChildren().add(close);
@@ -259,7 +164,7 @@ public class PropertyBoard {
             this.controller.drawPolygons();
         });
         xSlid.setPrefWidth(250);
-        xBoard.getChildren().addAll(new Label("      X : "),xSlid);
+        xBoard.getChildren().addAll(new Label("X : "),xSlid);
 
         //Y cursor
         Slider ySlid = new Slider(0,Main.getxSize(),p.getY());
@@ -275,19 +180,106 @@ public class PropertyBoard {
             this.controller.drawPolygons();
         });
         ySlid.setPrefWidth(250);
-        yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
+        yBoard.getChildren().addAll(new Label("Y : "),ySlid);
 
         pointBoard.setAlignment(Pos.CENTER);
         pointBoard.getChildren().addAll(xBoard,yBoard);
 
         //main board adds
-        ptsBoard.getChildren().addAll(nameBoard,pointBoard);
-
-        this.board = ptsBoard;
+        board.getChildren().addAll(nameBoard,pointBoard);
     }
 
     public void init (Wall wall){
+        board.getChildren().clear();
 
+        HBox nameBoard = new HBox();
+
+        HBox moveBoard = new HBox();
+        HBox name = new HBox();
+        HBox delete = new HBox();
+
+        moveBoard.setStyle(
+                "-fx-background-radius: 4 0 0 4;" +
+                "-fx-background-color: #909090;" +
+                "-fx-padding: 10px;" +
+                "-fx-spacing: 10px;"
+        );
+
+        Button close = new Button("X");
+        close.setPrefSize(10d,10d);
+        close.setOnMouseReleased(event -> {
+            //controller.tpmPoints.remove(p);
+            this.controller.repositories.remove(wall);
+            this.controller.actualizeBoard();
+        });
+
+        name.setAlignment(Pos.TOP_LEFT);
+        name.setPrefWidth(240);
+        name.getChildren().add(new Label("Wall " + wall.getId()));
+        delete.setAlignment(Pos.TOP_RIGHT);
+        delete.setPrefWidth(230);
+        delete.getChildren().add(close);
+        nameBoard.getChildren().addAll(name,delete);
+
+
+        Button xAdd = new Button("->");
+        xAdd.setPrefSize(40d,25d);
+        xAdd.setOnMouseReleased(event -> {
+            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            if (vec1.getX() + 1 <= Main.xSize && vec2.getX() + 1 <= Main.xSize) {
+                vec1.setX(vec1.getX() + 1);
+                vec2.setX(vec2.getX() + 1);
+            }
+            this.controller.actualizeBoard();
+        });
+
+        Button xMinus = new Button("<-");
+        xMinus.setPrefSize(40d,25d);
+        xMinus.setOnMouseReleased(event -> {
+            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            if (vec1.getX() - 1 >= 0 && vec2.getX() - 1 >= 0) {
+                vec1.setX(vec1.getX() - 1);
+                vec2.setX(vec2.getX() - 1);
+            }
+            this.controller.actualizeBoard();
+        });
+
+        Button yAdd = new Button("v");
+        yAdd.setPrefSize(40d,25d);
+        yAdd.setOnMouseReleased(event -> {
+            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            if (vec1.getY() + 1 <= Main.xSize && vec2.getY() + 1 <= Main.xSize) {
+                vec1.setY(vec1.getY() + 1);
+                vec2.setY(vec2.getY() + 1);
+            }
+            this.controller.actualizeBoard();
+        });
+
+        Button yMinus = new Button("^");
+        yMinus.setPrefSize(40d,25d);
+        yMinus.setOnMouseReleased(event -> {
+            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            if (vec1.getY() - 1 >= 0 && vec2.getY() - 1 >= 0) {
+                vec1.setY(vec1.getY() - 1);
+                vec2.setY(vec2.getY() - 1);
+            }
+            this.controller.actualizeBoard();
+        });
+        moveBoard.getChildren().addAll(new Label("move : "),xAdd,xMinus,yAdd,yMinus);
+
+        Button split = new Button("subdivide");
+        split.setPrefSize(300d,25d);
+        split.setOnMouseReleased(event -> {
+            Sector sec = controller.repositories.getSectorByWallID(wall.getVector1ID());
+            this.controller.actualizeBoard();
+        });
+
+        //main board adds
+        board.getChildren().addAll(nameBoard,moveBoard,split);
     }
 
     public VBox getBoard(){

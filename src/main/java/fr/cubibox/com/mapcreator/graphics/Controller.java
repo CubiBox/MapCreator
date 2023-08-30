@@ -207,16 +207,19 @@ public class Controller implements Initializable {
 
             propertyBoard.getChildren().clear();
             if (currItem.getValue().contains("vector")){
-                System.out.println(repositories.getVectorByID(currItem.hashCode()));
                 repositories.getVectorByID(currItem.hashCode()).setSelected(true);
                 property.init(repositories.getVectorByID(currItem.hashCode()));
                 propertyBoard.getChildren().add(property.getBoard());
             }
             else if (currItem.getValue().contains("wall")){
                 repositories.getWallByID(currItem.hashCode()).setSelected(true);
+                property.init(repositories.getWallByID(currItem.hashCode()));
+                propertyBoard.getChildren().add(property.getBoard());
             }
             else {
-                System.out.println(repositories.getSectorByID(currItem.hashCode()));
+                for (int id : repositories.getSectorByID(currItem.hashCode()).getWallIds()){
+                    repositories.getWallByID(id).setSelected(true);
+                }
                 property.init(repositories.getSectorByID(currItem.hashCode()));
                 propertyBoard.getChildren().add(property.getBoard());
             }
@@ -231,7 +234,7 @@ public class Controller implements Initializable {
 
     public void actualizeAllPolygons(){
         for (Sector obj : repositories.getAllSectors()){
-            renderPane.actualizePolygon(obj);
+            //renderPane.actualizePolygon(obj);
         }
     }
 
@@ -310,29 +313,6 @@ public class Controller implements Initializable {
         return ptsBoard;
     }
 
-    public TreeItem<String> polygonBoard(Sector obj){
-        //Sector p = obj.getPolygon();
-        obj.getTreeItem().setExpanded(false);
-
-        TreeItem<String> pointItem = new TreeItem<>("Points");
-        pointItem.setExpanded(false);
-        TreeItem<String> wallItem = new TreeItem<>("Walls");
-        wallItem.setExpanded(false);
-        int i = 0;
-        for (Vector2F v : repositories.getVectors(obj)) {
-            pointItem.getChildren().add(v.getTreeItem());
-            repositories.add(v.getTreeItem().hashCode(), v);
-        }
-        for (Wall w : repositories.getWalls(obj)) {
-            wallItem.getChildren().add(w.getTreeItem());
-            repositories.add(w.getTreeItem().hashCode(), w);
-        }
-
-        obj.getTreeItem().getChildren().add(wallItem);
-        obj.getTreeItem().getChildren().add(pointItem);
-
-        return obj.getTreeItem();
-    }
 
     public void actualizeBoard(){
         polyBoard.getChildren().clear();
@@ -372,7 +352,6 @@ public class Controller implements Initializable {
     }
 
     public void drawPolygons(ArrayList<Shape> tempPol) {
-        actualizeAllPolygons();
         coordinateSystem.getChildren().clear();
         ArrayList<Vector2F> vectors = tpmPoints;
 
@@ -418,9 +397,6 @@ public class Controller implements Initializable {
             tpmPoints = new ArrayList<>();
             actualizeBoard();
         }
-    }
-    public void setPolygon(Vector2F... vectors) {
-        setPolygon(new ArrayList<>(Arrays.asList(vectors)));
     }
 
     public void setPolygon(ArrayList<Vector2F> vectors) {
@@ -476,16 +452,13 @@ public class Controller implements Initializable {
             stageSave.close();
         });
         VBox vBox = new VBox();
-        vBox.setStyle("-fx-background-color: #880000");
+        vBox.setStyle("-fx-background-color: #202020");
         ArrayList<String> listeSave = new ArrayList<>();
         File file = new File("maps");
-        boolean res = file.mkdir();
-        if (res)
-        {
+        if (file.mkdir()){
             //System.out.println("le dossier a été créer");
         }
-        else
-        {
+        else{
             //System.out.println("le dossier existe deja");
         }
 
@@ -530,20 +503,10 @@ public class Controller implements Initializable {
 
 
     public void exportMapButton(ActionEvent actionEvent) throws IOException {
-    }
-    /*
-        Map map = Main.getMap();
-        System.out.println("Exctraction ...");
-        for (int i = 0; i < map.getSize()/16; i++) {
-            for (int j = 0; j < map.getSize()/16; j++) {
-                map.getChunks()[i][j] = new Chunk(findChunkPols(j, i));
-            }
-        }
-        WriteMap(map.getLevelID(), map.exportMap());
-    }
-     */
 
-    public static void WriteMap(String name, String content)throws IOException {
+    }
+
+    public static void writeMap(String name, String content)throws IOException {
         BufferedWriter writer = new BufferedWriter(new FileWriter(name + ".map"));
         writer.write(content);
         writer.close();

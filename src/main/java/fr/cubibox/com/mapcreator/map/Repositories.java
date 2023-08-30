@@ -30,10 +30,29 @@ public class Repositories {
 
 
     public void remove(int id, Sector sector){
+        for (int wallID : sector.getWallIds()) {
+            remove(wallID, getWallByID(wallID));
+            sector.getWallIds().remove(wallID);
+        }
         sectors.remove(id, sector);
     }
-    public void remove(int id, Wall wall){
-        walls.remove(id, wall);
+    public void remove(int id, Wall curr_wall){
+        boolean vec1Check = true;
+        boolean vec2Check = true;
+        for (Wall wall : getAllWalls()){
+            if (wall != curr_wall){
+                if (wall.getVector1ID() == curr_wall.getVector1ID() || wall.getVector2ID() == curr_wall.getVector1ID())
+                    vec1Check = false;
+                if (wall.getVector1ID() == curr_wall.getVector2ID() || wall.getVector2ID() == curr_wall.getVector2ID())
+                    vec2Check = false;
+            }
+        }
+        for (Sector sec : getAllSectors()){
+            sec.getWallIds().remove(id);
+        }
+        if (vec1Check) remove(curr_wall.getVector1ID(),getVectorByID(curr_wall.getVector1ID()));
+        if (vec2Check) remove(curr_wall.getVector2ID(),getVectorByID(curr_wall.getVector2ID()));
+        walls.remove(id, curr_wall);
     }
     public void remove(int id, Vector2F vector){
         vectors.remove(id, vector);
@@ -41,25 +60,13 @@ public class Repositories {
 
 
     public void remove(Sector sector){
-        for (int id : sectors.keySet()){
-            if (sectors.get(id).equals(sector)) {
-                sectors.remove(id);
-            }
-        }
+        remove(sector.getId(), sector);
     }
     public void remove(Wall wall){
-        for (int id : walls.keySet()){
-            if (walls.get(id).equals(wall)) {
-                walls.remove(id);
-            }
-        }
+        remove(wall.getId(), wall);
     }
     public void remove(Vector2F vector){
-        for (int id : vectors.keySet()){
-            if (vectors.get(id).equals(vector)) {
-                vectors.remove(id);
-            }
-        }
+        remove(vector.getId(), vector);
     }
 
 
@@ -141,6 +148,15 @@ public class Repositories {
             }
         }
         return vectors;
+    }
+
+    public Sector getSectorByWallID(int wallID){
+        for (Sector sec : this.sectors.values()){
+            if (sec.getWallIds().contains(wallID)){
+                return sec;
+            }
+        }
+        return null;
     }
 
 
