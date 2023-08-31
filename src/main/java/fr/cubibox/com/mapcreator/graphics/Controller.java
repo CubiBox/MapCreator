@@ -217,11 +217,16 @@ public class Controller implements Initializable {
                 propertyBoard.getChildren().add(property.getBoard());
             }
             else {
-                for (int id : repositories.getSectorByID(currItem.hashCode()).getWallIds()){
-                    repositories.getWallByID(id).setSelected(true);
+                try {
+                    for (int id : repositories.getSectorByID(currItem.hashCode()).getWallIds()) {
+                        repositories.getWallByID(id).setSelected(true);
+                    }
+                    property.init(repositories.getSectorByID(currItem.hashCode()));
+                    propertyBoard.getChildren().add(property.getBoard());
                 }
-                property.init(repositories.getSectorByID(currItem.hashCode()));
-                propertyBoard.getChildren().add(property.getBoard());
+                catch (NullPointerException npe){
+                    System.out.println("id null, skipped");
+                }
             }
             drawPolygons();
 
@@ -352,6 +357,7 @@ public class Controller implements Initializable {
     }
 
     public void drawPolygons(ArrayList<Shape> tempPol) {
+        actualizeTreeView();
         coordinateSystem.getChildren().clear();
         ArrayList<Vector2F> vectors = tpmPoints;
 
@@ -376,6 +382,25 @@ public class Controller implements Initializable {
                 coordinateSystem.getChildren().add(pol);
             }
         }
+    }
+
+    private void actualizeTreeView() {
+        for (TreeItem<String> treeItem : sectorTree.getRoot().getChildren()){
+            //remove from tree if delete
+            treeItem.getChildren().get(0).getChildren().removeIf(
+                    treeItemWall -> !repositories.getAllWalls().contains(repositories.getWallByID(treeItemWall.hashCode()))
+            );
+            treeItem.getChildren().get(1).getChildren().removeIf(
+                    treeItemVector -> !repositories.getAllVectors().contains(repositories.getVectorByID(treeItemVector.hashCode()))
+            );
+            if (!repositories.getAllSectors().contains(repositories.getSectorByID(treeItem.hashCode()))){
+                sectorTree.getRoot().getChildren().remove(treeItem);
+            }
+
+            //replace in tree if moved
+            //WIP
+        }
+        sectorTree.refresh();
     }
 
     public void reset(ActionEvent actionEvent) {

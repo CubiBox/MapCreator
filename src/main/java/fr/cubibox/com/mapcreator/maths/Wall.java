@@ -6,8 +6,8 @@ public class Wall {
     private final int id;
     private boolean selected;
 
-    private final int idVec1;
-    private final int idVec2;
+    private int idVec1;
+    private int idVec2;
 
 
     private final TreeItem<String> treeItem;
@@ -27,6 +27,15 @@ public class Wall {
     public int getVector2ID() {
         return idVec2;
     }
+
+    public int setVector1ID(int idVec1) {
+        return this.idVec1 = idVec1;
+    }
+    public int setVector2ID(int idVec2) {
+        return this.idVec2 = idVec2;
+    }
+
+
 
     /*
     public Vector2F getNormal() {

@@ -139,6 +139,7 @@ public class PropertyBoard {
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
             //controller.tpmPoints.remove(p);
+            this.controller.repositories.remove(p);
             this.controller.actualizeBoard();
         });
 
@@ -274,7 +275,7 @@ public class PropertyBoard {
         Button split = new Button("subdivide");
         split.setPrefSize(300d,25d);
         split.setOnMouseReleased(event -> {
-            Sector sec = controller.repositories.getSectorByWallID(wall.getVector1ID());
+            controller.repositories.subdivideWall(wall);
             this.controller.actualizeBoard();
         });
 

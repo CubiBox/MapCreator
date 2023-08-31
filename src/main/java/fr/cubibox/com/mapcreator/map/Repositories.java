@@ -30,32 +30,73 @@ public class Repositories {
 
 
     public void remove(int id, Sector sector){
-        for (int wallID : sector.getWallIds()) {
+        ArrayList<Integer> wallIDs = new ArrayList<>(sector.getWallIds());
+        for (int wallID : wallIDs) {
             remove(wallID, getWallByID(wallID));
             sector.getWallIds().remove(wallID);
         }
         sectors.remove(id, sector);
     }
     public void remove(int id, Wall curr_wall){
-        boolean vec1Check = true;
-        boolean vec2Check = true;
-        for (Wall wall : getAllWalls()){
-            if (wall != curr_wall){
-                if (wall.getVector1ID() == curr_wall.getVector1ID() || wall.getVector2ID() == curr_wall.getVector1ID())
-                    vec1Check = false;
-                if (wall.getVector1ID() == curr_wall.getVector2ID() || wall.getVector2ID() == curr_wall.getVector2ID())
-                    vec2Check = false;
-            }
+        Wall[] connectedWall = getWallsByVectorID(curr_wall.getVector1ID());
+
+        if (connectedWall[0] != null && connectedWall[1] != null) {
+            int wall = (connectedWall[0] != curr_wall) ? 0 : 1;
+            int vecId =
+                    (connectedWall[wall].getVector1ID() == curr_wall.getVector1ID() || connectedWall[wall].getVector2ID() == curr_wall.getVector1ID())
+                            ? curr_wall.getVector2ID() : curr_wall.getVector1ID();
+
+            if (vecId == connectedWall[wall].getVector1ID()) {
+                connectedWall[wall].setVector1ID(vecId);
+            } else connectedWall[wall].setVector2ID(vecId);
         }
-        for (Sector sec : getAllSectors()){
+
+        for (Sector sec : getAllSectors()) {
             sec.getWallIds().remove(id);
         }
-        if (vec1Check) remove(curr_wall.getVector1ID(),getVectorByID(curr_wall.getVector1ID()));
-        if (vec2Check) remove(curr_wall.getVector2ID(),getVectorByID(curr_wall.getVector2ID()));
         walls.remove(id, curr_wall);
     }
+
     public void remove(int id, Vector2F vector){
+        Wall[] walls = getWallsByVectorID(vector.getId());
+        int vec1ID = (walls[0].getVector1ID() == vector.getId()) ? walls[0].getVector2ID() : walls[0].getVector1ID();
+        int vec2ID = (walls[1].getVector1ID() == vector.getId()) ? walls[1].getVector2ID() : walls[1].getVector1ID();
+
+        Sector sec = getSectorByWallID(walls[0].getId());
+        for (Wall wall : getWallsByVectorID(vector.getId())) {
+            remove(wall);
+            //sec.getWallIds().remove(wall.getId());
+        }
+        Wall newWall = new Wall(vec1ID, vec2ID);
+        newWall.getTreeItem().getChildren().add(getVectorByID(vec1ID).getTreeItem());
+        newWall.getTreeItem().getChildren().add(getVectorByID(vec2ID).getTreeItem());
+
+        add(newWall.getId(), newWall);
+        sec.addWallId(newWall.getId());
+        sec.getTreeItem().getChildren().get(0).getChildren().add(newWall.getTreeItem());
+
         vectors.remove(id, vector);
+    }
+
+    public void subdivideWall(Wall wall) {
+        int vec1ID = wall.getVector1ID();
+        int vec2ID = wall.getVector2ID();
+        Vector2F newVec = new Vector2F(
+                (int)((getVectorByID(vec1ID).getX() + getVectorByID(vec2ID).getX())/2),
+                (int)((getVectorByID(vec1ID).getY() + getVectorByID(vec2ID).getY())/2)
+        );
+        add(newVec.getId(), newVec);
+        wall.setVector2ID(newVec.getId());
+
+        Wall newWall = new Wall(newVec.getId(), vec2ID);
+        newWall.getTreeItem().getChildren().add(getVectorByID(newVec.getId()).getTreeItem());
+        newWall.getTreeItem().getChildren().add(getVectorByID(vec2ID).getTreeItem());
+
+        add(newWall.getId(), newWall);
+
+        getSectorByWallID(wall.getId()).addWallId(newWall.getId());
+        getSectorByWallID(wall.getId()).getTreeItem().getChildren().get(0).getChildren().add(newWall.getTreeItem());
+        getSectorByWallID(wall.getId()).getTreeItem().getChildren().get(1).getChildren().add(newVec.getTreeItem());
     }
 
 
@@ -159,6 +200,17 @@ public class Repositories {
         return null;
     }
 
+    public Wall[] getWallsByVectorID(int secID){
+        Wall[] walls = new Wall[2];
+        for (Wall wall : this.walls.values()){
+            if (wall.getVector1ID() == secID || wall.getVector2ID() == secID){
+                if (walls[0] == null) walls[0] = wall;
+                else walls[1] = wall;
+            }
+        }
+        return walls;
+    }
+
 
 
     public void clear() {
@@ -166,4 +218,6 @@ public class Repositories {
         vectors = new HashMap<>();
         walls = new HashMap<>();
     }
+
+
 }
