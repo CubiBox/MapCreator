@@ -14,14 +14,11 @@ import fr.cubibox.com.mapcreator.maths.Wall;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
@@ -132,8 +129,8 @@ public class Controller implements Initializable {
         coordinateSystem.setOnScroll(event ->{
             double value = event.getDeltaY();
             if (event.isControlDown() && Main.DIML + value < 2000 && Main.DIML + value > scrollPane.getWidth()+20) {
-                Main.DIML += value;
-                Main.DIMC += value;
+                Main.DIML += (float) value;
+                Main.DIMC += (float) value;
                 coordinateSystem.setPrefSize(Main.DIMC,Main.DIML);
                 drawPolygons();
             }
@@ -237,87 +234,6 @@ public class Controller implements Initializable {
         drawPolygons();
     }
 
-    public void actualizeAllPolygons(){
-        for (Sector obj : repositories.getAllSectors()){
-            //renderPane.actualizePolygon(obj);
-        }
-    }
-
-
-    public VBox pointBoard(Vector2F p){
-        VBox ptsBoard = new VBox();
-        HBox nameBoard = new HBox();
-        HBox pointBoard = new HBox();
-
-        Color c = Color.rgb((int) (p.getColor().getRed()*255), (int) (p.getColor().getGreen()*255), (int) (p.getColor().getBlue()*255),0.2);
-        ptsBoard.setBackground(new Background(new BackgroundFill(c, CornerRadii.EMPTY, Insets.EMPTY)));
-        ptsBoard.setSpacing(5d);
-        ptsBoard.setFillWidth(true);
-
-        HBox xBoard = new HBox();
-        HBox yBoard = new HBox();
-        HBox name = new HBox();
-        HBox delete = new HBox();
-
-        xBoard.setAlignment(Pos.CENTER);
-        yBoard.setAlignment(Pos.CENTER);
-
-        Button close = new Button("X");
-        close.setPrefSize(10d,10d);
-        close.setOnMouseReleased(event -> {
-            repositories.remove(p);
-            actualizeBoard();
-        });
-
-        name.setAlignment(Pos.TOP_LEFT);
-        name.setPrefWidth(240);
-        name.getChildren().add(new Label("Point "));// + Main.getPoints().size()));
-        delete.setAlignment(Pos.TOP_RIGHT);
-        delete.setPrefWidth(230);
-        delete.getChildren().add(close);
-        nameBoard.getChildren().addAll(name,delete);
-
-        // X cursor
-        Slider xSlid = new Slider(0,Main.getxSize(),p.getX());
-        xSlid.setBlockIncrement(1);
-        xSlid.setMajorTickUnit(8);
-        xSlid.setShowTickLabels(true);
-        xSlid.valueProperty().addListener((obs, oldval, newVal) -> xSlid.setValue(newVal.intValue()));
-        xSlid.valueProperty().addListener(event -> {
-            p.setX((float) xSlid.getValue());
-            p.getCircle().setCenterX(Main.toScreenX(p.getX()));
-            p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            tpmPoints = new ArrayList<>(Vector2F.shortPoints(tpmPoints));
-            drawPolygons();
-        });
-        xSlid.setPrefWidth(250);
-        xBoard.getChildren().addAll(new Label("      X : "),xSlid);
-
-        //Y cursor
-        Slider ySlid = new Slider(0,Main.getxSize(),p.getY());
-        ySlid.setBlockIncrement(1);
-        ySlid.setMajorTickUnit(8);
-        ySlid.setShowTickLabels(true);
-        ySlid.valueProperty().addListener((obs, oldval, newVal) -> ySlid.setValue(newVal.intValue()));
-        ySlid.valueProperty().addListener(event -> {
-            p.setY((float) ySlid.getValue());
-            p.getCircle().setCenterX(Main.toScreenX(p.getX()));
-            p.getCircle().setCenterY(Main.toScreenY(p.getY()));
-            tpmPoints = new ArrayList<>(Vector2F.shortPoints(tpmPoints));
-            drawPolygons();
-        });
-        ySlid.setPrefWidth(250);
-        yBoard.getChildren().addAll(new Label("      Y : "),ySlid);
-
-        pointBoard.setAlignment(Pos.CENTER);
-        pointBoard.getChildren().addAll(xBoard,yBoard);
-
-        //main board adds
-        ptsBoard.getChildren().addAll(nameBoard,pointBoard);
-
-        return ptsBoard;
-    }
-
 
     public void actualizeBoard(){
         polyBoard.getChildren().clear();
@@ -398,12 +314,12 @@ public class Controller implements Initializable {
             }
 
             //replace in tree if moved
-            //WIP
+            //TODO
         }
         sectorTree.refresh();
     }
 
-    public void reset(ActionEvent actionEvent) {
+    public void reset(ActionEvent ignored) {
         Main.setPlayer1(new Player(Main.getxSize()/2, Main.getxSize()/2));
         repositories.clear();
         sectorTree = new TreeView<>();
@@ -416,7 +332,7 @@ public class Controller implements Initializable {
         return Type.toType(rd.getId());
     }
 
-    public void setPolygon(ActionEvent actionEvent) {
+    public void setPolygon(ActionEvent ignored) {
         if (tpmPoints.size() >= 2) {
             setPolygon(tpmPoints);
             tpmPoints = new ArrayList<>();

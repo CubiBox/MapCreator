@@ -6,15 +6,11 @@ import fr.cubibox.com.mapcreator.maths.Vector2F;
 public class Player {
 	private float posX;
 	private float posY;
-	private float screenX; 
-	private float screenY; 
 	private Vector2F vector;
 
 	public Player(float posX, float posY) {
 		this.setPosX(posX);
 		this.setPosY(posY);
-		this.setScreenX(Main.toScreenX(posX));
-		this.setScreenY(Main.toScreenY(posY));
 		this.setPoint(new Vector2F(posX,posY));
 	}
 
@@ -32,22 +28,6 @@ public class Player {
 
 	public void setPosY(float posY) {
 		this.posY = posY;
-	}
-
-	public float getScreenX() {
-		return screenX;
-	}
-
-	public void setScreenX(float screenX) {
-		this.screenX = screenX;
-	}
-
-	public float getScreenY() {
-		return screenY;
-	}
-
-	public void setScreenY(float screenY) {
-		this.screenY = screenY;
 	}
 
 

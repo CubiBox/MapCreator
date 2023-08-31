@@ -61,8 +61,8 @@ public class ClassicRender extends RenderPane {
                 Vector2F buff = vectors.get(vectors.size()-1);
                 for (Vector2F vec : vectors) {
                     tempPolygons.add(new Line(
-                            Main.toScreenX(buff.getX()), Main.toScreenY(buff.getY()),
-                            Main.toScreenX(vec.getX()), Main.toScreenY(vec.getY())
+                            toScreenX(buff.getX()), toScreenY(buff.getY()),
+                            toScreenX(vec.getX()), toScreenY(vec.getY())
                     ));
                     buff = vec;
                 }
@@ -101,10 +101,10 @@ public class ClassicRender extends RenderPane {
             Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
             Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
             Line line = new Line(
-                    Main.toScreenX(vec1.getX()),
-                    Main.toScreenY(vec1.getY()),
-                    Main.toScreenX(vec2.getX()),
-                    Main.toScreenY(vec2.getY())
+                    toScreenX(vec1.getX()),
+                    toScreenY(vec1.getY()),
+                    toScreenX(vec2.getX()),
+                    toScreenY(vec2.getY())
             );
             line.setFill(new Color(0, 1, 1, 0.3));
             line.setStrokeWidth(wall.isSelected() ? 3.5 : 1.2);
@@ -118,12 +118,22 @@ public class ClassicRender extends RenderPane {
 
         if (showPoint != null) {
             Label pointName = new Label(" v");
-            pointName.setLayoutX(Main.toScreenX(showPoint.getX()) - 5);
-            pointName.setLayoutY(Main.toScreenX(showPoint.getY()) - 20);
+            pointName.setLayoutX(toScreenX(showPoint.getX()) - 5);
+            pointName.setLayoutY(toScreenY(showPoint.getY()) - 20);
             pointName.setTextFill(Color.WHITE);
             coordinateSystem.getChildren().add(pointName);
-
-            coordinateSystem.getChildren().add(showPoint.getCirclePoint());
+            Polygon pol = new Polygon(
+                    toScreenX(showPoint.getX()+0.05),
+                    toScreenY(showPoint.getY()+0.05),
+                    toScreenX(showPoint.getX()-0.05),
+                    toScreenY(showPoint.getY()+0.05),
+                    toScreenX(showPoint.getX()-0.05),
+                    toScreenY(showPoint.getY()-0.05),
+                    toScreenX(showPoint.getX()+0.05),
+                    toScreenY(showPoint.getY()-0.05)
+            );
+            pol.setStroke(Color.GOLD);
+            coordinateSystem.getChildren().add(pol);
         }
 
 
@@ -151,22 +161,33 @@ public class ClassicRender extends RenderPane {
     public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
         super.drawPointsLabel(coordinateSystem, pol);
 
-        int countP = 0;
-        float[] v = new float[2];
+
         for (Vector2F p : controller.repositories.getVectors(pol)) {
-            Label pointName = new Label(countP++ + "");
+            Label pointName = new Label(p.getId()+"");
             pointName.setLayoutX(toScreenX(p.getX()) - 5);
             pointName.setLayoutY(toScreenY(p.getY()) - 15);
             pointName.setTextFill(Color.WHITE);
             coordinateSystem.getChildren().add(pointName);
+            drawPointShape(coordinateSystem, p);
         }
+
     }
 
     @Override
     public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
         super.drawPointShape(coordinateSystem, vector);
-
-        coordinateSystem.getChildren().add(vector.getCircle());
+        Polygon pol = new Polygon(
+                toScreenX(vector.getX()+0.05),
+                toScreenY(vector.getY()+0.05),
+                toScreenX(vector.getX()-0.05),
+                toScreenY(vector.getY()+0.05),
+                toScreenX(vector.getX()-0.05),
+                toScreenY(vector.getY()-0.05),
+                toScreenX(vector.getX()+0.05),
+                toScreenY(vector.getY()-0.05)
+        );
+        pol.setStroke(Color.GOLD);
+        coordinateSystem.getChildren().add(pol);
     }
 
     @Override

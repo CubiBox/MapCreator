@@ -128,15 +128,15 @@ public class IsometricRender extends RenderPane {
     public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
         super.drawPointsLabel(coordinateSystem, pol);
 
-        int countP = 0;
-        float[] v;
+
         for (Vector2F p : controller.repositories.getVectors(pol)) {
-            Label pointName = new Label(countP++ + "");
-            v = toScreenIso(p.getX(), p.getY(), pol.getCeilHeight());
+            Label pointName = new Label(p.getId() + "");
+            float[] v = toScreenIso(p.getX(), p.getY(), pol.getCeilHeight());
             pointName.setLayoutX(v[0] - 5);
             pointName.setLayoutY(v[1] - 15);
             pointName.setTextFill(Color.WHITE);
             coordinateSystem.getChildren().add(pointName);
+            drawPointShape(coordinateSystem, p);
         }
     }
 
@@ -144,8 +144,18 @@ public class IsometricRender extends RenderPane {
     public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
         super.drawPointShape(coordinateSystem, vector);
 
-        float[] v = toScreenIso(vector.getX(), vector.getY());
-        coordinateSystem.getChildren().add(new Circle(v[0], v[1], 3, vector.getColor()));
+        float[] v1 = toScreenIso(vector.getX()+0.05, vector.getY()+0.05);
+        float[] v2 = toScreenIso(vector.getX()+0.05, vector.getY()-0.05);
+        float[] v3 = toScreenIso(vector.getX()-0.05, vector.getY()-0.05);
+        float[] v4 = toScreenIso(vector.getX()-0.05, vector.getY()+0.05);
+        Polygon pol = new Polygon(
+                v1[0],v1[1],
+                v2[0],v2[1],
+                v3[0],v3[1],
+                v4[0],v4[1]
+        );
+        pol.setStroke(Color.GOLD);
+        coordinateSystem.getChildren().add(pol);
     }
 
     @Override

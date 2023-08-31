@@ -41,13 +41,6 @@ public class Main extends Application {
         launch(args);
     }
 
-    public static float toScreenX(double x){
-        return (float)(DIMC*(x)/(xSize));
-    }
-    public static float toScreenY(double y){
-        return (float)(DIML*(y)/(xSize));
-    }
-
 
     public static float getDIML() {
         return DIML;

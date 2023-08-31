@@ -159,8 +159,6 @@ public class PropertyBoard {
         xSlid.valueProperty().addListener((obs, oldval, newVal) -> xSlid.setValue(newVal.intValue()));
         xSlid.valueProperty().addListener(event -> {
             p.setX((float) xSlid.getValue());
-            p.getCircle().setCenterX(Main.toScreenX(p.getX()));
-            p.getCircle().setCenterY(Main.toScreenY(p.getY()));
             controller.tpmPoints = new ArrayList<>(Vector2F.shortPoints(controller.tpmPoints));
             this.controller.drawPolygons();
         });
@@ -175,8 +173,6 @@ public class PropertyBoard {
         ySlid.valueProperty().addListener((obs, oldval, newVal) -> ySlid.setValue(newVal.intValue()));
         ySlid.valueProperty().addListener(event -> {
             p.setY((float) ySlid.getValue());
-            p.getCircle().setCenterX(Main.toScreenX(p.getX()));
-            p.getCircle().setCenterY(Main.toScreenY(p.getY()));
             controller.tpmPoints = new ArrayList<>(Vector2F.shortPoints(controller.tpmPoints));
             this.controller.drawPolygons();
         });

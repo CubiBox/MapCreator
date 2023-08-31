@@ -14,20 +14,12 @@ public class Vector2F {
     private float x;
     private float y;
 
-    private Circle circlePoint;
-    private Color color;
     private final TreeItem<String> treeItem;
 
     public Vector2F(float x, float y) {
         this.x = x;
         this.y = y;
 
-        this.color = Color.rgb(
-                (int) (Math.random()*256),
-                (int)(Math.random()*256),
-                (int)(Math.random()*256)
-        );
-        this.circlePoint = new Circle(Main.toScreenX(x), Main.toScreenY(y), 3, this.color);
         this.treeItem = new TreeItem<>("vector2f");
         this.id = treeItem.hashCode();
         this.treeItem.setValue("vector2F " + this.id);
@@ -49,32 +41,8 @@ public class Vector2F {
         return shortedVectors;
     }
 
-    public Circle getCircle() {
-        return circlePoint;
-    }
-
-    public void setCircle(Circle circ) {
-        this.circlePoint = circ;
-    }
-
     public String toString() {
         return "[" + (int)this.x + ";" + (int)this.y + "]";
-    }
-
-    public Color getColor() {
-        return color;
-    }
-
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
-    public Circle getCirclePoint() {
-        return circlePoint;
-    }
-
-    public void setCirclePoint(Circle circlePoint) {
-        this.circlePoint = circlePoint;
     }
 
     public float getX() {
