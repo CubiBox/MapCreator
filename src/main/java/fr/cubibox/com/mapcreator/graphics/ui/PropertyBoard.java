@@ -78,19 +78,31 @@ public class PropertyBoard {
         });
         label.getChildren().addAll(lName,help);
 
-        Slider height = new Slider(0, 31, sector.getCeilHeight());
-        height.setPrefWidth(256d);
-        height.setBlockIncrement(1);
-        height.setMajorTickUnit(8);
-        height.setShowTickLabels(true);
-        height.valueProperty().addListener(
+        Slider ceilHeight = new Slider(0, 31, sector.getCeilHeight());
+        ceilHeight.setPrefWidth(256d);
+        ceilHeight.setBlockIncrement(1);
+        ceilHeight.setMajorTickUnit(8);
+        ceilHeight.setShowTickLabels(true);
+        ceilHeight.valueProperty().addListener(
                 (obs, oldval, newVal) -> {
-                    height.setValue(newVal.intValue());
-                    sector.setCeilHeight((float) height.getValue());
+                    ceilHeight.setValue(newVal.intValue());
+                    sector.setCeilHeight((float) ceilHeight.getValue());
                     this.controller.drawPolygons();
                 }
         );
-        heightBox.getChildren().addAll(label,height);
+        Slider floorHeight = new Slider(0, 31, sector.getFloorHeight());
+        floorHeight.setPrefWidth(256d);
+        floorHeight.setBlockIncrement(1);
+        floorHeight.setMajorTickUnit(8);
+        floorHeight.setShowTickLabels(true);
+        floorHeight.valueProperty().addListener(
+                (obs, oldval, newVal) -> {
+                    floorHeight.setValue(newVal.intValue());
+                    sector.setFloorHeight((float) floorHeight.getValue());
+                    this.controller.drawPolygons();
+                }
+        );
+        heightBox.getChildren().addAll(label,ceilHeight,floorHeight);
 
         // Type RadioButtons
         ToggleGroup choise = new ToggleGroup();

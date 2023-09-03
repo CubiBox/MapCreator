@@ -81,6 +81,8 @@ public class Repositories {
     public void subdivideWall(Wall wall) {
         int vec1ID = wall.getVector1ID();
         int vec2ID = wall.getVector2ID();
+
+        //create new vector
         Vector2F newVec = new Vector2F(
                 (int)((getVectorByID(vec1ID).getX() + getVectorByID(vec2ID).getX())/2),
                 (int)((getVectorByID(vec1ID).getY() + getVectorByID(vec2ID).getY())/2)
@@ -88,15 +90,25 @@ public class Repositories {
         add(newVec.getId(), newVec);
         wall.setVector2ID(newVec.getId());
 
+        //create new wall
         Wall newWall = new Wall(newVec.getId(), vec2ID);
-        newWall.getTreeItem().getChildren().add(getVectorByID(newVec.getId()).getTreeItem());
+        newWall.getTreeItem().getChildren().add(newVec.getTreeItem());
         newWall.getTreeItem().getChildren().add(getVectorByID(vec2ID).getTreeItem());
 
         add(newWall.getId(), newWall);
 
+        //add to sector
         getSectorByWallID(wall.getId()).addWallId(newWall.getId());
         getSectorByWallID(wall.getId()).getTreeItem().getChildren().get(0).getChildren().add(newWall.getTreeItem());
         getSectorByWallID(wall.getId()).getTreeItem().getChildren().get(1).getChildren().add(newVec.getTreeItem());
+
+        System.out.println("-----wrong-----");
+        System.out.println(newVec.getId());
+        System.out.println(vec2ID);
+        System.out.println(newWall.getId());
+        System.out.println("-----good-----");
+        System.out.println(vec1ID);
+        System.out.println("------------");
     }
 
 

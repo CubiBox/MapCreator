@@ -5,37 +5,39 @@ import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Wall;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static fr.cubibox.com.mapcreator.Main.*;
-import static fr.cubibox.com.mapcreator.map.Type.CELLING;
-import static fr.cubibox.com.mapcreator.map.Type.FLOOR;
 
 
 public class IsometricRender extends RenderPane {
     private double xAngle;
     private double yAngle;
-    private Vector2F origin;
+
+    private final Vector2F origin;
+    private final Vector2F cam;
+    private double zoom;
+
 
     public IsometricRender(Vector2F origin, Controller controller) {
         this(0, 0.5,  origin, controller);
-    }
-    public IsometricRender(float origin, Controller controller) {
-        this(0, 0.5,  new Vector2F(origin,origin), controller);
     }
     public IsometricRender(double xAngle, double yAngle, Vector2F origin, Controller controller) {
         super(controller);
         this.xAngle = xAngle;
         this.yAngle = yAngle;
         this.origin = origin;
+        this.cam = new Vector2F(0.f, 0.f);
+        this.zoom = getDIML();
     }
 
 
@@ -45,12 +47,37 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public boolean drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint) {
-        super.drag(dragState, dragPointOrigin, dragPoint);
+    public void move(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
+        super.move(dragState, dragPointOrigin, dragPoint, event);
+
+        float xDistance = dragPointOrigin[0] - dragPoint[0];
+        float yDistance = dragPointOrigin[1] - dragPoint[1];
+
+        cam.setX(cam.getX() - xDistance);
+        cam.setY(cam.getY() - yDistance);
+
+        dragPointOrigin[0] = dragPoint[0];
+        dragPointOrigin[1] = dragPoint[1];
+    }
+
+    @Override
+    public void zoom(boolean dragState, double value, ScrollEvent event) {
+        super.zoom(dragState, value, event);
+
+        zoom += value;
+        cam.setX((float) (cam.getX() - value * 0.5));
+        cam.setY((float) (cam.getY() - value * 0.5));
+
+        System.out.println(zoom);
+    }
+
+    @Override
+    public boolean drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
+        super.drag(dragState, dragPointOrigin, dragPoint, event);
         float newX = dragPoint[0];
         float newY = dragPoint[1];
 
-        if (!dragState || (dragPointOrigin[0]-newX>75 || dragPointOrigin[1]-newY>75) || (dragPointOrigin[0]-newX<-75 || dragPointOrigin[1]-newY<-75)){
+        if (!dragState || (dragPointOrigin[0] - newX > 75 || dragPointOrigin[1] - newY > 75) || (dragPointOrigin[0] - newX < -75 || dragPointOrigin[1] - newY < -75)) {
             dragPointOrigin[0] = newX;
             dragPointOrigin[1] = newY;
         }
@@ -68,12 +95,12 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawPolygon(Pane coordinateSystem, Sector pol) {
-        super.drawPolygon(coordinateSystem, pol);
+    public void drawPolygon(Pane coordinateSystem, Sector sec) {
+        super.drawPolygon(coordinateSystem, sec);
 
-        drawShapes(coordinateSystem, pol);
-        if (pol.isShowPoint()) {
-            drawPointsLabel(coordinateSystem, pol);
+        drawShapes(coordinateSystem, sec);
+        if (sec.isShowPoint()) {
+            drawPointsLabel(coordinateSystem, sec);
         }
     }
 
@@ -127,7 +154,6 @@ public class IsometricRender extends RenderPane {
     @Override
     public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
         super.drawPointsLabel(coordinateSystem, pol);
-
 
         for (Vector2F p : controller.repositories.getVectors(pol)) {
             Label pointName = new Label(p.getId() + "");
@@ -209,13 +235,13 @@ public class IsometricRender extends RenderPane {
         double relativeY = origin.getY() - y;
         double newAngle = xAngle + ((relativeX==0 && relativeY==0) ? 0 : Math.atan(relativeY / relativeX));
         double originDistance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
-        double finalX = originDistance * Math.cos(newAngle) * getDIML()/xSize * (relativeX < 0 ? -1 : 1) /2;
-        double finalY = originDistance * Math.sin(newAngle) * getDIML()/xSize * (relativeX < 0 ? -1 : 1) /2;
+        double finalX = originDistance * Math.cos(newAngle) * zoom/xSize * (relativeX < 0 ? -1 : 1) /2;
+        double finalY = originDistance * Math.sin(newAngle) * zoom/xSize * (relativeX < 0 ? -1 : 1) /2;
 
-        double heightOffset = getDIML()*0.65 - (Math.sin(Math.PI/2-(yAngle*(Math.PI/2)))*height * getDIML()/64);
+        double heightOffset = zoom*0.65 - (Math.sin(Math.PI/2-(yAngle*(Math.PI/2)))*height * zoom/64);
         return new float[] {
-                (float) (getDIML()/2 + (finalX - finalY)),
-                (float) (heightOffset + (finalY*yAngle + finalX*yAngle))
+                (float) (cam.getX() + zoom/2 + (finalX - finalY)),
+                (float) (cam.getY() + heightOffset + (finalY + finalX) * yAngle)
         };
     }
 
@@ -236,7 +262,16 @@ public class IsometricRender extends RenderPane {
     public Vector2F getOrigin() {
         return origin;
     }
-    public void setOrigin(Vector2F origin) {
-        this.origin = origin;
+
+    public Vector2F getCam() {
+        return cam;
+    }
+
+    public double getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
     }
 }

@@ -5,7 +5,8 @@ import fr.cubibox.com.mapcreator.graphics.render.ClassicRender;
 import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
 import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
 import fr.cubibox.com.mapcreator.graphics.ui.PropertyBoard;
-import fr.cubibox.com.mapcreator.iu.Player;
+import fr.cubibox.com.mapcreator.io.Keyboard;
+import fr.cubibox.com.mapcreator.map.Player;
 import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Type;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
@@ -79,12 +80,17 @@ public class Controller implements Initializable {
     private ArrayList<Type> drawablePol;
     private boolean dragState;
     private float[] dragPointOrigin = new float[2];
+
+    private Keyboard keyboard;
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         double screenWidth = Screen.getPrimary().getBounds().getWidth();
         double screenHeight = Screen.getPrimary().getBounds().getHeight();
 
         renderPane = new ClassicRender(this);
+        keyboard = new Keyboard(coordinateSystem);
 
         scrollPane.setPrefWidth(screenWidth/2);
         coordinateSystem.setPrefSize(980,980);
@@ -128,10 +134,9 @@ public class Controller implements Initializable {
         //zoom (WIP)
         coordinateSystem.setOnScroll(event ->{
             double value = event.getDeltaY();
-            if (event.isControlDown() && Main.DIML + value < 2000 && Main.DIML + value > scrollPane.getWidth()+20) {
-                Main.DIML += (float) value;
-                Main.DIMC += (float) value;
-                coordinateSystem.setPrefSize(Main.DIMC,Main.DIML);
+
+            if (event.isControlDown()) {
+                renderPane.zoom(dragState, value, event);
                 drawPolygons();
             }
             System.out.println("scroll");
@@ -151,9 +156,13 @@ public class Controller implements Initializable {
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
                 float[] dragPoint = {(float) event.getX(), (float) event.getY()};
 
-                if (renderPane.drag(dragState, dragPointOrigin, dragPoint)) {
-                    drawPolygons(renderPane.getTempPolygons());
+                if (event.isShiftDown()){
+                    renderPane.move(dragState, dragPointOrigin, dragPoint, event);
                 }
+                else {
+                    renderPane.drag(dragState, dragPointOrigin, dragPoint, event);
+                }
+                drawPolygons(renderPane.getTempPolygons());
 
                 dragState = true;
             }
@@ -249,7 +258,7 @@ public class Controller implements Initializable {
 
     public void actualizeView(ActionEvent ae){
         renderPane = isoview.isSelected() ?
-                new IsometricRender(xSize/2, this) :
+                new IsometricRender(new Vector2F(xSize/2,xSize/2), this) :
                 new ClassicRender(this);
 
         ImageView imgSclt = new ImageView();
@@ -313,10 +322,38 @@ public class Controller implements Initializable {
                 sectorTree.getRoot().getChildren().remove(treeItem);
             }
 
+            //add in tree if added
+            /*
+            for (int wallID : repositories.getSectorByID(treeItem.hashCode()).getWallIds()) {
+                if (!treeItem.getChildren().get(0).getChildren().contains(repositories.getWallByID(wallID).getTreeItem())){
+                    treeItem.getChildren().get(0).getChildren().add(repositories.getWallByID(wallID).getTreeItem());
+                }
+            }
+            for (TreeItem<String> vectorItem : treeItem.getChildren().get(1).getChildren()){
+
+            }
+
+             */
+
+
             //replace in tree if moved
             //TODO
+
+            for (TreeItem<String> treeItemWall : treeItem.getChildren().get(0).getChildren()){
+                Wall currwall = repositories.getWallByID(treeItemWall.hashCode());
+                if (treeItemWall.getChildren().get(0).hashCode() != currwall.getVector1ID()) {
+                    treeItemWall.getChildren().remove(0);
+                    //wall.getChildren().add(repositories.getVectorByID(currwall.getVector1ID()).getTreeItem());
+                }
+                if (treeItemWall.getChildren().get(1).hashCode() != currwall.getVector2ID()) {
+                    treeItemWall.getChildren().remove(1);
+                    treeItemWall.getChildren().add(repositories.getVectorByID(currwall.getVector2ID()).getTreeItem());
+                    System.out.println(currwall.getVector2ID());
+                }
+            }
+
         }
-        sectorTree.refresh();
+        //sectorTree.refresh();
     }
 
     public void reset(ActionEvent ignored) {

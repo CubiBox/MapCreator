@@ -3,6 +3,8 @@ package fr.cubibox.com.mapcreator.graphics.render;
 import fr.cubibox.com.mapcreator.graphics.Controller;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 
@@ -20,7 +22,7 @@ public abstract class RenderPane {
 
     }
 
-    public boolean drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint) {
+    public boolean drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
         return false;
     }
 
@@ -46,5 +48,11 @@ public abstract class RenderPane {
 
     public ArrayList<Vector2F> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
         return null;
+    }
+
+    public void move(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
+    }
+
+    public void zoom(boolean dragState, double value, ScrollEvent event) {
     }
 }

@@ -1,6 +1,7 @@
 package fr.cubibox.com.mapcreator;
 
-import fr.cubibox.com.mapcreator.iu.Player;
+import fr.cubibox.com.mapcreator.io.Keyboard;
+import fr.cubibox.com.mapcreator.map.Player;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,7 +17,7 @@ import java.util.Objects;
 public class Main extends Application {
     public static float DIML = 980;
     public static float DIMC = 980;
-    public static float xSize = 16f;
+    public static float xSize = 32f;
 
     public static Player player1;
 

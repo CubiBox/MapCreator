@@ -1,6 +1,5 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.graphics.Controller;
 import fr.cubibox.com.mapcreator.map.Type;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
@@ -8,13 +7,13 @@ import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Wall;
 import javafx.scene.control.Label;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,8 +35,8 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public boolean drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint) {
-        super.drag(dragState, dragPointOrigin, dragPoint);
+    public boolean drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
+        super.drag(dragState, dragPointOrigin, dragPoint, event);
 
         float roundX = MathFunction.round(toPlotX(dragPoint[0]));
         float roundY = MathFunction.round(toPlotY(dragPoint[1]));
