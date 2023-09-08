@@ -164,7 +164,7 @@ public class PropertyBoard {
         nameBoard.getChildren().addAll(name,delete);
 
         // X cursor
-        Slider xSlid = new Slider(0,Main.getxSize(),p.getX());
+        Slider xSlid = new Slider(0,Main.xSize,p.getX());
         xSlid.setBlockIncrement(1);
         xSlid.setMajorTickUnit(8);
         xSlid.setShowTickLabels(true);
@@ -178,7 +178,7 @@ public class PropertyBoard {
         xBoard.getChildren().addAll(new Label("X : "),xSlid);
 
         //Y cursor
-        Slider ySlid = new Slider(0,Main.getxSize(),p.getY());
+        Slider ySlid = new Slider(0,Main.xSize,p.getY());
         ySlid.setBlockIncrement(1);
         ySlid.setMajorTickUnit(8);
         ySlid.setShowTickLabels(true);

@@ -5,9 +5,6 @@ module fr.cubibox.com.mapcreator {
 
     opens fr.cubibox.com.mapcreator to javafx.fxml;
 
-    exports fr.cubibox.com.mapcreator.io;
-    opens fr.cubibox.com.mapcreator.io to javafx.fxml;
-
     exports fr.cubibox.com.mapcreator.maths;
     opens fr.cubibox.com.mapcreator.maths to javafx.fxml;
 

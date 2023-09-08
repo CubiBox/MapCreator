@@ -14,7 +14,6 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static fr.cubibox.com.mapcreator.Main.*;
 
@@ -23,21 +22,11 @@ public class IsometricRender extends RenderPane {
     private double xAngle;
     private double yAngle;
 
-    private final Vector2F origin;
-    private final Vector2F cam;
-    private double zoom;
 
-
-    public IsometricRender(Vector2F origin, Controller controller) {
-        this(0, 0.5,  origin, controller);
-    }
-    public IsometricRender(double xAngle, double yAngle, Vector2F origin, Controller controller) {
+    public IsometricRender(double xAngle, double yAngle, Controller controller) {
         super(controller);
         this.xAngle = xAngle;
         this.yAngle = yAngle;
-        this.origin = origin;
-        this.cam = new Vector2F(0.f, 0.f);
-        this.zoom = getDIML();
     }
 
 
@@ -47,32 +36,7 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void move(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
-        super.move(dragState, dragPointOrigin, dragPoint, event);
-
-        float xDistance = dragPointOrigin[0] - dragPoint[0];
-        float yDistance = dragPointOrigin[1] - dragPoint[1];
-
-        cam.setX(cam.getX() - xDistance);
-        cam.setY(cam.getY() - yDistance);
-
-        dragPointOrigin[0] = dragPoint[0];
-        dragPointOrigin[1] = dragPoint[1];
-    }
-
-    @Override
-    public void zoom(boolean dragState, double value, ScrollEvent event) {
-        super.zoom(dragState, value, event);
-
-        zoom += value;
-        cam.setX((float) (cam.getX() - value * 0.5));
-        cam.setY((float) (cam.getY() - value * 0.5));
-
-        System.out.println(zoom);
-    }
-
-    @Override
-    public boolean drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
+    public void drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
         super.drag(dragState, dragPointOrigin, dragPoint, event);
         float newX = dragPoint[0];
         float newY = dragPoint[1];
@@ -90,8 +54,6 @@ public class IsometricRender extends RenderPane {
 
         dragPointOrigin[0] = newX;
         dragPointOrigin[1] = newY;
-
-        return true;
     }
 
     @Override

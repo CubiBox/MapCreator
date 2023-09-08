@@ -5,7 +5,6 @@ import fr.cubibox.com.mapcreator.graphics.render.ClassicRender;
 import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
 import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
 import fr.cubibox.com.mapcreator.graphics.ui.PropertyBoard;
-import fr.cubibox.com.mapcreator.io.Keyboard;
 import fr.cubibox.com.mapcreator.map.Player;
 import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Type;
@@ -81,19 +80,18 @@ public class Controller implements Initializable {
     private boolean dragState;
     private float[] dragPointOrigin = new float[2];
 
-    private Keyboard keyboard;
-
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        //coordinateSystem.setPrefSize(scrollPane.getWidth(),scrollPane.getHeight());
+
         double screenWidth = Screen.getPrimary().getBounds().getWidth();
         double screenHeight = Screen.getPrimary().getBounds().getHeight();
 
         renderPane = new ClassicRender(this);
-        keyboard = new Keyboard(coordinateSystem);
 
-        scrollPane.setPrefWidth(screenWidth/2);
-        coordinateSystem.setPrefSize(980,980);
+        //scrollPane.setPrefWidth(screenWidth/2);
+        //coordinateSystem.setPrefSize(screenWidth,screenWidth);
 
         // Toggle view buttons
         drawablePol = new ArrayList<>();
@@ -126,7 +124,7 @@ public class Controller implements Initializable {
         mapSizeSlide.setShowTickLabels(true);
         mapSizeSlide.valueProperty().addListener((obs, oldval, newVal) -> mapSizeSlide.setValue(newVal.intValue()));
         mapSizeSlide.valueProperty().addListener(event -> {
-            Main.setxSize((int) (16*mapSizeSlide.getValue()));
+            Main.xSize = (int) (16 * mapSizeSlide.getValue());
             drawPolygons();
         });
         isoview.setOnAction(this::actualizeView);
@@ -142,14 +140,6 @@ public class Controller implements Initializable {
             System.out.println("scroll");
         });
 
-        //reset pane dimension if windowed (WIP)
-        scrollPane.widthProperty().addListener(e -> {
-            scrollPane.setPrefWidth(screenWidth/2);
-            coordinateSystem.setPrefSize(980,980);
-            Main.DIML = 980;
-            Main.DIMC = 980;
-            drawPolygons();
-        });
 
         //record drag status
         coordinateSystem.setOnMouseDragged(event ->{
@@ -168,9 +158,9 @@ public class Controller implements Initializable {
             }
         });
 
-        //set by click
+        //set by click (make intern variable to know if drag is shifted or not)
         coordinateSystem.setOnMouseClicked(event -> {
-            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
+            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY) && !event.isShiftDown()) {
                 ArrayList<Vector2F> pts = renderPane.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
                 if (pts != null) {
                     if (pts.size() > 1) {
@@ -182,10 +172,9 @@ public class Controller implements Initializable {
                         //polyBoard.getChildren().add(pointBoard(pts.get(0)));
                     }
                 }
-
-                dragState = false;
                 drawPolygons();
             }
+            dragState = false;
         });
 
         repositories = new Repositories();
@@ -258,7 +247,7 @@ public class Controller implements Initializable {
 
     public void actualizeView(ActionEvent ae){
         renderPane = isoview.isSelected() ?
-                new IsometricRender(new Vector2F(xSize/2,xSize/2), this) :
+                new IsometricRender(0, 0.5, this) :
                 new ClassicRender(this);
 
         ImageView imgSclt = new ImageView();
@@ -357,7 +346,7 @@ public class Controller implements Initializable {
     }
 
     public void reset(ActionEvent ignored) {
-        Main.setPlayer1(new Player(Main.getxSize()/2, Main.getxSize()/2));
+        //Main.setPlayer1(new Player(Main.getxSize()/2, Main.getxSize()/2));
         repositories.clear();
         sectorTree = new TreeView<>();
         actualizeBoard();

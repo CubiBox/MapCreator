@@ -1,6 +1,5 @@
 package fr.cubibox.com.mapcreator;
 
-import fr.cubibox.com.mapcreator.io.Keyboard;
 import fr.cubibox.com.mapcreator.map.Player;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -23,7 +22,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("sample.fxml")));
+        Parent root = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("gui.fxml")));
         primaryStage.setTitle("Map maker");
         primaryStage.getIcons().add(new Image(new BufferedInputStream(Objects.requireNonNull(Main.class.getResource("images/icon.png")).openStream())));
         primaryStage.setScene(new Scene(root));
@@ -40,38 +39,5 @@ public class Main extends Application {
 //        WriteMap(map.getIdLevel(), map.exportMap());
 
         launch(args);
-    }
-
-
-    public static float getDIML() {
-        return DIML;
-    }
-
-    public static void setDIML(float DIML) {
-        Main.DIML = DIML;
-    }
-
-    public static float getDIMC() {
-        return DIMC;
-    }
-
-    public static void setDIMC(float DIMC) {
-        Main.DIMC = DIMC;
-    }
-
-    public static float getxSize() {
-        return xSize;
-    }
-
-    public static void setxSize(float xSize) {
-        Main.xSize = xSize;
-    }
-
-    public static Player getPlayer1() {
-        return player1;
-    }
-
-    public static void setPlayer1(Player player1) {
-        Main.player1 = player1;
     }
 }

@@ -8,6 +8,7 @@ import fr.cubibox.com.mapcreator.maths.Vector2F;
 import fr.cubibox.com.mapcreator.maths.Wall;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -35,7 +36,12 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public boolean drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
+    public void zoom(boolean dragState, double value, ScrollEvent event) {
+        super.zoom(dragState, value, event);
+    }
+
+    @Override
+    public void drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
         super.drag(dragState, dragPointOrigin, dragPoint, event);
 
         float roundX = MathFunction.round(toPlotX(dragPoint[0]));
@@ -75,10 +81,8 @@ public class ClassicRender extends RenderPane {
                         default -> Color.CYAN;
                     });
                 }
-                return true;
             }
         }
-        return false;
     }
 
     @Override
@@ -231,7 +235,6 @@ public class ClassicRender extends RenderPane {
         pts.add(currentPos);
 
         if (currentPos.getX() >= 0 && currentPos.getX() <= xSize && currentPos.getY() >= 0 && currentPos.getY() <= xSize) {
-
             if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())) {
                 if (dragPointOrigin[0] == currentPos.getX() || dragPointOrigin[1] == currentPos.getY())
                     pts.add(new Vector2F(dragPointOrigin[0], dragPointOrigin[1]));
@@ -248,17 +251,17 @@ public class ClassicRender extends RenderPane {
         else return null;
     }
 
-    public static float toScreenX(double x){
-        return (float)(DIMC*(x)/(xSize));
+    public float toScreenX(double x){
+        return (float)(zoom*x/(xSize) + cam.getX());
     }
-    public static float toScreenY(double y){
-        return (float)(DIML*(y)/(xSize));
+    public float toScreenY(double y){
+        return (float)(zoom*y/(xSize) + cam.getY());
     }
 
-    public static float toPlotX(double scrX){
-        return (float) ((scrX/DIMC)*(xSize));
+    public float toPlotX(double scrX){
+        return (float) (((scrX - cam.getX())/zoom)*(xSize));
     }
-    public static float toPlotY(double scrY){
-        return (float) ((scrY/DIML)*(xSize));
+    public float toPlotY(double scrY){
+        return (float) (((scrY - cam.getY())/zoom)*(xSize));
     }
 }

@@ -52,7 +52,7 @@
       </MenuBar>
    </top>
    <center>
-      <ScrollPane fx:id="scrollPane" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
+      <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
          <content>
             <Pane fx:id="coordinateSystem" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #000000;" />
          </content>
