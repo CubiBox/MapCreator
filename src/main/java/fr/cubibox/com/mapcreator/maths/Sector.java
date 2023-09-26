@@ -11,20 +11,13 @@ import java.util.*;
 
 import static fr.cubibox.com.mapcreator.map.Type.*;
 
-public class Sector {
+public class Sector extends fr.cubibox.com.mapcreator.map.Sector {
     public static int staticId;
-
     private final TreeItem<String> treeItem;
-    private final int id;
-    private float ceilHeight;
-    private float floorHeight;
-    private final HashSet<Integer> wallIds;
-
 
     private Type type;
     private boolean selected;
     private boolean showPoint;
-
 
 
     //shape for views
@@ -40,12 +33,10 @@ public class Sector {
         this(ceilHeight, floorHeight, WALL);
     }
     public Sector(float ceilHeight, float floorHeight, Type type) {
+        super(0, ceilHeight, floorHeight);
         this.treeItem = new TreeItem<>("sector");
-        this.id = treeItem.hashCode();
         this.treeItem.setValue("sector " + this.id);
-        this.ceilHeight = ceilHeight;
-        this.floorHeight = floorHeight;
-        this.wallIds = new HashSet<>();
+        this.id = treeItem.hashCode();
         this.type = type;
     }
 
@@ -55,23 +46,8 @@ public class Sector {
         return out;
     }
 
-    public void addWallIds(Integer... wallIds) {
-        this.wallIds.addAll(Arrays.asList(wallIds));
-    }
-    public void addWallId(Integer wallIds) {
-        this.wallIds.add(wallIds);
-    }
     public void addWallIds(HashSet<Integer> wallID) {
         this.wallIds.addAll(wallID);
-    }
-
-    public static int newId(){
-        staticId++;
-        return staticId;
-    }
-
-    public int getId() {
-        return id;
     }
 
     public boolean isShowPoint() {
@@ -112,26 +88,6 @@ public class Sector {
 
     public void setShapeTop(ArrayList<Shape> shapeTop) {
         this.shapeTop = shapeTop;
-    }
-
-    public float getCeilHeight() {
-        return ceilHeight;
-    }
-
-    public float getFloorHeight() {
-        return floorHeight;
-    }
-
-    public HashSet<Integer> getWallIds() {
-        return wallIds;
-    }
-
-    public void setCeilHeight(float ceilHeight) {
-        this.ceilHeight = ceilHeight;
-    }
-
-    public void setFloorHeight(float floorHeight) {
-        this.floorHeight = floorHeight;
     }
 
     public TreeItem<String> getTreeItem() {

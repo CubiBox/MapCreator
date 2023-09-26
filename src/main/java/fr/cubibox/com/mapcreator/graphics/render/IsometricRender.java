@@ -1,9 +1,7 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
 import fr.cubibox.com.mapcreator.graphics.Controller;
-import fr.cubibox.com.mapcreator.maths.Sector;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
-import fr.cubibox.com.mapcreator.maths.Wall;
+import fr.cubibox.com.mapcreator.maths.*;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -22,11 +20,18 @@ public class IsometricRender extends RenderPane {
     private double xAngle;
     private double yAngle;
 
+    private Matrix3d base;
+
 
     public IsometricRender(double xAngle, double yAngle, Controller controller) {
         super(controller);
         this.xAngle = xAngle;
         this.yAngle = yAngle;
+        this.base = new Matrix3d(
+                new Vector3d(1, 0, 0),
+                new Vector3d(0, 1, 0),
+                new Vector3d(0, 0, 1)
+        );
     }
 
 
@@ -207,11 +212,37 @@ public class IsometricRender extends RenderPane {
         };
     }
 
+    public float[] toScreenIso_(double x, double y, double height){
+        Vector3d newVec = base.mul(new Vector3d(x, y, height));
+        return new float[] {
+                toScreenX(newVec.getX()),
+                toScreenY(newVec.getY() + newVec.getZ())
+        };
+    }
+    public float toScreenX(double x){
+        //return (float) (cam.getX() + x * xSize);
+        return (float) (origin.getX() + cam.getX() + x * xSize);
+    }
+    public float toScreenY(double y){
+        //return (float) (cam.getY() -y * xSize);
+        return (float) (origin.getY() - cam.getY() -y * xSize);
+    }
+
+
+    public void updateMatrix(){
+        this.base.setMatrix(
+                this.base.setIso(xAngle, yAngle, 1, 0, 0),
+                this.base.setIso(xAngle, yAngle, 0, 1, 0),
+                this.base.setIso(xAngle, yAngle, 0, 0, 1)
+        );
+    }
+
     public double getXAngle() {
         return xAngle;
     }
     public void setXAngle(double xAngle) {
         this.xAngle = xAngle;
+        updateMatrix();
     }
 
     public double getYAngle() {
@@ -219,6 +250,7 @@ public class IsometricRender extends RenderPane {
     }
     public void setYAngle(double yAngle) {
         this.yAngle = yAngle;
+        updateMatrix();
     }
 
     public Vector2F getOrigin() {
@@ -235,5 +267,13 @@ public class IsometricRender extends RenderPane {
 
     public void setZoom(double zoom) {
         this.zoom = zoom;
+    }
+
+    public Matrix3d getBase() {
+        return base;
+    }
+
+    public void setBase(Matrix3d base) {
+        this.base = base;
     }
 }

@@ -298,6 +298,8 @@ public class Controller implements Initializable {
         }
     }
 
+
+
     private void actualizeTreeView() {
         for (TreeItem<String> treeItem : sectorTree.getRoot().getChildren()){
             //remove from tree if delete
@@ -402,7 +404,7 @@ public class Controller implements Initializable {
         obj.getTreeItem().getChildren().add(pointItem);
 
         sectorTree.getRoot().getChildren().add(obj.getTreeItem());
-        repositories.add(obj.getId(), obj);
+        repositories.add(obj.id, obj);
 
         actualizeBoard();
         drawPolygons();

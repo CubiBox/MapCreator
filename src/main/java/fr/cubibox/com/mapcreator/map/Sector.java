@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.HashSet;
 
 public class Sector {
-    public final int id;
+    public int id;
 
-    private final HashSet<Integer> wallIds;
+    protected final HashSet<Integer> wallIds;
 
-    private double ceilHeight;
-    private double floorHeight;
+    protected double ceilHeight;
+    protected double floorHeight;
 
 
     public Sector(int id, double ceilHeight, double floorHeight) {

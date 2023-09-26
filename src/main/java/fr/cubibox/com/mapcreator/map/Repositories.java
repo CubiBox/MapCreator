@@ -113,7 +113,7 @@ public class Repositories {
 
 
     public void remove(Sector sector){
-        remove(sector.getId(), sector);
+        remove(sector.id, sector);
     }
     public void remove(Wall wall){
         remove(wall.getId(), wall);
