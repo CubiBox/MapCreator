@@ -32,7 +32,7 @@ public class Map {
 
     public Wall getWall(int wallId) {
         for (Wall wall : walls) {
-            if (wall.id == wallId) {
+            if (wall.getId() == wallId) {
                 return wall;
             }
         }
@@ -79,6 +79,6 @@ public class Map {
     }
 
     public void removeWall(int id) {
-        walls.removeIf(wall -> wall.id == id);
+        walls.removeIf(wall -> wall.getId() == id);
     }
 }

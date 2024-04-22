@@ -1,10 +1,7 @@
 package fr.cubibox.com.mapcreator.maths;
 
-import fr.cubibox.com.mapcreator.Main;
 import fr.cubibox.com.mapcreator.map.Type;
 import javafx.scene.control.TreeItem;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 
 import java.util.*;

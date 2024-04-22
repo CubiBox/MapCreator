@@ -8,8 +8,8 @@ module fr.cubibox.com.mapcreator {
     exports fr.cubibox.com.mapcreator.maths;
     opens fr.cubibox.com.mapcreator.maths to javafx.fxml;
 
-    exports fr.cubibox.com.mapcreator.graphics;
-    opens fr.cubibox.com.mapcreator.graphics to javafx.fxml;
+    exports fr.cubibox.com.mapcreator.graphics.ui;
+    opens fr.cubibox.com.mapcreator.graphics.ui to javafx.fxml;
 
     exports fr.cubibox.com.mapcreator;
     exports fr.cubibox.com.mapcreator.map;

@@ -1,18 +1,15 @@
-package fr.cubibox.com.mapcreator.graphics;
+package fr.cubibox.com.mapcreator.graphics.ui;
 
-import fr.cubibox.com.mapcreator.Main;
+import fr.cubibox.com.mapcreator.Application;
 import fr.cubibox.com.mapcreator.graphics.render.ClassicRender;
 import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
 import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
-import fr.cubibox.com.mapcreator.graphics.ui.PropertyBoard;
-import fr.cubibox.com.mapcreator.map.Player;
 import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Type;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
+import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.maths.Sector;
-import fr.cubibox.com.mapcreator.maths.Wall;
+import fr.cubibox.com.mapcreator.map.Wall;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -30,57 +27,26 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-import static fr.cubibox.com.mapcreator.Main.*;
 import static fr.cubibox.com.mapcreator.map.Type.*;
 
 public class Controller implements Initializable {
 
     public ScrollPane scrollPane;
-    @FXML
-    private Pane coordinateSystem;
-    @FXML
-    private ToggleButton walls;
     public ToggleButton bottom;
     public ToggleButton top;
 
-    @FXML
-    private ToggleButton isoview;
-    @FXML
-    private ToggleGroup SelectionOption;
-    @FXML
-    private ToggleGroup view;
-    @FXML
-    private ToggleGroup POV;
-    @FXML
-    private Slider mapSizeSlide;
-    @FXML
-    private Slider polHeightSlide;
-
-    @FXML
-    private VBox polyBoard;
-    @FXML
-    private TreeView<String> sectorTree;
-
-
     public Repositories repositories;
-    public ArrayList<Vector2F> tpmPoints;
+    public ArrayList<Vector2v> tpmPoints;
+    private PropertyBoardController property;
 
-    @FXML
-    private VBox propertyBoard;
-    private PropertyBoard property;
-
-    @FXML
-    private Button Reset;
-    @FXML
-    private Button importer;
 
     public static RenderPane renderPane;
-
     private ArrayList<Type> drawablePol;
     private boolean dragState;
     private float[] dragPointOrigin = new float[2];
 
 
+    //TODO divide part on many controllers (pane / tab on left/right / menu bar etc...)
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         //coordinateSystem.setPrefSize(scrollPane.getWidth(),scrollPane.getHeight());
@@ -124,7 +90,7 @@ public class Controller implements Initializable {
         mapSizeSlide.setShowTickLabels(true);
         mapSizeSlide.valueProperty().addListener((obs, oldval, newVal) -> mapSizeSlide.setValue(newVal.intValue()));
         mapSizeSlide.valueProperty().addListener(event -> {
-            Main.xSize = (int) (16 * mapSizeSlide.getValue());
+            Application.xSize = (int) (16 * mapSizeSlide.getValue());
             drawPolygons();
         });
         isoview.setOnAction(this::actualizeView);
@@ -161,7 +127,7 @@ public class Controller implements Initializable {
         //set by click (make intern variable to know if drag is shifted or not)
         coordinateSystem.setOnMouseClicked(event -> {
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY) && !event.isShiftDown()) {
-                ArrayList<Vector2F> pts = renderPane.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
+                ArrayList<Vector2v> pts = renderPane.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
                 if (pts != null) {
                     if (pts.size() > 1) {
                         setPolygon(pts);
@@ -177,10 +143,10 @@ public class Controller implements Initializable {
             dragState = false;
         });
 
-        repositories = new Repositories();
+        repositories = Repositories.getInstance();
         tpmPoints = new ArrayList<>();
 
-        property = new PropertyBoard(propertyBoard, this);
+        property = new PropertyBoardController(propertyBoard, this);
 
         TreeItem<String> rootItem = new TreeItem<String> ("Sectors");
         rootItem.setExpanded(true);
@@ -196,7 +162,7 @@ public class Controller implements Initializable {
             for (Wall wall : repositories.getAllWalls()){
                 if (wall.isSelected()) wall.setSelected(false);
             }
-            for (Vector2F vec : repositories.getAllVectors()){
+            for (Vector2v vec : repositories.getAllVectors()){
                 if (vec.isSelected()) vec.setSelected(false);
             }
 
@@ -226,7 +192,7 @@ public class Controller implements Initializable {
             drawPolygons();
 
             //System.out.println();
-            //renderPane.drawPointShape(coordinateSystem, (Vector2F) item);
+            //renderPane.drawPointShape(coordinateSystem, (Vector2d) item);
         });
 
         drawPolygons();
@@ -253,8 +219,8 @@ public class Controller implements Initializable {
         ImageView imgSclt = new ImageView();
         ImageView img = new ImageView();
         try {
-            imgSclt = new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("images/icon.png")).openStream()));
-            img = new ImageView(new Image(Objects.requireNonNull(Main.class.getResource("images/wall.png")).openStream()));;
+            imgSclt = new ImageView(new Image(Objects.requireNonNull(Application.class.getResource("images/icon.png")).openStream()));
+            img = new ImageView(new Image(Objects.requireNonNull(Application.class.getResource("images/wall.png")).openStream()));;
         }
         catch (IOException e) { throw new RuntimeException(e); }
 
@@ -273,13 +239,13 @@ public class Controller implements Initializable {
     public void drawPolygons(ArrayList<Shape> tempPol) {
         actualizeTreeView();
         coordinateSystem.getChildren().clear();
-        ArrayList<Vector2F> vectors = tpmPoints;
+        ArrayList<Vector2v> vectors = tpmPoints;
 
         //draw the grid
         renderPane.drawGrid(coordinateSystem);
 
         //draw points
-        for(Vector2F vector : vectors) {
+        for(Vector2v vector : vectors) {
             renderPane.drawPointShape(coordinateSystem, vector);
         }
 
@@ -368,10 +334,10 @@ public class Controller implements Initializable {
         }
     }
 
-    public void setPolygon(ArrayList<Vector2F> vectors) {
-        Vector2F buff = vectors.get(vectors.size()-1);
+    public void setPolygon(ArrayList<Vector2v> vectors) {
+        Vector2v buff = vectors.get(vectors.size()-1);
         HashSet<Integer> wallsID = new HashSet<>();
-        for (Vector2F vec : vectors) {
+        for (Vector2v vec : vectors) {
             repositories.add(vec.getId(), vec);
             Wall currWall = new Wall(buff.getId(), vec.getId());
             currWall.getTreeItem().getChildren().add(buff.getTreeItem());
@@ -394,7 +360,7 @@ public class Controller implements Initializable {
         TreeItem<String> wallItem = new TreeItem<>("Walls");
         wallItem.setExpanded(false);
 
-        for (Vector2F v : repositories.getVectors(obj))
+        for (Vector2v v : repositories.getVectors(obj))
             pointItem.getChildren().add(v.getTreeItem());
 
         for (Wall w : repositories.getWalls(obj))

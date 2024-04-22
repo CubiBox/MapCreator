@@ -1,10 +1,11 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.graphics.Controller;
+import fr.cubibox.com.mapcreator.graphics.ui.PaneController;
+import fr.cubibox.com.mapcreator.map.Vector2v;
+import fr.cubibox.com.mapcreator.map.Wall;
 import fr.cubibox.com.mapcreator.maths.*;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
@@ -13,7 +14,7 @@ import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
 
-import static fr.cubibox.com.mapcreator.Main.*;
+import static fr.cubibox.com.mapcreator.Application.*;
 
 
 public class IsometricRender extends RenderPane {
@@ -23,7 +24,7 @@ public class IsometricRender extends RenderPane {
     private Matrix3d base;
 
 
-    public IsometricRender(double xAngle, double yAngle, Controller controller) {
+    public IsometricRender(double xAngle, double yAngle, PaneController controller) {
         super(controller);
         this.xAngle = xAngle;
         this.yAngle = yAngle;
@@ -32,6 +33,8 @@ public class IsometricRender extends RenderPane {
                 new Vector3d(0, 1, 0),
                 new Vector3d(0, 0, 1)
         );
+
+        origin = new Vector2F(0f, 0f);
     }
 
 
@@ -77,8 +80,8 @@ public class IsometricRender extends RenderPane {
 
         Vector2F showPoint = null;
         for (Wall wall : controller.repositories.getWalls(sec)){
-            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
             float[] v1 = toScreenIso(vec1.getX(),vec1.getY(),sec.getCeilHeight());
             float[] v2 = toScreenIso(vec2.getX(),vec2.getY(),sec.getCeilHeight());
             float[] v3 = toScreenIso(vec2.getX(),vec2.getY(),sec.getFloorHeight());
@@ -122,7 +125,7 @@ public class IsometricRender extends RenderPane {
     public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
         super.drawPointsLabel(coordinateSystem, pol);
 
-        for (Vector2F p : controller.repositories.getVectors(pol)) {
+        for (Vector2v p : controller.repositories.getVectors(pol)) {
             Label pointName = new Label(p.getId() + "");
             float[] v = toScreenIso(p.getX(), p.getY(), pol.getCeilHeight());
             pointName.setLayoutX(v[0] - 5);
@@ -197,7 +200,8 @@ public class IsometricRender extends RenderPane {
         return toScreenIso(x,y,0);
     }
 
-    public float[] toScreenIso(double x, double y, double height){
+    /*
+    public float[] toScreenIso_(double x, double y, double height){
         double relativeX = origin.getX() - x;
         double relativeY = origin.getY() - y;
         double newAngle = xAngle + ((relativeX==0 && relativeY==0) ? 0 : Math.atan(relativeY / relativeX));
@@ -211,9 +215,12 @@ public class IsometricRender extends RenderPane {
                 (float) (cam.getY() + heightOffset + (finalY + finalX) * yAngle)
         };
     }
+    */
 
-    public float[] toScreenIso_(double x, double y, double height){
-        Vector3d newVec = base.mul(new Vector3d(x, y, height));
+    public float[] toScreenIso(double x, double y, double height){
+        Vector3d newVec = new Vector3d(x - 16, y - 16, height);
+        newVec.mul(base);
+
         return new float[] {
                 toScreenX(newVec.getX()),
                 toScreenY(newVec.getY() + newVec.getZ())

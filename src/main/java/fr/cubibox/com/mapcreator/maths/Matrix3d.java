@@ -15,6 +15,7 @@ public class Matrix3d {
     public Matrix3d(Vector3d vec1, Vector3d vec2, Vector3d vec3) {
         setMatrix(vec1, vec2, vec3);
     }
+
     public void setMatrix(Matrix3d m) {
         setMatrix(m.vec1, m.vec2, m.vec3);
     }
@@ -46,22 +47,15 @@ public class Matrix3d {
     }
 
 
-    public void multiplyBy(double val){
+    public void mul(double val){
         vec1.mul(val);
         vec2.mul(val);
         vec3.mul(val);
     }
-    public void multiplyBy(Matrix3d mat){
+    public void mul(Matrix3d mat){
         vec1.mul(mat.vec1);
         vec2.mul(mat.vec2);
         vec3.mul(mat.vec2);
-    }
-
-    public Vector3d mul(Vector3d vec){
-        double x = vec1.x * vec.x + vec2.x * vec.y + vec3.x * vec.z;
-        double y = vec1.y * vec.x + vec2.y * vec.y + vec3.y * vec.z;
-        double z = vec1.z * vec.x + vec2.z * vec.y + vec3.z * vec.z;
-        return new Vector3d(x, y, z);
     }
 
 

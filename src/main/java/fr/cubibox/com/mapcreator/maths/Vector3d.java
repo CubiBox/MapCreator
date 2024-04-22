@@ -36,6 +36,18 @@ public class Vector3d {
         }
     }
 
+    public void mul(Matrix3d mat) {
+        if (mat != null) {
+            double x = mat.getVec1().x * this.x + mat.getVec2().x * this.y + mat.getVec3().x * this.z;
+            double y = mat.getVec1().y * this.x + mat.getVec2().y * this.y + mat.getVec3().y * this.z;
+            double z = mat.getVec1().z * this.x + mat.getVec2().z * this.y + mat.getVec3().z * this.z;
+
+            this.x = x;
+            this.y = y;
+            this.z = z;
+        }
+    }
+
     public void div(double val) {
         if (val != 0) {
             x = x / val;

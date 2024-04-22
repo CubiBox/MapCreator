@@ -1,6 +1,7 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.graphics.Controller;
+import fr.cubibox.com.mapcreator.graphics.ui.PaneController;
+import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import javafx.scene.input.MouseEvent;
@@ -10,18 +11,18 @@ import javafx.scene.shape.Shape;
 
 import java.util.ArrayList;
 
-import static fr.cubibox.com.mapcreator.Main.xSize;
+import static fr.cubibox.com.mapcreator.Application.xSize;
 
 public abstract class RenderPane {
     protected ArrayList<Shape> tempPolygons;
-    protected Controller controller;
+    protected PaneController controller;
 
     protected Vector2F origin;
     protected Vector2F cam;
     protected double zoom;
 
 
-    public RenderPane(Controller controller) {
+    public RenderPane(PaneController controller) {
         this.controller = controller;
         this.cam = new Vector2F(0.f, 0.f);
         this.zoom = 900;
@@ -83,7 +84,7 @@ public abstract class RenderPane {
         return tempPolygons;
     }
 
-    public ArrayList<Vector2F> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
+    public ArrayList<Vector2v> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
         return null;
     }
 }

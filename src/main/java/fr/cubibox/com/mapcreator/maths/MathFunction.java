@@ -1,7 +1,5 @@
 package fr.cubibox.com.mapcreator.maths;
 
-import fr.cubibox.com.mapcreator.Main;
-
 import java.math.BigDecimal;
 
 public class MathFunction {

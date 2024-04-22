@@ -1,11 +1,12 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.graphics.Controller;
+import fr.cubibox.com.mapcreator.graphics.ui.PaneController;
 import fr.cubibox.com.mapcreator.map.Type;
+import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
-import fr.cubibox.com.mapcreator.maths.Wall;
+import fr.cubibox.com.mapcreator.map.Wall;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
@@ -19,14 +20,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static fr.cubibox.com.mapcreator.Main.xSize;
-import static fr.cubibox.com.mapcreator.Main.DIML;
-import static fr.cubibox.com.mapcreator.Main.DIMC;
+import static fr.cubibox.com.mapcreator.Application.xSize;
 import static fr.cubibox.com.mapcreator.map.Type.WALL;
 
 public class ClassicRender extends RenderPane {
 
-    public ClassicRender(Controller controller) {
+    public ClassicRender(PaneController controller) {
         super(controller);
     }
 
@@ -101,8 +100,8 @@ public class ClassicRender extends RenderPane {
 
         Vector2F showPoint = null;
         for (Wall wall : controller.repositories.getWalls(sec)) {
-            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
             Line line = new Line(
                     toScreenX(vec1.getX()),
                     toScreenY(vec1.getY()),
@@ -165,7 +164,7 @@ public class ClassicRender extends RenderPane {
         super.drawPointsLabel(coordinateSystem, pol);
 
 
-        for (Vector2F p : controller.repositories.getVectors(pol)) {
+        for (Vector2v p : controller.repositories.getVectors(pol)) {
             Label pointName = new Label(p.getId()+"");
             pointName.setLayoutX(toScreenX(p.getX()) - 5);
             pointName.setLayoutY(toScreenY(p.getY()) - 15);
@@ -229,20 +228,20 @@ public class ClassicRender extends RenderPane {
 
 
     @Override
-    public ArrayList<Vector2F> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
-        Vector2F currentPos = new Vector2F(MathFunction.round(toPlotX(x)), MathFunction.round(toPlotY(y)));
-        ArrayList<Vector2F> pts = new ArrayList<>();
+    public ArrayList<Vector2v> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
+        Vector2v currentPos = new Vector2v(MathFunction.round(toPlotX(x)), MathFunction.round(toPlotY(y)));
+        ArrayList<Vector2v> pts = new ArrayList<>();
         pts.add(currentPos);
 
         if (currentPos.getX() >= 0 && currentPos.getX() <= xSize && currentPos.getY() >= 0 && currentPos.getY() <= xSize) {
             if (dragState && !(dragPointOrigin[0] == currentPos.getX() && dragPointOrigin[1] == currentPos.getY())) {
                 if (dragPointOrigin[0] == currentPos.getX() || dragPointOrigin[1] == currentPos.getY())
-                    pts.add(new Vector2F(dragPointOrigin[0], dragPointOrigin[1]));
+                    pts.add(new Vector2v(dragPointOrigin[0], dragPointOrigin[1]));
 
                 else pts.addAll(List.of(
-                                new Vector2F(dragPointOrigin[0], currentPos.getY()),
-                                new Vector2F(dragPointOrigin[0], dragPointOrigin[1]),
-                                new Vector2F(currentPos.getX(), dragPointOrigin[1])
+                                new Vector2v(dragPointOrigin[0], currentPos.getY()),
+                                new Vector2v(dragPointOrigin[0], dragPointOrigin[1]),
+                                new Vector2v(currentPos.getX(), dragPointOrigin[1])
                         )
                 );
             }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.layout.BorderPane?>
+
+<MenuBar fx:id="menubar" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.graphics.ui.MenuBarController">
+  <Menu mnemonicParsing="false" text="Fichier">
+    <MenuItem mnemonicParsing="false" onAction="#importMapButton" text="Ouvrir" />
+    <MenuItem mnemonicParsing="false" onAction="#exportMapButton" text="Enregistrer - Ecraser" />
+    <MenuItem mnemonicParsing="false" text="Enregistrer tout" />
+  </Menu>
+  <Menu mnemonicParsing="false" text="Textures">
+    <MenuItem mnemonicParsing="false" text="Ouvrir Le Gestionnaire de textures" />
+  </Menu>
+  <Menu mnemonicParsing="false" text="Help">
+    <MenuItem mnemonicParsing="false" text="About" />
+  </Menu>
+  <Menu mnemonicParsing="false" text="Extras">
+    <MenuItem mnemonicParsing="false" text="Génération Procédurale" />
+  </Menu>
+</MenuBar>

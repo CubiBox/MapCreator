@@ -2,7 +2,6 @@ package fr.cubibox.com.mapcreator.map;
 
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
-import fr.cubibox.com.mapcreator.maths.Wall;
 import javafx.scene.control.TreeItem;
 
 import java.util.ArrayList;
@@ -10,13 +9,25 @@ import java.util.HashMap;
 
 public class Repositories {
     private HashMap<Integer, Sector> sectors;
-    private HashMap<Integer, Vector2F> vectors;
+    private HashMap<Integer, Vector2v> vectors;
     private HashMap<Integer, Wall> walls;
-    public Repositories() {
+
+
+    private static Repositories instance;
+
+    private Repositories() {
         sectors = new HashMap<>();
         vectors = new HashMap<>();
         walls = new HashMap<>();
     }
+
+    public static Repositories getInstance(){
+        if (instance == null){
+            instance = new Repositories();
+        }
+        return instance;
+    }
+
 
     public void add(int id, Sector sector){
         sectors.put(id, sector);
@@ -24,10 +35,9 @@ public class Repositories {
     public void add(int id, Wall wall){
         walls.put(id, wall);
     }
-    public void add(int id, Vector2F vector){
+    public void add(int id, Vector2v vector){
         vectors.put(id, vector);
     }
-
 
     public void remove(int id, Sector sector){
         ArrayList<Integer> wallIDs = new ArrayList<>(sector.getWallIds());
@@ -57,7 +67,7 @@ public class Repositories {
         walls.remove(id, curr_wall);
     }
 
-    public void remove(int id, Vector2F vector){
+    public void remove(int id, Vector2v vector){
         Wall[] walls = getWallsByVectorID(vector.getId());
         int vec1ID = (walls[0].getVector1ID() == vector.getId()) ? walls[0].getVector2ID() : walls[0].getVector1ID();
         int vec2ID = (walls[1].getVector1ID() == vector.getId()) ? walls[1].getVector2ID() : walls[1].getVector1ID();
@@ -83,7 +93,7 @@ public class Repositories {
         int vec2ID = wall.getVector2ID();
 
         //create new vector
-        Vector2F newVec = new Vector2F(
+        Vector2v newVec = new Vector2v(
                 (int)((getVectorByID(vec1ID).getX() + getVectorByID(vec2ID).getX())/2),
                 (int)((getVectorByID(vec1ID).getY() + getVectorByID(vec2ID).getY())/2)
         );
@@ -118,7 +128,7 @@ public class Repositories {
     public void remove(Wall wall){
         remove(wall.getId(), wall);
     }
-    public void remove(Vector2F vector){
+    public void remove(Vector2v vector){
         remove(vector.getId(), vector);
     }
 
@@ -145,7 +155,7 @@ public class Repositories {
     public Sector getSectorByID(int id){
         return sectors.get(id);
     }
-    public Vector2F getVectorByID(int id){
+    public Vector2v getVectorByID(int id){
         return vectors.get(id);
     }
     public Wall getWallByID(int id){
@@ -170,7 +180,7 @@ public class Repositories {
     public ArrayList<Wall> getAllWalls(){
         return new ArrayList<>(this.walls.values());
     }
-    public ArrayList<Vector2F> getAllVectors(){
+    public ArrayList<Vector2v> getAllVectors(){
         return new ArrayList<>(this.vectors.values());
     }
 
@@ -182,17 +192,17 @@ public class Repositories {
         }
         return walls;
     }
-    public ArrayList<Vector2F> getVectors(Wall wall){
-        ArrayList<Vector2F> vectors = new ArrayList<>();
+    public ArrayList<Vector2v> getVectors(Wall wall){
+        ArrayList<Vector2v> vectors = new ArrayList<>();
         vectors.add(getVectorByID(wall.getVector1ID()));
         vectors.add(getVectorByID(wall.getVector2ID()));
         return vectors;
     }
 
-    public ArrayList<Vector2F> getVectors(Sector sector){
-        ArrayList<Vector2F> vectors = new ArrayList<>();
+    public ArrayList<Vector2v> getVectors(Sector sector){
+        ArrayList<Vector2v> vectors = new ArrayList<>();
         for (int wallId : sector.getWallIds()){
-            ArrayList<Vector2F> vec = getVectors(walls.get(wallId));
+            ArrayList<Vector2v> vec = getVectors(walls.get(wallId));
             if (!vectors.contains(vec.get(0))){
                 vectors.add(vec.get(0));
             }

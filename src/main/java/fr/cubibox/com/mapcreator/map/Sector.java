@@ -37,7 +37,7 @@ public class Sector {
 
     public void addWalls(Wall... walls) {
         for (Wall wall : walls) {
-            this.wallIds.add(wall.id);
+            this.wallIds.add(wall.getId());
         }
     }
 
@@ -63,9 +63,15 @@ public class Sector {
 
     @Override
     public String toString() {
-        return "Sector " + id +
-                ", wallIds=" + wallIds +
-                ", ceilHeight=" + ceilHeight +
-                ", floorHeight=" + floorHeight;
+        StringBuilder str = new StringBuilder("sector_" + id + ":\n");
+
+        str.append("\twallids: ");
+        for (int id : wallIds)
+            str.append(id).append(' ');
+
+        str.append("\tceilHeight: " + ceilHeight + '\n');
+        str.append("\tfloorHeight: " + floorHeight + '\n');
+
+        return str.toString();
     }
 }

@@ -1,27 +1,23 @@
 package fr.cubibox.com.mapcreator.graphics.ui;
 
 
-import fr.cubibox.com.mapcreator.Main;
-import fr.cubibox.com.mapcreator.graphics.Controller;
+import fr.cubibox.com.mapcreator.Application;
+import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.maths.Sector;
-import fr.cubibox.com.mapcreator.maths.Wall;
+import fr.cubibox.com.mapcreator.map.Wall;
 import fr.cubibox.com.mapcreator.map.Type;
-import fr.cubibox.com.mapcreator.maths.Vector2F;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
-import java.util.function.Consumer;
 
-public class PropertyBoard {
+public class PropertyBoardController {
     private Controller controller;
     private VBox propertyBoard;
     private VBox board;
 
-    public PropertyBoard(VBox propertyBoard, Controller controller) {
+    public PropertyBoardController(VBox propertyBoard, Controller controller) {
         this.propertyBoard = propertyBoard;
         this.controller = controller;
         VBox board = new VBox();
@@ -133,7 +129,7 @@ public class PropertyBoard {
         board.getChildren().addAll(heightBox,nameBoard,rightPart);
     }
 
-    public void init (Vector2F p){
+    public void init (Vector2v p){
         board.getChildren().clear();
 
         HBox nameBoard = new HBox();
@@ -164,28 +160,28 @@ public class PropertyBoard {
         nameBoard.getChildren().addAll(name,delete);
 
         // X cursor
-        Slider xSlid = new Slider(0,Main.xSize,p.getX());
+        Slider xSlid = new Slider(0, Application.xSize,p.getX());
         xSlid.setBlockIncrement(1);
         xSlid.setMajorTickUnit(8);
         xSlid.setShowTickLabels(true);
         xSlid.valueProperty().addListener((obs, oldval, newVal) -> xSlid.setValue(newVal.intValue()));
         xSlid.valueProperty().addListener(event -> {
             p.setX((float) xSlid.getValue());
-            controller.tpmPoints = new ArrayList<>(Vector2F.shortPoints(controller.tpmPoints));
+            controller.tpmPoints = new ArrayList<>(Vector2v.shortPoints(controller.tpmPoints));
             this.controller.drawPolygons();
         });
         xSlid.setPrefWidth(250);
         xBoard.getChildren().addAll(new Label("X : "),xSlid);
 
         //Y cursor
-        Slider ySlid = new Slider(0,Main.xSize,p.getY());
+        Slider ySlid = new Slider(0, Application.xSize,p.getY());
         ySlid.setBlockIncrement(1);
         ySlid.setMajorTickUnit(8);
         ySlid.setShowTickLabels(true);
         ySlid.valueProperty().addListener((obs, oldval, newVal) -> ySlid.setValue(newVal.intValue()));
         ySlid.valueProperty().addListener(event -> {
             p.setY((float) ySlid.getValue());
-            controller.tpmPoints = new ArrayList<>(Vector2F.shortPoints(controller.tpmPoints));
+            controller.tpmPoints = new ArrayList<>(Vector2v.shortPoints(controller.tpmPoints));
             this.controller.drawPolygons();
         });
         ySlid.setPrefWidth(250);
@@ -234,9 +230,9 @@ public class PropertyBoard {
         Button xAdd = new Button("->");
         xAdd.setPrefSize(40d,25d);
         xAdd.setOnMouseReleased(event -> {
-            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
-            if (vec1.getX() + 1 <= Main.xSize && vec2.getX() + 1 <= Main.xSize) {
+            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            if (vec1.getX() + 1 <= Application.xSize && vec2.getX() + 1 <= Application.xSize) {
                 vec1.setX(vec1.getX() + 1);
                 vec2.setX(vec2.getX() + 1);
             }
@@ -246,8 +242,8 @@ public class PropertyBoard {
         Button xMinus = new Button("<-");
         xMinus.setPrefSize(40d,25d);
         xMinus.setOnMouseReleased(event -> {
-            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
             if (vec1.getX() - 1 >= 0 && vec2.getX() - 1 >= 0) {
                 vec1.setX(vec1.getX() - 1);
                 vec2.setX(vec2.getX() - 1);
@@ -258,9 +254,9 @@ public class PropertyBoard {
         Button yAdd = new Button("v");
         yAdd.setPrefSize(40d,25d);
         yAdd.setOnMouseReleased(event -> {
-            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
-            if (vec1.getY() + 1 <= Main.xSize && vec2.getY() + 1 <= Main.xSize) {
+            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            if (vec1.getY() + 1 <= Application.xSize && vec2.getY() + 1 <= Application.xSize) {
                 vec1.setY(vec1.getY() + 1);
                 vec2.setY(vec2.getY() + 1);
             }
@@ -270,8 +266,8 @@ public class PropertyBoard {
         Button yMinus = new Button("^");
         yMinus.setPrefSize(40d,25d);
         yMinus.setOnMouseReleased(event -> {
-            Vector2F vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2F vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
             if (vec1.getY() - 1 >= 0 && vec2.getY() - 1 >= 0) {
                 vec1.setY(vec1.getY() - 1);
                 vec2.setY(vec2.getY() - 1);

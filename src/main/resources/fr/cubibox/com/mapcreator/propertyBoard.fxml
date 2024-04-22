@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="propertyBoard" alignment="TOP_CENTER" prefHeight="230.0" prefWidth="400.0" spacing="10" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="fr.cubibox.com.mapcreator.graphics.ui.LeftBoardController"
+      style="-fx-background-color: #808080;">
+  <opaqueInsets>
+    <Insets/>
+  </opaqueInsets>
+  <padding>
+    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+  </padding>
+</VBox>
