@@ -1,5 +1,7 @@
 package fr.cubibox.com.mapcreator.map;
 
+import fr.cubibox.com.mapcreator.maths.Sector;
+
 import java.util.Arrays;
 import java.util.HashSet;
 

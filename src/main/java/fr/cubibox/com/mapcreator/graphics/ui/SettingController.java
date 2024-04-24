@@ -1,33 +1,16 @@
 package fr.cubibox.com.mapcreator.graphics.ui;
 
 import fr.cubibox.com.mapcreator.Application;
-import fr.cubibox.com.mapcreator.graphics.render.ClassicRender;
-import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
-import fr.cubibox.com.mapcreator.map.Repositories;
-import fr.cubibox.com.mapcreator.map.Type;
-import fr.cubibox.com.mapcreator.map.Vector2v;
-import fr.cubibox.com.mapcreator.map.Wall;
-import fr.cubibox.com.mapcreator.maths.Sector;
+import fr.cubibox.com.mapcreator.map.*;
 import javafx.event.ActionEvent;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.ResourceBundle;
 
 public class SettingController {
     public ToggleButton topView;
@@ -51,10 +34,8 @@ public class SettingController {
     public Button setPol;
 
     private static SettingController instance;
-
     private SettingController(){
     }
-
     public static SettingController getInstance(){
         if (instance == null){
             instance = new SettingController();
@@ -63,7 +44,20 @@ public class SettingController {
     }
 
     public void initialize() {
+        bottom.setSelected(true);
+        bottom.setOnMouseClicked(event -> {
+            PaneController.getInstance().draw();
+        });
 
+        top.setSelected(true);
+        top.setOnMouseClicked(event -> {
+            PaneController.getInstance().draw();
+        });
+
+        walls.setSelected(true);
+        walls.setOnMouseClicked(event -> {
+            PaneController.getInstance().draw();
+        });
     }
 
     public void actualizeView(ActionEvent ae){
@@ -86,6 +80,15 @@ public class SettingController {
     public Type selectType(ToggleGroup tg){
         RadioButton rd = (RadioButton)tg.getSelectedToggle();
         return Type.toType(rd.getId());
+    }
+
+    public boolean drawableType(Type type){
+        switch (type) {
+            case WALL -> { return walls.isSelected(); }
+            case CELLING -> { return top.isSelected(); }
+            case FLOOR -> { return bottom.isSelected(); }
+        }
+        return false;
     }
 
     public void setPolygon(ActionEvent ignored) {

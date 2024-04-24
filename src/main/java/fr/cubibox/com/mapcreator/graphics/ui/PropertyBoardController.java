@@ -2,20 +2,13 @@ package fr.cubibox.com.mapcreator.graphics.ui;
 
 
 import fr.cubibox.com.mapcreator.Application;
-import fr.cubibox.com.mapcreator.map.Repositories;
-import fr.cubibox.com.mapcreator.map.Vector2v;
-import fr.cubibox.com.mapcreator.maths.Sector;
-import fr.cubibox.com.mapcreator.map.Wall;
-import fr.cubibox.com.mapcreator.map.Type;
+import fr.cubibox.com.mapcreator.map.*;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.ResourceBundle;
 
 public class PropertyBoardController {
     @FXML

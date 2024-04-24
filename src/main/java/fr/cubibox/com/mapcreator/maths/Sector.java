@@ -1,95 +1,79 @@
 package fr.cubibox.com.mapcreator.maths;
 
-import fr.cubibox.com.mapcreator.map.Type;
-import javafx.scene.control.TreeItem;
-import javafx.scene.shape.Shape;
+import fr.cubibox.com.mapcreator.map.Wall;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
 
-import static fr.cubibox.com.mapcreator.map.Type.*;
+public class Sector {
+    public int id;
 
-public class Sector extends fr.cubibox.com.mapcreator.map.Sector {
-    public static int staticId;
-    private final TreeItem<String> treeItem;
+    protected final HashSet<Integer> wallIds;
 
-    private Type type;
-    private boolean selected;
-    private boolean showPoint;
+    protected double ceilHeight;
+    protected double floorHeight;
 
 
-    //shape for views
-    private ArrayList<Shape> shapesIso;
-    private ArrayList<Shape> shapeTop;
-
-    private Shape shapeLeft;
-    private Shape shapeRight;
-
-
-
-    public Sector(float ceilHeight, float floorHeight) {
-        this(ceilHeight, floorHeight, WALL);
-    }
-    public Sector(float ceilHeight, float floorHeight, Type type) {
-        super(0, ceilHeight, floorHeight);
-        this.treeItem = new TreeItem<>("sector");
-        this.treeItem.setValue("sector " + this.id);
-        this.id = treeItem.hashCode();
-        this.type = type;
+    public Sector(int id, double ceilHeight, double floorHeight) {
+        this.id = id;
+        this.ceilHeight = ceilHeight;
+        this.floorHeight = floorHeight;
+        this.wallIds = new HashSet<>();
     }
 
-    public String toName(){
-        String out = "";
-        out += "Polygon";
-        return out;
+    public double getCeilHeight() {
+        return ceilHeight;
     }
 
-    public void addWallIds(HashSet<Integer> wallID) {
-        this.wallIds.addAll(wallID);
+    public void setCeilHeight(double ceilHeight) {
+        this.ceilHeight = ceilHeight;
     }
 
-    public boolean isShowPoint() {
-        return showPoint;
+    public double getFloorHeight() {
+        return floorHeight;
     }
 
-    public void setShowPoint(boolean showPoint) {
-        this.showPoint = showPoint;
+    public void setFloorHeight(double floorHeight) {
+        this.floorHeight = floorHeight;
     }
 
-    public ArrayList<Shape> getShapeTop() {
-        return shapeTop;
+    public void addWalls(Wall... walls) {
+        for (Wall wall : walls) {
+            this.wallIds.add(wall.getId());
+        }
     }
 
-    public ArrayList<Shape> getShapesIso() {
-        return shapesIso;
+    public void addWallId(Integer wallId) {
+        this.wallIds.add(wallId);
     }
 
-    public void setSelected(boolean isSelected) {
-        this.selected = isSelected;
+    public void addWallIds(Integer... wallIds) {
+        this.wallIds.addAll(Arrays.asList(wallIds));
     }
 
-    public boolean isSelected() {
-        return selected;
+    public void removeWallId(Integer wallId) {
+        this.wallIds.remove(wallId);
     }
 
-    public Type getType() {
-        return type;
+    public void removeWallId(int id) {
+        wallIds.removeIf(wallId -> wallId == id);
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public HashSet<Integer> getWallIds() {
+        return wallIds;
     }
 
-    public void setShapesIso(ArrayList<Shape> shapesIso) {
-        this.shapesIso = shapesIso;
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder("sector_" + id + ":\n");
+
+        str.append("\twallids: ");
+        for (int id : wallIds)
+            str.append(id).append(' ');
+
+        str.append("\tceilHeight: " + ceilHeight + '\n');
+        str.append("\tfloorHeight: " + floorHeight + '\n');
+
+        return str.toString();
     }
-
-    public void setShapeTop(ArrayList<Shape> shapeTop) {
-        this.shapeTop = shapeTop;
-    }
-
-    public TreeItem<String> getTreeItem() {
-        return treeItem;
-    }
-
-
 }

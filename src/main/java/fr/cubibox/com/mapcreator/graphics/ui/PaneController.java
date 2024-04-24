@@ -4,16 +4,13 @@ import fr.cubibox.com.mapcreator.graphics.render.ClassicRender;
 import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
 import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
 import fr.cubibox.com.mapcreator.map.Repositories;
+import fr.cubibox.com.mapcreator.map.Sector;
 import fr.cubibox.com.mapcreator.map.Vector2v;
-import fr.cubibox.com.mapcreator.maths.Sector;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 
-import java.net.URL;
 import java.util.*;
 
 public class PaneController {
@@ -104,6 +101,7 @@ public class PaneController {
     }
 
     public void draw(ArrayList<Shape> tempPol) {
+        System.out.println("drawing");
         coordinateSystem.getChildren().clear();
 
         //draw the grid
@@ -116,9 +114,7 @@ public class PaneController {
 
         //draw polygons
         for (Sector obj : Repositories.getInstance().getAllSectors()) {
-//            if (drawable(obj.getType())) {
-                renderPane.drawPolygon(coordinateSystem, obj);
-//            }
+            renderPane.drawPolygon(coordinateSystem, obj);
         }
 
         if (tempPol != null && !tempPol.isEmpty()){

@@ -1,6 +1,5 @@
 package fr.cubibox.com.mapcreator.map;
 
-import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import javafx.scene.control.TreeItem;
 

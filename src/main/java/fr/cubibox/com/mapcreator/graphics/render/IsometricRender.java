@@ -1,6 +1,7 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.graphics.ui.PaneController;
+import fr.cubibox.com.mapcreator.map.Sector;
+import fr.cubibox.com.mapcreator.graphics.ui.SettingController;
 import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.map.Wall;
@@ -68,6 +69,10 @@ public class IsometricRender extends RenderPane {
     @Override
     public void drawPolygon(Pane coordinateSystem, Sector sec) {
         super.drawPolygon(coordinateSystem, sec);
+
+        if (SettingController.getInstance().drawableType(sec.getType())) {
+            return;
+        }
 
         drawShapes(coordinateSystem, sec);
         if (sec.isShowPoint()) {
