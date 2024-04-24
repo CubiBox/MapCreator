@@ -5,10 +5,10 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.BorderPane?>
 
-<MenuBar fx:id="menubar" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.graphics.ui.MenuBarController">
+<MenuBar fx:id="menubar" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" >
   <Menu mnemonicParsing="false" text="Fichier">
-    <MenuItem mnemonicParsing="false" onAction="#importMapButton" text="Ouvrir" />
-    <MenuItem mnemonicParsing="false" onAction="#exportMapButton" text="Enregistrer - Ecraser" />
+<!--    <MenuItem mnemonicParsing="false" onAction="#importMapButton" text="Ouvrir" />-->
+<!--    <MenuItem mnemonicParsing="false" onAction="#exportMapButton" text="Enregistrer - Ecraser" />-->
     <MenuItem mnemonicParsing="false" text="Enregistrer tout" />
   </Menu>
   <Menu mnemonicParsing="false" text="Textures">

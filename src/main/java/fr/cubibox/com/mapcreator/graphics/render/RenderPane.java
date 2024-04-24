@@ -22,8 +22,8 @@ public abstract class RenderPane {
     protected double zoom;
 
 
-    public RenderPane(PaneController controller) {
-        this.controller = controller;
+
+    public RenderPane(Pane coordinateSystem) {
         this.cam = new Vector2F(0.f, 0.f);
         this.zoom = 900;
         this.origin = new Vector2F(xSize/2,xSize/2);
@@ -74,6 +74,9 @@ public abstract class RenderPane {
     public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
     }
     public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
+    }
+
+    public void drawTemporaryPolygon(Pane coordinateSystem, ArrayList<Shape> shape){
     }
 
     public void drawGrid(Pane coordinateSystem) {

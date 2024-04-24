@@ -2,24 +2,32 @@ package fr.cubibox.com.mapcreator.graphics.ui;
 
 
 import fr.cubibox.com.mapcreator.Application;
+import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import fr.cubibox.com.mapcreator.map.Wall;
 import fr.cubibox.com.mapcreator.map.Type;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.ResourceBundle;
 
 public class PropertyBoardController {
-    private Controller controller;
+    @FXML
     private VBox propertyBoard;
     private VBox board;
 
-    public PropertyBoardController(VBox propertyBoard, Controller controller) {
-        this.propertyBoard = propertyBoard;
-        this.controller = controller;
+
+    public PropertyBoardController() {
+
+    }
+
+    public void initialize() {
         VBox board = new VBox();
         board.setStyle(
                 "-fx-background-radius : 8 8 8 8;" +
@@ -30,15 +38,15 @@ public class PropertyBoardController {
         this.board = board;
     }
 
-    public void init (Sector sector){
+    public void init(Sector sector){
         board.getChildren().clear();
 
         //close button
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            this.controller.repositories.remove(sector);
-            this.controller.actualizeBoard();
+            Repositories.getInstance().remove(sector);
+//            this.controller.actualizeBoard();
         });
         HBox delete = new HBox();
         delete.setAlignment(Pos.TOP_RIGHT);
@@ -57,7 +65,7 @@ public class PropertyBoardController {
                 showP.setText("Hide Points");
                 sector.setShowPoint(true);
             }
-            this.controller.drawPolygons();
+//            drawPolygons();
         });
 
 
@@ -83,7 +91,7 @@ public class PropertyBoardController {
                 (obs, oldval, newVal) -> {
                     ceilHeight.setValue(newVal.intValue());
                     sector.setCeilHeight((float) ceilHeight.getValue());
-                    this.controller.drawPolygons();
+//                    this.controller.drawPolygons();
                 }
         );
         Slider floorHeight = new Slider(0, 31, sector.getFloorHeight());
@@ -95,7 +103,7 @@ public class PropertyBoardController {
                 (obs, oldval, newVal) -> {
                     floorHeight.setValue(newVal.intValue());
                     sector.setFloorHeight((float) floorHeight.getValue());
-                    this.controller.drawPolygons();
+//                    this.controller.drawPolygons();
                 }
         );
         heightBox.getChildren().addAll(label,ceilHeight,floorHeight);
@@ -109,7 +117,7 @@ public class PropertyBoardController {
             typeButton.setToggleGroup(choise);
             typeButton.selectedProperty().addListener(event -> {
                 sector.setType(type);
-                this.controller.drawPolygons();
+//                this.controller.drawPolygons();
             });
             if (sector.getType() == type) typeButton.setSelected(true);
             rightPart.getChildren().add(typeButton);
@@ -146,9 +154,9 @@ public class PropertyBoardController {
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            //controller.tpmPoints.remove(p);
-            this.controller.repositories.remove(p);
-            this.controller.actualizeBoard();
+//            controller.tpmPoints.remove(p);
+            Repositories.getInstance().remove(p);
+//            this.controller.actualizeBoard();
         });
 
         name.setAlignment(Pos.TOP_LEFT);
@@ -167,8 +175,8 @@ public class PropertyBoardController {
         xSlid.valueProperty().addListener((obs, oldval, newVal) -> xSlid.setValue(newVal.intValue()));
         xSlid.valueProperty().addListener(event -> {
             p.setX((float) xSlid.getValue());
-            controller.tpmPoints = new ArrayList<>(Vector2v.shortPoints(controller.tpmPoints));
-            this.controller.drawPolygons();
+            Repositories.getInstance().tpmPoints = new ArrayList<>(Vector2v.shortPoints(Repositories.getInstance().tpmPoints));
+//            this.controller.drawPolygons();
         });
         xSlid.setPrefWidth(250);
         xBoard.getChildren().addAll(new Label("X : "),xSlid);
@@ -181,8 +189,8 @@ public class PropertyBoardController {
         ySlid.valueProperty().addListener((obs, oldval, newVal) -> ySlid.setValue(newVal.intValue()));
         ySlid.valueProperty().addListener(event -> {
             p.setY((float) ySlid.getValue());
-            controller.tpmPoints = new ArrayList<>(Vector2v.shortPoints(controller.tpmPoints));
-            this.controller.drawPolygons();
+            Repositories.getInstance().tpmPoints = new ArrayList<>(Vector2v.shortPoints(Repositories.getInstance().tpmPoints));
+//            this.controller.drawPolygons();
         });
         ySlid.setPrefWidth(250);
         yBoard.getChildren().addAll(new Label("Y : "),ySlid);
@@ -213,9 +221,9 @@ public class PropertyBoardController {
         Button close = new Button("X");
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
-            //controller.tpmPoints.remove(p);
-            this.controller.repositories.remove(wall);
-            this.controller.actualizeBoard();
+//            controller.tpmPoints.remove(p);
+            Repositories.getInstance().remove(wall);
+//            this.controller.actualizeBoard();
         });
 
         name.setAlignment(Pos.TOP_LEFT);
@@ -230,57 +238,57 @@ public class PropertyBoardController {
         Button xAdd = new Button("->");
         xAdd.setPrefSize(40d,25d);
         xAdd.setOnMouseReleased(event -> {
-            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Vector2v vec1 = Repositories.getInstance().getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = Repositories.getInstance().getVectorByID(wall.getVector2ID());
             if (vec1.getX() + 1 <= Application.xSize && vec2.getX() + 1 <= Application.xSize) {
                 vec1.setX(vec1.getX() + 1);
                 vec2.setX(vec2.getX() + 1);
             }
-            this.controller.actualizeBoard();
+//            this.controller.actualizeBoard();
         });
 
         Button xMinus = new Button("<-");
         xMinus.setPrefSize(40d,25d);
         xMinus.setOnMouseReleased(event -> {
-            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Vector2v vec1 = Repositories.getInstance().getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = Repositories.getInstance().getVectorByID(wall.getVector2ID());
             if (vec1.getX() - 1 >= 0 && vec2.getX() - 1 >= 0) {
                 vec1.setX(vec1.getX() - 1);
                 vec2.setX(vec2.getX() - 1);
             }
-            this.controller.actualizeBoard();
+//            this.controller.actualizeBoard();
         });
 
         Button yAdd = new Button("v");
         yAdd.setPrefSize(40d,25d);
         yAdd.setOnMouseReleased(event -> {
-            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Vector2v vec1 = Repositories.getInstance().getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = Repositories.getInstance().getVectorByID(wall.getVector2ID());
             if (vec1.getY() + 1 <= Application.xSize && vec2.getY() + 1 <= Application.xSize) {
                 vec1.setY(vec1.getY() + 1);
                 vec2.setY(vec2.getY() + 1);
             }
-            this.controller.actualizeBoard();
+//            this.controller.actualizeBoard();
         });
 
         Button yMinus = new Button("^");
         yMinus.setPrefSize(40d,25d);
         yMinus.setOnMouseReleased(event -> {
-            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+            Vector2v vec1 = Repositories.getInstance().getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = Repositories.getInstance().getVectorByID(wall.getVector2ID());
             if (vec1.getY() - 1 >= 0 && vec2.getY() - 1 >= 0) {
                 vec1.setY(vec1.getY() - 1);
                 vec2.setY(vec2.getY() - 1);
             }
-            this.controller.actualizeBoard();
+//            this.controller.actualizeBoard();
         });
         moveBoard.getChildren().addAll(new Label("move : "),xAdd,xMinus,yAdd,yMinus);
 
         Button split = new Button("subdivide");
         split.setPrefSize(300d,25d);
         split.setOnMouseReleased(event -> {
-            controller.repositories.subdivideWall(wall);
-            this.controller.actualizeBoard();
+            Repositories.getInstance().subdivideWall(wall);
+//            this.controller.actualizeBoard();
         });
 
         //main board adds
@@ -291,4 +299,7 @@ public class PropertyBoardController {
         return board;
     }
 
+    public VBox getPropertyBoard() {
+        return propertyBoard;
+    }
 }

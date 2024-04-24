@@ -1,6 +1,7 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
 import fr.cubibox.com.mapcreator.graphics.ui.PaneController;
+import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.map.Wall;
 import fr.cubibox.com.mapcreator.maths.*;
@@ -24,8 +25,8 @@ public class IsometricRender extends RenderPane {
     private Matrix3d base;
 
 
-    public IsometricRender(double xAngle, double yAngle, PaneController controller) {
-        super(controller);
+    public IsometricRender(double xAngle, double yAngle, Pane coordinateSystem) {
+        super(coordinateSystem);
         this.xAngle = xAngle;
         this.yAngle = yAngle;
         this.base = new Matrix3d(
@@ -79,9 +80,9 @@ public class IsometricRender extends RenderPane {
         super.drawShapes(coordinateSystem, sec);
 
         Vector2F showPoint = null;
-        for (Wall wall : controller.repositories.getWalls(sec)){
-            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+        for (Wall wall : Repositories.getInstance().getWalls(sec)){
+            Vector2v vec1 = Repositories.getInstance().getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = Repositories.getInstance().getVectorByID(wall.getVector2ID());
             float[] v1 = toScreenIso(vec1.getX(),vec1.getY(),sec.getCeilHeight());
             float[] v2 = toScreenIso(vec2.getX(),vec2.getY(),sec.getCeilHeight());
             float[] v3 = toScreenIso(vec2.getX(),vec2.getY(),sec.getFloorHeight());
@@ -125,7 +126,7 @@ public class IsometricRender extends RenderPane {
     public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
         super.drawPointsLabel(coordinateSystem, pol);
 
-        for (Vector2v p : controller.repositories.getVectors(pol)) {
+        for (Vector2v p : Repositories.getInstance().getVectors(pol)) {
             Label pointName = new Label(p.getId() + "");
             float[] v = toScreenIso(p.getX(), p.getY(), pol.getCeilHeight());
             pointName.setLayoutX(v[0] - 5);

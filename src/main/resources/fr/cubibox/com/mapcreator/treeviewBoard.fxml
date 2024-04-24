@@ -7,8 +7,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox prefHeight="726.0" prefWidth="415.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER"
-      xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="fr.cubibox.com.mapcreator.graphics.ui.LeftBoardController">
+      xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <ScrollPane prefHeight="524.0" prefWidth="415.0" vbarPolicy="ALWAYS">
       <VBox fx:id="polyBoard" alignment="TOP_CENTER" prefHeight="524.0" prefWidth="400.0" spacing="10"
             style="-fx-background-color: #808080;">
@@ -21,7 +20,7 @@
          <TreeView fx:id="sectorTree" prefHeight="200.0" prefWidth="200.0"/>
       </VBox>
    </ScrollPane>
-   <ScrollPane prefHeight="259.0" prefWidth="415.0">
-      <fx:include source="propertyBoard.fxml"/>
-   </ScrollPane>
+<!--   <ScrollPane prefHeight="259.0" prefWidth="415.0">-->
+<!--      <fx:include source="propertyBoard.fxml"/>-->
+<!--   </ScrollPane>-->
 </VBox>

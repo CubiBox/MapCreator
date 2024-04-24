@@ -2,17 +2,17 @@
 
 <?import javafx.scene.layout.BorderPane?>
 
-<BorderPane style="-fx-background-color: #404040;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="fr.cubibox.com.mapcreator.graphics.ui.Controller">
-   <top>
-      <fx:include source="menubar.fxml"/>
-   </top>
-   <center>
-      <fx:include source="pane.fxml"/>
-   </center>
-   <left>
-      <fx:include source="settingBoard.fxml"/>
-   </left>
-   <right>
-      <fx:include source="treeviewBoard.fxml"/>
-   </right>
+<BorderPane style="-fx-background-color: #404040;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<!--   <top>-->
+<!--      <fx:include fx:id="menubar" source="menubar.fxml"/>-->
+<!--   </top>-->
+<!--   <center>-->
+<!--      <fx:include fx:id="pane" source="pane.fxml"/>-->
+<!--   </center>-->
+<!--   <left>-->
+<!--      <fx:include fx:id="settingBoard" source="settingBoard.fxml"/>-->
+<!--   </left>-->
+<!--   <right>-->
+<!--      <fx:include fx:id="treeviewBoard" source="treeviewBoard.fxml"/>-->
+<!--   </right>-->
 </BorderPane>

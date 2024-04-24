@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.BufferedWriter;
@@ -16,12 +17,23 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.*;
 
-public class MenuBarController implements Initializable {
+public class MenuBarController {
     @FXML
-    MenuBar menubar;
+    public MenuBar menubar;
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    private static MenuBarController instance;
+
+    private MenuBarController(){
+    }
+
+    public static MenuBarController getInstance(){
+        if (instance == null){
+            instance = new MenuBarController();
+        }
+        return instance;
+    }
+
+    public void initialize() {
 
     }
 

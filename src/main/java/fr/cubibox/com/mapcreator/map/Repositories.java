@@ -13,12 +13,17 @@ public class Repositories {
     private HashMap<Integer, Wall> walls;
 
 
+    private ArrayList<Type> drawablePol;
+    public ArrayList<Vector2v> tpmPoints;
+
+
     private static Repositories instance;
 
     private Repositories() {
         sectors = new HashMap<>();
         vectors = new HashMap<>();
         walls = new HashMap<>();
+        tpmPoints = new ArrayList<>();
     }
 
     public static Repositories getInstance(){

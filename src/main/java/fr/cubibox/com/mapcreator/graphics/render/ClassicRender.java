@@ -1,6 +1,7 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
 import fr.cubibox.com.mapcreator.graphics.ui.PaneController;
+import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Type;
 import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.maths.MathFunction;
@@ -25,8 +26,8 @@ import static fr.cubibox.com.mapcreator.map.Type.WALL;
 
 public class ClassicRender extends RenderPane {
 
-    public ClassicRender(PaneController controller) {
-        super(controller);
+    public ClassicRender(Pane coordinateSystem) {
+        super(coordinateSystem);
     }
 
     @Override
@@ -99,9 +100,9 @@ public class ClassicRender extends RenderPane {
         super.drawShapes(coordinateSystem, sec);
 
         Vector2F showPoint = null;
-        for (Wall wall : controller.repositories.getWalls(sec)) {
-            Vector2v vec1 = controller.repositories.getVectorByID(wall.getVector1ID());
-            Vector2v vec2 = controller.repositories.getVectorByID(wall.getVector2ID());
+        for (Wall wall : Repositories.getInstance().getWalls(sec)) {
+            Vector2v vec1 = Repositories.getInstance().getVectorByID(wall.getVector1ID());
+            Vector2v vec2 = Repositories.getInstance().getVectorByID(wall.getVector2ID());
             Line line = new Line(
                     toScreenX(vec1.getX()),
                     toScreenY(vec1.getY()),
@@ -164,7 +165,7 @@ public class ClassicRender extends RenderPane {
         super.drawPointsLabel(coordinateSystem, pol);
 
 
-        for (Vector2v p : controller.repositories.getVectors(pol)) {
+        for (Vector2v p : Repositories.getInstance().getVectors(pol)) {
             Label pointName = new Label(p.getId()+"");
             pointName.setLayoutX(toScreenX(p.getX()) - 5);
             pointName.setLayoutY(toScreenY(p.getY()) - 15);
@@ -248,6 +249,15 @@ public class ClassicRender extends RenderPane {
             return pts;
         }
         else return null;
+    }
+
+    @Override
+    public void drawTemporaryPolygon(Pane coordinateSystem, ArrayList<Shape> shape) {
+        if (shape != null && !shape.isEmpty()){
+            for (Shape pol : shape){
+                coordinateSystem.getChildren().add(pol);
+            }
+        }
     }
 
     public float toScreenX(double x){

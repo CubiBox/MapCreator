@@ -4,7 +4,6 @@ import fr.cubibox.com.mapcreator.graphics.render.ClassicRender;
 import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
 import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
 import fr.cubibox.com.mapcreator.map.Repositories;
-import fr.cubibox.com.mapcreator.map.Type;
 import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.maths.Sector;
 import javafx.event.ActionEvent;
@@ -17,16 +16,12 @@ import javafx.scene.shape.Shape;
 import java.net.URL;
 import java.util.*;
 
-public class PaneController implements Initializable {
+public class PaneController {
     @FXML
     public ScrollPane scrollPane;
 
     @FXML
     private Pane coordinateSystem;
-
-
-
-    public ArrayList<Vector2v> tpmPoints;
 
     private ClassicRender classicRender;
     private IsometricRender isometricRender;
@@ -34,57 +29,100 @@ public class PaneController implements Initializable {
     private RenderPane renderPane;
 
 
-    private ArrayList<Type> drawablePol;
     private boolean dragState;
     private float[] dragPointOrigin = new float[2];
 
+    private static PaneController instance;
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        classicRender = new ClassicRender(this);
-        isometricRender = new IsometricRender(0, 0, this);
+    private PaneController(){
+        classicRender = new ClassicRender(coordinateSystem);
+        isometricRender = new IsometricRender(0, 0, coordinateSystem);
 
         renderPane = classicRender;
     }
 
-
-    public void actualizeBoard(){
-
+    public static PaneController getInstance(){
+        if (instance == null){
+            instance = new PaneController();
+        }
+        return instance;
     }
 
-    public void actualizeView(ActionEvent ae){
+    public void initialize() {
+        //zoom
+        coordinateSystem.setOnScroll(event ->{
+            double value = event.getDeltaY();
 
+            if (event.isControlDown()) {
+                renderPane.zoom(dragState, value, event);
+                draw();
+            }
+            System.out.println("scroll");
+        });
+
+
+        //record drag status
+        coordinateSystem.setOnMouseDragged(event ->{
+            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
+                float[] dragPoint = {(float) event.getX(), (float) event.getY()};
+
+                if (event.isShiftDown()){
+                    renderPane.move(dragState, dragPointOrigin, dragPoint, event);
+                }
+                else {
+                    renderPane.drag(dragState, dragPointOrigin, dragPoint, event);
+                }
+                draw(renderPane.getTempPolygons());
+
+                dragState = true;
+            }
+        });
+
+        //set by click (make intern variable to know if drag is shifted or not)
+        coordinateSystem.setOnMouseClicked(event -> {
+            if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY) && !event.isShiftDown()) {
+                ArrayList<Vector2v> pts = renderPane.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
+                if (pts != null) {
+                    if (pts.size() > 1) {
+                        SettingController.getInstance().setPolygon(pts);
+                        Repositories.getInstance().tpmPoints = new ArrayList<>();
+                    }
+                    else {
+                        Repositories.getInstance().tpmPoints.add(pts.get(0));
+                        //polyBoard.getChildren().add(pointBoard(pts.get(0)));
+                    }
+                }
+                draw();
+            }
+            dragState = false;
+        });
     }
 
-    public void drawPolygons(Shape ... tempPol){
-        drawPolygons(new ArrayList<>(Arrays.asList(tempPol)));
+
+    public void draw(Shape ... tempPol){
+        draw(new ArrayList<>(Arrays.asList(tempPol)));
     }
 
-    public void drawPolygons(ArrayList<Shape> tempPol) {
-        actualizeTreeView();
+    public void draw(ArrayList<Shape> tempPol) {
         coordinateSystem.getChildren().clear();
-        ArrayList<Vector2v> vectors = tpmPoints;
 
         //draw the grid
         renderPane.drawGrid(coordinateSystem);
 
         //draw points
-        for(Vector2v vector : vectors) {
+        for (Vector2v vector : Repositories.getInstance().tpmPoints) {
             renderPane.drawPointShape(coordinateSystem, vector);
         }
 
         //draw polygons
         for (Sector obj : Repositories.getInstance().getAllSectors()) {
-            if (drawablePol.contains(obj.getType())) {
+//            if (drawable(obj.getType())) {
                 renderPane.drawPolygon(coordinateSystem, obj);
-            }
+//            }
         }
 
-        //draw temp polygon (WIP -> move to renderPane)
-        if (tempPol != null && !tempPol.isEmpty() && !isoview.isSelected()){
-            for (Shape pol : tempPol){
-                coordinateSystem.getChildren().add(pol);
-            }
+        if (tempPol != null && !tempPol.isEmpty()){
+            renderPane.drawTemporaryPolygon(coordinateSystem, tempPol);
         }
     }
 }
