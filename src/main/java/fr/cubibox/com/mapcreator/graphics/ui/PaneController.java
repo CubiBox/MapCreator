@@ -23,7 +23,7 @@ public class PaneController {
     private ClassicRender classicRender;
     private IsometricRender isometricRender;
 
-    private RenderPane renderPane;
+    private RenderPane currentRender;
 
 
     private boolean dragState;
@@ -32,10 +32,11 @@ public class PaneController {
     private static PaneController instance;
 
     private PaneController(){
-        classicRender = new ClassicRender(coordinateSystem);
-        isometricRender = new IsometricRender(0, 0, coordinateSystem);
+    }
 
-        renderPane = classicRender;
+    public void switchRender(boolean isIsoSelected){
+        currentRender = isIsoSelected ? isometricRender : classicRender;
+        draw();
     }
 
     public static PaneController getInstance(){
@@ -46,15 +47,20 @@ public class PaneController {
     }
 
     public void initialize() {
+        classicRender = new ClassicRender(coordinateSystem);
+        isometricRender = new IsometricRender(Math.PI/4, 0.5, coordinateSystem);
+
+        currentRender = classicRender;
+
+
         //zoom
         coordinateSystem.setOnScroll(event ->{
             double value = event.getDeltaY();
 
             if (event.isControlDown()) {
-                renderPane.zoom(dragState, value, event);
+                currentRender.zoom(dragState, value, event);
                 draw();
             }
-            System.out.println("scroll");
         });
 
 
@@ -64,12 +70,12 @@ public class PaneController {
                 float[] dragPoint = {(float) event.getX(), (float) event.getY()};
 
                 if (event.isShiftDown()){
-                    renderPane.move(dragState, dragPointOrigin, dragPoint, event);
+                    currentRender.move(dragState, dragPointOrigin, dragPoint, event);
                 }
                 else {
-                    renderPane.drag(dragState, dragPointOrigin, dragPoint, event);
+                    currentRender.drag(dragState, dragPointOrigin, dragPoint, event);
                 }
-                draw(renderPane.getTempPolygons());
+                draw(currentRender.getTempPolygons());
 
                 dragState = true;
             }
@@ -78,10 +84,11 @@ public class PaneController {
         //set by click (make intern variable to know if drag is shifted or not)
         coordinateSystem.setOnMouseClicked(event -> {
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY) && !event.isShiftDown()) {
-                ArrayList<Vector2v> pts = renderPane.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
+                ArrayList<Vector2v> pts = currentRender.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
                 if (pts != null) {
                     if (pts.size() > 1) {
                         SettingController.getInstance().setPolygon(pts);
+                        currentRender.setTempPolygons(new ArrayList<>());
                         Repositories.getInstance().tpmPoints = new ArrayList<>();
                     }
                     else {
@@ -96,29 +103,30 @@ public class PaneController {
     }
 
 
-    public void draw(Shape ... tempPol){
-        draw(new ArrayList<>(Arrays.asList(tempPol)));
+    public void draw(){
+        draw(null);
     }
 
     public void draw(ArrayList<Shape> tempPol) {
-        System.out.println("drawing");
+        //System.out.println("drawing");
         coordinateSystem.getChildren().clear();
 
         //draw the grid
-        renderPane.drawGrid(coordinateSystem);
+        currentRender.drawGrid();
 
         //draw points
         for (Vector2v vector : Repositories.getInstance().tpmPoints) {
-            renderPane.drawPointShape(coordinateSystem, vector);
+            currentRender.drawPointShape(vector);
         }
 
         //draw polygons
         for (Sector obj : Repositories.getInstance().getAllSectors()) {
-            renderPane.drawPolygon(coordinateSystem, obj);
+            currentRender.drawPolygon(obj);
         }
 
+        //draw temporary polygons (ephemeral ones)
         if (tempPol != null && !tempPol.isEmpty()){
-            renderPane.drawTemporaryPolygon(coordinateSystem, tempPol);
+            currentRender.drawTemporaryPolygon(tempPol);
         }
     }
 }

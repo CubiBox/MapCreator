@@ -16,7 +16,7 @@ public class Controller {
     public SettingController settingController;
 
     public VBox treeviewBoard;
-    public RightBoardController rightBoardController;
+    public TreeViewController treeViewController;
 
     private static Controller instance;
 

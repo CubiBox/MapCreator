@@ -30,19 +30,37 @@ public class IsometricRender extends RenderPane {
         super(coordinateSystem);
         this.xAngle = xAngle;
         this.yAngle = yAngle;
-        this.base = new Matrix3d(
-                new Vector3d(1, 0, 0),
-                new Vector3d(0, 1, 0),
-                new Vector3d(0, 0, 1)
-        );
 
         origin = new Vector2F(0f, 0f);
+
+        //TODO no hardcoded value, use screen dim instead
+        cam = new Vector2F(600.f, -500.f);
+
+        this.base = new Matrix3d(
+                        setIso(new Vector3d(1, 0, 0)),
+                        setIso(new Vector3d(0, 1, 0)),
+                        setIso(new Vector3d(0, 0, 0.1))
+                );
     }
 
 
     @Override
     public void render() {
         super.render();
+    }
+
+    @Override
+    public void move(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
+        super.move(dragState, dragPointOrigin, dragPoint, event);
+        Vector2F distance = getDistance(dragState, dragPointOrigin, dragPoint);
+
+        cam.setX(cam.getX() - distance.getX());
+        cam.setY(cam.getY() + distance.getY());
+
+        dragPointOrigin[0] = dragPoint[0];
+        dragPointOrigin[1] = dragPoint[1];
+
+        System.out.println(cam);
     }
 
     @Override
@@ -58,31 +76,33 @@ public class IsometricRender extends RenderPane {
 
         setXAngle((float) (getXAngle() + (dragPointOrigin[0] - newX) * 0.0045f));
         float temp_yAngle = (float) (getYAngle() - (dragPointOrigin[1] - newY) * 0.001f);
-        if (temp_yAngle >= 0 && temp_yAngle <= 1) {
+        if (temp_yAngle >= 0 && temp_yAngle <= Math.PI/4) {
             setYAngle(temp_yAngle);
         }
 
         dragPointOrigin[0] = newX;
         dragPointOrigin[1] = newY;
+
+        System.out.println(xAngle + "; " + yAngle);
     }
 
     @Override
-    public void drawPolygon(Pane coordinateSystem, Sector sec) {
-        super.drawPolygon(coordinateSystem, sec);
+    public void drawPolygon(Sector sec) {
+        super.drawPolygon(sec);
 
-        if (SettingController.getInstance().drawableType(sec.getType())) {
+        if (!SettingController.getInstance().drawableType(sec.getType())) {
             return;
         }
 
-        drawShapes(coordinateSystem, sec);
+        drawShapes(sec);
         if (sec.isShowPoint()) {
-            drawPointsLabel(coordinateSystem, sec);
+            drawPointsLabel(sec);
         }
     }
 
     @Override
-    public void drawShapes(Pane coordinateSystem, Sector sec) {
-        super.drawShapes(coordinateSystem, sec);
+    public void drawShapes(Sector sec) {
+        super.drawShapes(sec);
 
         Vector2F showPoint = null;
         for (Wall wall : Repositories.getInstance().getWalls(sec)){
@@ -128,8 +148,8 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
-        super.drawPointsLabel(coordinateSystem, pol);
+    public void drawPointsLabel(Sector pol) {
+        super.drawPointsLabel(pol);
 
         for (Vector2v p : Repositories.getInstance().getVectors(pol)) {
             Label pointName = new Label(p.getId() + "");
@@ -138,13 +158,13 @@ public class IsometricRender extends RenderPane {
             pointName.setLayoutY(v[1] - 15);
             pointName.setTextFill(Color.WHITE);
             coordinateSystem.getChildren().add(pointName);
-            drawPointShape(coordinateSystem, p);
+            drawPointShape(p);
         }
     }
 
     @Override
-    public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
-        super.drawPointShape(coordinateSystem, vector);
+    public void drawPointShape(Vector2F vector) {
+        super.drawPointShape(vector);
 
         float[] v1 = toScreenIso(vector.getX()+0.05, vector.getY()+0.05);
         float[] v2 = toScreenIso(vector.getX()+0.05, vector.getY()-0.05);
@@ -161,8 +181,8 @@ public class IsometricRender extends RenderPane {
     }
 
     @Override
-    public void drawGrid(Pane coordinateSystem) {
-        super.drawGrid(coordinateSystem);
+    public void drawGrid() {
+        super.drawGrid();
 
         ArrayList<Shape> lines = new ArrayList<>();
         ArrayList<Shape> tpmLines = new ArrayList<>();
@@ -202,52 +222,47 @@ public class IsometricRender extends RenderPane {
     }
 
 
+    //TODO use vector instead of primitive
     public float[] toScreenIso(double x, double y){
         return toScreenIso(x,y,0);
     }
 
-    /*
-    public float[] toScreenIso_(double x, double y, double height){
-        double relativeX = origin.getX() - x;
-        double relativeY = origin.getY() - y;
-        double newAngle = xAngle + ((relativeX==0 && relativeY==0) ? 0 : Math.atan(relativeY / relativeX));
-        double originDistance = Math.sqrt(relativeX * relativeX + relativeY * relativeY);
-        double finalX = originDistance * Math.cos(newAngle) * zoom/xSize * (relativeX < 0 ? -1 : 1) /2;
-        double finalY = originDistance * Math.sin(newAngle) * zoom/xSize * (relativeX < 0 ? -1 : 1) /2;
-
-        double heightOffset = zoom*0.65 - (Math.sin(Math.PI/2-(yAngle*(Math.PI/2)))*height * zoom/64);
-        return new float[] {
-                (float) (cam.getX() + zoom/2 + (finalX - finalY)),
-                (float) (cam.getY() + heightOffset + (finalY + finalX) * yAngle)
-        };
-    }
-    */
-
+    //TODO use vector instead of primitive
     public float[] toScreenIso(double x, double y, double height){
-        Vector3d newVec = new Vector3d(x - 16, y - 16, height);
-        newVec.mul(base);
+        //TODO replace 16 by the map size
+        Vector3d vec = new Vector3d(x - 16, y - 16, height);
+        vec.mul(base);
 
         return new float[] {
-                toScreenX(newVec.getX()),
-                toScreenY(newVec.getY() + newVec.getZ())
+                (float) (origin.getX() + cam.getX() + vec.getX() * xSize),
+                (float) (origin.getY() - cam.getY() -(vec.getY() + vec.getZ()) * xSize)
         };
     }
-    public float toScreenX(double x){
-        //return (float) (cam.getX() + x * xSize);
-        return (float) (origin.getX() + cam.getX() + x * xSize);
-    }
-    public float toScreenY(double y){
-        //return (float) (cam.getY() -y * xSize);
-        return (float) (origin.getY() - cam.getY() -y * xSize);
-    }
-
 
     public void updateMatrix(){
         this.base.setMatrix(
-                this.base.setIso(xAngle, yAngle, 1, 0, 0),
-                this.base.setIso(xAngle, yAngle, 0, 1, 0),
-                this.base.setIso(xAngle, yAngle, 0, 0, 1)
+                setIso(new Vector3d(1, 0, 0)),
+                setIso(new Vector3d(0, 1, 0)),
+                setIso(new Vector3d(0, 0, 0.1))
         );
+    }
+
+    public Vector3d setIso(Vector3d vec){
+        Matrix3d matrix = new Matrix3d(
+                new Vector3d(Math.cos(xAngle), -Math.sin(xAngle), 0),
+                new Vector3d(Math.sin(xAngle), Math.cos(xAngle), 0),
+                new Vector3d(0, 0, 1)
+        );
+        vec.mul(matrix);
+
+        matrix.setMatrix(
+                new Vector3d(1, 0, 0),
+                new Vector3d(0, Math.cos(yAngle), -Math.sin(yAngle)),
+                new Vector3d(0, Math.sin(yAngle), Math.cos(yAngle))
+        );
+        vec.mul(matrix);
+
+        return vec;
     }
 
     public double getXAngle() {
@@ -264,22 +279,6 @@ public class IsometricRender extends RenderPane {
     public void setYAngle(double yAngle) {
         this.yAngle = yAngle;
         updateMatrix();
-    }
-
-    public Vector2F getOrigin() {
-        return origin;
-    }
-
-    public Vector2F getCam() {
-        return cam;
-    }
-
-    public double getZoom() {
-        return zoom;
-    }
-
-    public void setZoom(double zoom) {
-        this.zoom = zoom;
     }
 
     public Matrix3d getBase() {

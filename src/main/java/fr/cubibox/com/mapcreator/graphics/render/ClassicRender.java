@@ -41,6 +41,18 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
+    public void move(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
+        super.move(dragState, dragPointOrigin, dragPoint, event);
+        Vector2F distance = getDistance(dragState, dragPointOrigin, dragPoint);
+
+        cam.setX(cam.getX() - distance.getX());
+        cam.setY(cam.getY() - distance.getY());
+
+        dragPointOrigin[0] = dragPoint[0];
+        dragPointOrigin[1] = dragPoint[1];
+    }
+
+    @Override
     public void drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
         super.drag(dragState, dragPointOrigin, dragPoint, event);
 
@@ -86,23 +98,23 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public void drawPolygon(Pane coordinateSystem, Sector obj) {
-        super.drawPolygon(coordinateSystem, obj);
+    public void drawPolygon(Sector obj) {
+        super.drawPolygon(obj);
 
         if (!SettingController.getInstance().drawableType(obj.getType())) {
             System.out.println("exited");
             return;
         }
 
-        drawShapes(coordinateSystem, obj);
+        drawShapes(obj);
         if (obj.isShowPoint()) {
-            drawPointsLabel(coordinateSystem, obj);
+            drawPointsLabel(obj);
         }
     }
 
     @Override
-    public void drawShapes(Pane coordinateSystem, Sector sec) {
-        super.drawShapes(coordinateSystem, sec);
+    public void drawShapes(Sector sec) {
+        super.drawShapes(sec);
 
         Vector2F showPoint = null;
         for (Wall wall : Repositories.getInstance().getWalls(sec)) {
@@ -166,8 +178,8 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
-        super.drawPointsLabel(coordinateSystem, pol);
+    public void drawPointsLabel(Sector pol) {
+        super.drawPointsLabel(pol);
 
 
         for (Vector2v p : Repositories.getInstance().getVectors(pol)) {
@@ -176,14 +188,14 @@ public class ClassicRender extends RenderPane {
             pointName.setLayoutY(toScreenY(p.getY()) - 15);
             pointName.setTextFill(Color.WHITE);
             coordinateSystem.getChildren().add(pointName);
-            drawPointShape(coordinateSystem, p);
+            drawPointShape(p);
         }
 
     }
 
     @Override
-    public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
-        super.drawPointShape(coordinateSystem, vector);
+    public void drawPointShape( Vector2F vector) {
+        super.drawPointShape(vector);
         Polygon pol = new Polygon(
                 toScreenX(vector.getX()+0.05),
                 toScreenY(vector.getY()+0.05),
@@ -199,8 +211,8 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public void drawGrid(Pane coordinateSystem) {
-        super.drawGrid(coordinateSystem);
+    public void drawGrid() {
+        super.drawGrid();
 
         ArrayList<Shape> tpmLines = new ArrayList<>();
         Line line1,line2;
@@ -257,7 +269,7 @@ public class ClassicRender extends RenderPane {
     }
 
     @Override
-    public void drawTemporaryPolygon(Pane coordinateSystem, ArrayList<Shape> shape) {
+    public void drawTemporaryPolygon(ArrayList<Shape> shape) {
         if (shape != null && !shape.isEmpty()){
             for (Shape pol : shape){
                 coordinateSystem.getChildren().add(pol);

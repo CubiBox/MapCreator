@@ -3,14 +3,12 @@ package fr.cubibox.com.mapcreator;
 import fr.cubibox.com.mapcreator.graphics.ui.*;
 import fr.cubibox.com.mapcreator.map.Player;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 
 import java.io.BufferedInputStream;
@@ -48,14 +46,14 @@ public class Application extends javafx.application.Application {
         MenuBarController.getInstance().initialize();
 
         FXMLLoader rightBoardfxmlLoader = new FXMLLoader(getClass().getResource("treeviewBoard.fxml"));
-        rightBoardfxmlLoader.setController(RightBoardController.getInstance());
+        rightBoardfxmlLoader.setController(TreeViewController.getInstance());
         VBox rightBoard = rightBoardfxmlLoader.load();
-        RightBoardController.getInstance().initialize();
+        TreeViewController.getInstance().initialize();
 
         FXMLLoader PropertyfxmlLoader = new FXMLLoader(getClass().getResource("propertyBoard.fxml"));
-        PropertyfxmlLoader.setController(RightBoardController.getInstance().getPropertyController());
+        PropertyfxmlLoader.setController(TreeViewController.getInstance().getPropertyController());
         VBox property = PropertyfxmlLoader.load();
-        RightBoardController.getInstance().initialize();
+        //TreeViewController.getInstance().initialize();
 
         rightBoard.getChildren().add(property);
 

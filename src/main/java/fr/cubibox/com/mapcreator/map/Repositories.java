@@ -237,13 +237,9 @@ public class Repositories {
         return walls;
     }
 
-
-
     public void clear() {
         sectors = new HashMap<>();
         vectors = new HashMap<>();
         walls = new HashMap<>();
     }
-
-
 }

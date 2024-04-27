@@ -64,4 +64,9 @@ public class Vector2F {
     public void subToY(float y){
         this.y -= y;
     }
+
+    @Override
+    public String toString() {
+        return "Vec2f : " + x + "; " + y;
+    }
 }

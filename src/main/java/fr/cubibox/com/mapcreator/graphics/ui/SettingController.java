@@ -1,11 +1,13 @@
 package fr.cubibox.com.mapcreator.graphics.ui;
 
 import fr.cubibox.com.mapcreator.Application;
+import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
 import fr.cubibox.com.mapcreator.map.*;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -58,6 +60,10 @@ public class SettingController {
         walls.setOnMouseClicked(event -> {
             PaneController.getInstance().draw();
         });
+
+        isoview.setOnMouseClicked(event -> {
+            PaneController.getInstance().switchRender(isoview.isSelected());
+        });
     }
 
     public void actualizeView(ActionEvent ae){
@@ -96,6 +102,7 @@ public class SettingController {
         if (Repositories.getInstance().tpmPoints.size() >= 2) {
             setPolygon(Repositories.getInstance().tpmPoints);
             Repositories.getInstance().tpmPoints = new ArrayList<>();
+            PaneController.getInstance().draw();
         }
     }
 
@@ -135,7 +142,8 @@ public class SettingController {
         obj.getTreeItem().getChildren().add(wallItem);
         obj.getTreeItem().getChildren().add(pointItem);
 
-//        sectorTree.getRoot().getChildren().add(obj.getTreeItem());
+        TreeViewController.getInstance().sectorTree.getRoot().getChildren().add(obj.getTreeItem());
+        System.out.println(TreeViewController.getInstance().sectorTree.getRoot().getChildren().toString());
         Repositories.getInstance().add(obj.id, obj);
 
 //        actualizeBoard();

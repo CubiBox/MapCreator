@@ -21,9 +21,12 @@ public abstract class RenderPane {
     protected Vector2F cam;
     protected double zoom;
 
+    protected Pane coordinateSystem;
+
 
 
     public RenderPane(Pane coordinateSystem) {
+        this.coordinateSystem = coordinateSystem;
         this.cam = new Vector2F(0.f, 0.f);
         this.zoom = 900;
         this.origin = new Vector2F(xSize/2,xSize/2);
@@ -33,27 +36,16 @@ public abstract class RenderPane {
 
     }
 
+    //TODO use vector instead of float[]
     public void drag(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
     }
 
+    //TODO use vector instead of float[]
     public void move(boolean dragState, float[] dragPointOrigin, float[] dragPoint, MouseEvent event) {
-        float xDistance = dragPointOrigin[0] - dragPoint[0];
-        float yDistance = dragPointOrigin[1] - dragPoint[1];
-
-        //|| (xDistance > 75 || yDistance > 75) || (xDistance < -75 || yDistance < -75)
         if (!dragState) {
             dragPointOrigin[0] = dragPoint[0];
             dragPointOrigin[1] = dragPoint[1];
-            xDistance = 0;
-            yDistance = 0;
         }
-
-
-        cam.setX(cam.getX() - xDistance);
-        cam.setY(cam.getY() - yDistance);
-
-        dragPointOrigin[0] = dragPoint[0];
-        dragPointOrigin[1] = dragPoint[1];
     }
 
     public void zoom(boolean dragState, double value, ScrollEvent event) {
@@ -65,21 +57,21 @@ public abstract class RenderPane {
     }
 
 
-    public void drawShapes(Pane coordinateSystem, Sector pol) {
+    public void drawShapes(Sector pol) {
     }
 
-    public void drawPolygon(Pane coordinateSystem, Sector obj) {
+    public void drawPolygon(Sector obj) {
     }
 
-    public void drawPointsLabel(Pane coordinateSystem, Sector pol) {
+    public void drawPointsLabel(Sector pol) {
     }
-    public void drawPointShape(Pane coordinateSystem, Vector2F vector) {
-    }
-
-    public void drawTemporaryPolygon(Pane coordinateSystem, ArrayList<Shape> shape){
+    public void drawPointShape(Vector2F vector) {
     }
 
-    public void drawGrid(Pane coordinateSystem) {
+    public void drawTemporaryPolygon(ArrayList<Shape> shape){
+    }
+
+    public void drawGrid() {
     }
 
 
@@ -87,7 +79,49 @@ public abstract class RenderPane {
         return tempPolygons;
     }
 
+    //TODO use vector instead of float[]
     public ArrayList<Vector2v> setPolygonByDrag(double x, double y, float[] dragPointOrigin, boolean dragState) {
         return null;
+    }
+
+    //TODO use vector instead of float[]
+    public Vector2F getDistance(boolean dragState, float[] dragPointOrigin, float[] dragPoint){
+        float xDistance = dragPointOrigin[0] - dragPoint[0];
+        float yDistance = dragPointOrigin[1] - dragPoint[1];
+
+        if (!dragState) {
+            xDistance = 0;
+            yDistance = 0;
+        }
+
+        return new Vector2F(xDistance, yDistance);
+    }
+
+    public Vector2F getOrigin() {
+        return origin;
+    }
+
+    public void setOrigin(Vector2F origin) {
+        this.origin = origin;
+    }
+
+    public Vector2F getCam() {
+        return cam;
+    }
+
+    public void setCam(Vector2F cam) {
+        this.cam = cam;
+    }
+
+    public double getZoom() {
+        return zoom;
+    }
+
+    public void setZoom(double zoom) {
+        this.zoom = zoom;
+    }
+
+    public void setTempPolygons(ArrayList<Shape> arrayList) {
+        tempPolygons = arrayList;
     }
 }
