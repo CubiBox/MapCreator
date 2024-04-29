@@ -1,24 +1,28 @@
-package fr.cubibox.com.mapcreator.graphics.ui;
+package fr.cubibox.com.mapcreator.graphics.ui.pane;
 
 import fr.cubibox.com.mapcreator.graphics.render.ClassicRender;
 import fr.cubibox.com.mapcreator.graphics.render.IsometricRender;
 import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
+import fr.cubibox.com.mapcreator.graphics.ui.SettingController;
 import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Sector;
 import fr.cubibox.com.mapcreator.map.Vector2v;
-import javafx.fxml.FXML;
-import javafx.scene.control.*;
-import javafx.scene.layout.Pane;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 
 import java.util.*;
 
 public class PaneController {
-    @FXML
-    public ScrollPane scrollPane;
 
-    @FXML
-    private Pane coordinateSystem;
+    private StackPane stackPane;
+    private ButtonBar buttonBar;
+    private Pane pane;
 
     private ClassicRender classicRender;
     private IsometricRender isometricRender;
@@ -27,11 +31,13 @@ public class PaneController {
 
 
     private boolean dragState;
+    //TODO use Vector2d
     private float[] dragPointOrigin = new float[2];
 
     private static PaneController instance;
 
-    private PaneController(){
+    public PaneController(){
+        initialize();
     }
 
     public void switchRender(boolean isIsoSelected){
@@ -47,14 +53,17 @@ public class PaneController {
     }
 
     public void initialize() {
-        classicRender = new ClassicRender(coordinateSystem);
-        isometricRender = new IsometricRender(Math.PI/4, 0.5, coordinateSystem);
+        pane = new Pane();
+        pane.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        pane.setPrefSize(500,500);
+
+        classicRender = new ClassicRender(pane);
+        isometricRender = new IsometricRender(Math.PI/4, 0.5, pane);
 
         currentRender = classicRender;
 
-
         //zoom
-        coordinateSystem.setOnScroll(event ->{
+        pane.setOnScroll(event ->{
             double value = event.getDeltaY();
 
             if (event.isControlDown()) {
@@ -65,7 +74,7 @@ public class PaneController {
 
 
         //record drag status
-        coordinateSystem.setOnMouseDragged(event ->{
+        pane.setOnMouseDragged(event ->{
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY)) {
                 float[] dragPoint = {(float) event.getX(), (float) event.getY()};
 
@@ -82,7 +91,7 @@ public class PaneController {
         });
 
         //set by click (make intern variable to know if drag is shifted or not)
-        coordinateSystem.setOnMouseClicked(event -> {
+        pane.setOnMouseClicked(event -> {
             if (event.getButton().equals(javafx.scene.input.MouseButton.PRIMARY) && !event.isShiftDown()) {
                 ArrayList<Vector2v> pts = currentRender.setPolygonByDrag(event.getX(), event.getY(), dragPointOrigin, dragState);
                 if (pts != null) {
@@ -96,10 +105,24 @@ public class PaneController {
                         //polyBoard.getChildren().add(pointBoard(pts.get(0)));
                     }
                 }
-                draw();
+                TabPaneController.getInstance().draw();
             }
             dragState = false;
         });
+
+        buttonBar = new ButtonBar();
+        ToggleButton viewButton = new ToggleButton("2D");
+        viewButton.setOnMouseReleased((event) -> {
+            viewButton.setText(viewButton.isSelected() ? "3D" : "2D");
+            switchRender(viewButton.isSelected());
+        });
+        buttonBar.getButtons().add(viewButton);
+        buttonBar.setMaxSize(120,40);
+        buttonBar.setMinSize(120,40);
+
+        stackPane = new StackPane();
+        stackPane.setAlignment(Pos.TOP_RIGHT);
+        stackPane.getChildren().addAll(pane, buttonBar);
     }
 
 
@@ -109,7 +132,7 @@ public class PaneController {
 
     public void draw(ArrayList<Shape> tempPol) {
         //System.out.println("drawing");
-        coordinateSystem.getChildren().clear();
+        pane.getChildren().clear();
 
         //draw the grid
         currentRender.drawGrid();
@@ -128,5 +151,9 @@ public class PaneController {
         if (tempPol != null && !tempPol.isEmpty()){
             currentRender.drawTemporaryPolygon(tempPol);
         }
+    }
+
+    public StackPane getNodes() {
+        return stackPane;
     }
 }

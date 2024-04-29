@@ -1,57 +1,51 @@
 package fr.cubibox.com.mapcreator.graphics.ui;
 
+import fr.cubibox.com.mapcreator.graphics.ui.pane.PaneController;
+import fr.cubibox.com.mapcreator.graphics.ui.pane.TabPaneController;
 import fr.cubibox.com.mapcreator.map.Repositories;
 import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.map.Wall;
-import javafx.collections.ListChangeListener;
-import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 
 public class TreeViewController {
 
     public VBox polyBoard;
-    @FXML
-    public TreeView sectorTree;
+
+    public TreeView<String> sectorTree;
 
     public PropertyBoardController property;
 
 
     private static TreeViewController instance;
 
-    private TreeViewController(){
+    public TreeViewController(){
         property = new PropertyBoardController();
-    }
-
-    public static TreeViewController getInstance(){
-        if (instance == null){
-            instance = new TreeViewController();
-        }
-        return instance;
     }
 
     public void initialize() {
         TreeItem<String> rootItem = new TreeItem<String> ("Sectors");
         rootItem.setExpanded(true);
         sectorTree = new TreeView<String> (rootItem);
-        sectorTree.getRoot().getChildren().addAll(
-                new TreeItem<String>("Item 1"),
-                new TreeItem<String>("Item 2"),
-                new TreeItem<String>("Item 3")
-        );
         sectorTree.setMaxHeight(500 + 20);
         sectorTree.setMinHeight(500 + 20);
+        sectorTree.setShowRoot(true);
+
+        polyBoard.getChildren().add(sectorTree);
+        polyBoard.getChildren().add(property.getBoard());
+
+        System.out.println("init treeview");
 
         MultipleSelectionModel<TreeItem<String>> sectorTreeSelectionModel = sectorTree.getSelectionModel();
-        sectorTree.getRoot().getChildren().addListener((ListChangeListener) (item) -> {
-            //actualizeTreeView();
-            System.out.println(item);
-        });
 
         sectorTreeSelectionModel.selectedItemProperty().addListener((item) -> {
             System.out.println("selected");
             System.out.println(item.toString());
+
             TreeItem<String> currItem = sectorTreeSelectionModel.getSelectedItem();
+            String type = currItem.getValue().split(" ")[0];
+            int id = Integer.parseInt(currItem.getValue().split(" ")[1]);
 
             for (Wall wall : Repositories.getInstance().getAllWalls()){
                 if (wall.isSelected()) wall.setSelected(false);
@@ -60,41 +54,27 @@ public class TreeViewController {
                 if (vec.isSelected()) vec.setSelected(false);
             }
 
-            property.getPropertyBoard().getChildren().clear();
             if (currItem.getValue().contains("vector")){
-                Repositories.getInstance().getVectorByID(currItem.hashCode()).setSelected(true);
-                property.init(Repositories.getInstance().getVectorByID(currItem.hashCode()));
-                property.getPropertyBoard().getChildren().add(property.getBoard());
+                Repositories.getInstance().getVectorByID(id).setSelected(true);
+                property.init(Repositories.getInstance().getVectorByID(id));
             }
             else if (currItem.getValue().contains("wall")){
-                Repositories.getInstance().getWallByID(currItem.hashCode()).setSelected(true);
-                property.init(Repositories.getInstance().getWallByID(currItem.hashCode()));
-                property.getPropertyBoard().getChildren().add(property.getBoard());
+                Repositories.getInstance().getWallByID(id).setSelected(true);
+                property.init(Repositories.getInstance().getWallByID(id));
             }
-            else {
-                try {
-                    for (int id : Repositories.getInstance().getSectorByID(currItem.hashCode()).getWallIds()) {
-                        Repositories.getInstance().getWallByID(id).setSelected(true);
-                    }
-                    property.init(Repositories.getInstance().getSectorByID(currItem.hashCode()));
-                    property.getPropertyBoard().getChildren().add(property.getBoard());
+            else if (currItem.getValue().contains("sector")){
+                for (int wallId : Repositories.getInstance().getSectorByID(id).getWallIds()) {
+                    Repositories.getInstance().getWallByID(wallId).setSelected(true);
                 }
-                catch (NullPointerException npe){
-                    System.out.println("id null, skipped");
-                }
+                property.init(Repositories.getInstance().getSectorByID(id));
             }
-            PaneController.getInstance().draw();
-
-            //System.out.println();
-            //renderPane.drawPointShape(coordinateSystem, (Vector2d) item);
+            TabPaneController.getInstance().draw();
         });
     }
 
-    private void actualizeTreeView() {
-        for (Object obj : sectorTree.getRoot().getChildren()){
-            TreeItem<String> treeItem = (TreeItem<String>) obj;
+    public void actualizeTreeView() {
+        for (TreeItem<String> treeItem : sectorTree.getRoot().getChildren()){
 
-            /*
             //remove from tree if delete
             treeItem.getChildren().get(0).getChildren().removeIf(
                     treeItemWall -> !Repositories.getInstance().getAllWalls().contains(Repositories.getInstance().getWallByID(treeItemWall.hashCode()))
@@ -105,7 +85,7 @@ public class TreeViewController {
             if (!Repositories.getInstance().getAllSectors().contains(Repositories.getInstance().getSectorByID(treeItem.hashCode()))){
                 sectorTree.getRoot().getChildren().remove(treeItem);
             }
-            */
+
 
             //add in tree if added
 
@@ -141,7 +121,8 @@ public class TreeViewController {
         //sectorTree.refresh();
     }
 
-    public PropertyBoardController getPropertyController() {
-        return property;
+
+    public int getIdFromName(String name){
+        return Integer.parseInt(name.split(" ")[1]);
     }
 }

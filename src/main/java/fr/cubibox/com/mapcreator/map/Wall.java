@@ -3,6 +3,8 @@ package fr.cubibox.com.mapcreator.map;
 import javafx.scene.control.TreeItem;
 
 public class Wall {
+    private static int globalID = 0;
+
     private final int id;
     private boolean selected;
 
@@ -16,7 +18,7 @@ public class Wall {
         this.idVec1 = idVec1;
         this.idVec2 = idVec2;
         this.treeItem = new TreeItem<>("wall");
-        this.id = treeItem.hashCode();
+        this.id = applyGlobalID();
         this.treeItem.setValue("wall " + this.id);
         this.selected = false;
     }
@@ -96,5 +98,9 @@ public class Wall {
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    private static int applyGlobalID(){
+        return globalID++;
     }
 }

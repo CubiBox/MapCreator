@@ -1,22 +1,11 @@
 package fr.cubibox.com.mapcreator.graphics.ui;
 
+import fr.cubibox.com.mapcreator.graphics.ui.pane.PaneController;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Screen;
 
 public class Controller {
-
-    public MenuBar menubar;
-    public MenuBarController menuBarController;
-
-    public ScrollPane pane;
-    public PaneController paneController;
-
-    public VBox settingBoard;
-    public SettingController settingController;
-
-    public VBox treeviewBoard;
-    public TreeViewController treeViewController;
 
     private static Controller instance;
 

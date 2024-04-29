@@ -6,6 +6,8 @@ import javafx.scene.control.TreeItem;
 import java.util.ArrayList;
 
 public class Vector2v extends Vector2F{
+    private static int globalID = 0;
+
     private final int id;
     private boolean selected;
     private final TreeItem<String> treeItem;
@@ -15,7 +17,7 @@ public class Vector2v extends Vector2F{
         super(x, y);
 
         this.treeItem = new TreeItem<>("vector2f");
-        this.id = treeItem.hashCode();
+        this.id = applyGlobalID();
         this.treeItem.setValue("vector2F " + this.id);
         this.selected = false;
     }
@@ -53,5 +55,9 @@ public class Vector2v extends Vector2F{
 
     public void setSelected(boolean selected) {
         this.selected = selected;
+    }
+
+    private static int applyGlobalID(){
+        return globalID++;
     }
 }

@@ -1,6 +1,6 @@
 package fr.cubibox.com.mapcreator.graphics.render;
 
-import fr.cubibox.com.mapcreator.graphics.ui.PaneController;
+import fr.cubibox.com.mapcreator.graphics.ui.pane.PaneController;
 import fr.cubibox.com.mapcreator.map.Vector2v;
 import fr.cubibox.com.mapcreator.map.Sector;
 import fr.cubibox.com.mapcreator.maths.Vector2F;

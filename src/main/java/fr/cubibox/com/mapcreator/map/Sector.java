@@ -9,7 +9,8 @@ import java.util.*;
 import static fr.cubibox.com.mapcreator.map.Type.*;
 
 public class Sector extends fr.cubibox.com.mapcreator.maths.Sector {
-    public static int staticId;
+    private static int globalID = 0;
+
     private final TreeItem<String> treeItem;
 
     private Type type;
@@ -30,10 +31,9 @@ public class Sector extends fr.cubibox.com.mapcreator.maths.Sector {
         this(ceilHeight, floorHeight, WALL);
     }
     public Sector(float ceilHeight, float floorHeight, Type type) {
-        super(0, ceilHeight, floorHeight);
+        super(applyGlobalID(), ceilHeight, floorHeight);
         this.treeItem = new TreeItem<>("sector");
         this.treeItem.setValue("sector " + this.id);
-        this.id = treeItem.hashCode();
         this.type = type;
     }
 
@@ -79,17 +79,11 @@ public class Sector extends fr.cubibox.com.mapcreator.maths.Sector {
         this.type = type;
     }
 
-    public void setShapesIso(ArrayList<Shape> shapesIso) {
-        this.shapesIso = shapesIso;
-    }
-
-    public void setShapeTop(ArrayList<Shape> shapeTop) {
-        this.shapeTop = shapeTop;
-    }
-
     public TreeItem<String> getTreeItem() {
         return treeItem;
     }
 
-
+    private static int applyGlobalID(){
+        return globalID++;
+    }
 }

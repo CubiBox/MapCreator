@@ -1,5 +1,6 @@
 package fr.cubibox.com.mapcreator.graphics.ui;
 
+import fr.cubibox.com.mapcreator.map.Map;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -34,7 +35,13 @@ public class MenuBarController {
     }
 
     public void initialize() {
-
+        Menu saveMenu = new Menu("save");
+        MenuItem saveButton = new MenuItem("save");
+        saveButton.setOnAction((event -> {
+            new Map();
+        }));
+        saveMenu.getItems().add(saveButton);
+        menubar.getMenus().add(saveMenu);
     }
 
 

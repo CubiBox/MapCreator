@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<BorderPane style="-fx-background-color: #404040;" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1">
+   <top>
+      <MenuBar style="-fx-background-color: #404040;" BorderPane.alignment="CENTER" xmlns:fx="http://javafx.com/fxml/1">
+        <menus>
+          <Menu mnemonicParsing="false" text="Fichier">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#importMapButton" text="Ouvrir" />
+                  <MenuItem mnemonicParsing="false" onAction="#exportMapButton" text="Enregistrer - Ecraser" />
+                  <MenuItem mnemonicParsing="false" text="Enregistrer tout" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Textures">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Ouvrir Le Gestionnaire de textures" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="Extras">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Génération Procédurale" />
+               </items>
+            </Menu>
+        </menus>
+      </MenuBar>
+   </top>
+   <center>
+      <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
+         <content>
+            <Pane fx:id="coordinateSystem" prefHeight="500.0" prefWidth="500.0" style="-fx-background-color: #000000;" />
+         </content>
+      </ScrollPane>
+   </center>
+   <left>
+      <VBox prefHeight="726.0" prefWidth="317.0" spacing="5.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
+         <children>
+            <VBox prefHeight="137.0" prefWidth="307.0" style="-fx-background-color: #606060;">
+               <children>
+                  <Label prefHeight="38.0" prefWidth="293.0" text="Mode de vue">
+                     <font>
+                        <Font size="27.0" />
+                     </font>
+                  </Label>
+                  <HBox alignment="CENTER" prefHeight="30.0" prefWidth="317.0" spacing="20.0">
+                     <children>
+                        <Label prefHeight="38.0" prefWidth="293.0" text="Vue des polygons">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </Label>
+                        <ToggleButton fx:id="walls" mnemonicParsing="false" />
+                        <ToggleButton fx:id="top" mnemonicParsing="false" />
+                        <ToggleButton fx:id="bottom" mnemonicParsing="false" />
+                     </children>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="35.0" prefWidth="317.0" spacing="20.0">
+                     <children>
+                        <Label prefHeight="38.0" prefWidth="293.0" text="Angle de vue">
+                           <font>
+                              <Font size="17.0" />
+                           </font>
+                        </Label>
+                        <ToggleButton fx:id="topView" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false" onAction="#actualizeView" selected="true">
+                           <graphic>
+                              <ImageView fx:id="topViewImage" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/wall.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <padding>
+                              <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                           </padding>
+                           <toggleGroup>
+                              <ToggleGroup fx:id="POV" />
+                           </toggleGroup>
+                        </ToggleButton>
+                        <ToggleButton fx:id="horizontalView" mnemonicParsing="false" onAction="#actualizeView" toggleGroup="$POV">
+                           <graphic>
+                              <ImageView fitHeight="30.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@images/wall.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <padding>
+                              <Insets bottom="1.0" left="1.0" right="1.0" top="1.0" />
+                           </padding>
+                        </ToggleButton>
+                     </children>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="44.0" prefWidth="317.0" spacing="20.0">
+                     <children>
+                        <Label text="Grid size">
+                           <font>
+                              <Font size="16.0" />
+                           </font>
+                        </Label>
+                        <Slider fx:id="mapSizeSlide" blockIncrement="0.0" majorTickUnit="1.0" max="4.0" min="1.0" minorTickCount="0" prefHeight="14.0" prefWidth="209.0" snapToTicks="true" value="2.0" />
+                     </children>
+                     <padding>
+                        <Insets right="10.0" />
+                     </padding>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                     <children>
+                        <ToggleButton fx:id="isoview" mnemonicParsing="false" text="Isometric view" />
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+            <VBox prefHeight="152.0" prefWidth="307.0" style="-fx-background-color: #606060;">
+               <children>
+                  <VBox prefHeight="149.0" prefWidth="307.0">
+                     <children>
+                        <Label prefHeight="38.0" prefWidth="293.0" text="Options de la sélection">
+                           <font>
+                              <Font size="27.0" />
+                           </font>
+                        </Label>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <VBox alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="100.0" spacing="10.0">
+                                 <children>
+                                    <RadioButton fx:id="wall" mnemonicParsing="false" selected="true" text="Wall">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="SelectionOption" />
+                                       </toggleGroup>
+                                    </RadioButton>
+                                    <RadioButton fx:id="floor" mnemonicParsing="false" text="Floor" toggleGroup="$SelectionOption" />
+                                    <RadioButton fx:id="celling" mnemonicParsing="false" text="Celling" toggleGroup="$SelectionOption" />
+                                    <Separator prefWidth="200.0" />
+                                    <RadioButton fx:id="portal" mnemonicParsing="false" text="Portal" />
+                                 </children>
+                              </VBox>
+                              <VBox prefHeight="100.0" prefWidth="206.0" spacing="10.0">
+                                 <children>
+                                    <Slider fx:id="polHeightSlide" blockIncrement="0.0" majorTickUnit="1.0" max="31.0" minorTickCount="0" snapToTicks="true" value="16.0" />
+                                    <HBox alignment="CENTER" prefHeight="31.0" prefWidth="317.0">
+                                       <children>
+                                          <Label text="Texture" />
+                                          <Button mnemonicParsing="false" text="Ouvrir" />
+                                       </children>
+                                    </HBox>
+                                    <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
+                                       <children>
+                                          <Button fx:id="setPol" mnemonicParsing="false" onAction="#setPolygon" prefHeight="31.0" prefWidth="91.0" text="Draw Polygon" />
+                                       </children>
+                                    </HBox>
+                                 </children>
+                              </VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </VBox>
+            <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-background-color: #606060;">
+               <children>
+                  <Label prefHeight="38.0" prefWidth="293.0" text="Paramettre de la Map">
+                     <font>
+                        <Font size="27.0" />
+                     </font>
+                  </Label>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" prefHeight="26.0" prefWidth="317.0">
+                           <children>
+                              <TextField prefHeight="25.0" prefWidth="284.0" promptText="Nom de la mapOld" />
+                              <Label text=".bkr" />
+                           </children>
+                        </HBox>
+                        <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="20.0">
+                           <children>
+                              <Button mnemonicParsing="false" onAction="#reset" prefHeight="25.0" prefWidth="74.0" text="RESET" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </VBox>
+   </left>
+   <right>
+      <VBox prefHeight="726.0" prefWidth="415.0" style="-fx-background-color: #404040;" BorderPane.alignment="CENTER">
+         <children>
+            <ScrollPane prefHeight="524.0" prefWidth="415.0" vbarPolicy="ALWAYS">
+               <content>
+                  <VBox fx:id="polyBoard" alignment="TOP_CENTER" prefHeight="524.0" prefWidth="400.0" spacing="10" style="-fx-background-color: #808080;">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <children>
+                        <TreeView fx:id="sectorTree" prefHeight="200.0" prefWidth="200.0" />
+                     </children>
+                  </VBox>
+               </content>
+            </ScrollPane>
+            <ScrollPane prefHeight="259.0" prefWidth="415.0">
+               <content>
+                  <VBox fx:id="propertyBoard" alignment="TOP_CENTER" prefHeight="230.0" prefWidth="400.0" spacing="10" style="-fx-background-color: #808080;">
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                  </VBox>
+               </content>
+            </ScrollPane>
+         </children>
+      </VBox>
+   </right>
+</BorderPane>

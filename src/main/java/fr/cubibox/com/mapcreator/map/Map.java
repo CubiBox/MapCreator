@@ -1,86 +1,67 @@
 package fr.cubibox.com.mapcreator.map;
 
-import fr.cubibox.com.mapcreator.maths.Sector;
-
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.StringJoiner;
+import java.util.Vector;
 
 public class Map {
-    private final HashSet<Sector> sectors;
-    private final HashSet<Wall> walls;
+    String mapVersion;
+    String name;
+    int size;
 
-    public Map() {
-        sectors = new HashSet<>();
-        walls = new HashSet<>();
+    ArrayList<Vector2v> vectors;
+    ArrayList<Wall> walls;
+    ArrayList<Sector> sectors;
+    ArrayList<Partition> partitions;
+
+    public Map(){
+        mapVersion = "0.1";
+        name = "test";
+        size = 16;
+
+        vectors = Repositories.getInstance().getAllVectors();
+        walls = Repositories.getInstance().getAllWalls();
+        sectors = Repositories.getInstance().getAllSectors();
+
+        System.out.println(writer());
+//        vectors = Repositories.getInstance().getAllVectors();
     }
 
-    public HashSet<Sector> getSectors() {
-        return sectors;
-    }
+    public String writer(){
+        StringJoiner str = new StringJoiner("\n");
+        str.add("map_version: " + mapVersion);
+        str.add("name: " + name);
+        str.add("size: " + size);
 
-    public Sector getSector(int sectorId) {
-        for (Sector sector : sectors) {
-            if (sector.id == sectorId) {
-                return sector;
+        str.add("vectors:");
+        for (Vector2v vec : vectors){
+            str.add("\t" + vec.getId() + ": " + vec.getX() + ' ' + vec.getY());
+        }
+
+        str.add("");
+
+        str.add("walls:");
+        for (Wall wall : walls){
+            str.add("\t" + wall.getId() + ": " + wall.getVector1ID() + ' ' + wall.getVector2ID());
+        }
+
+        str.add("");
+
+        str.add("sectors:");
+        for (Sector sector : sectors){
+            str.add("\t" + sector.getId() + ":");
+            str.add("\t\tceil: " + sector.getCeilHeight());
+            str.add("\t\tfloor: " + sector.getFloorHeight());
+            str.add("\t\twallsID:");
+            for (int wallId : sector.getWallIds()) {
+                str.add("\t\t\t" + wallId);
             }
         }
 
+        return str.toString();
+    }
+
+    public static Map parser(String file){
         return null;
-    }
-
-    public HashSet<Wall> getWalls() {
-        return walls;
-    }
-
-    public Wall getWall(int wallId) {
-        for (Wall wall : walls) {
-            if (wall.getId() == wallId) {
-                return wall;
-            }
-        }
-
-        return null;
-    }
-
-    public Sector getWallSector(int wallId) {
-        for (Sector sector : sectors) {
-            if (sector.getWallIds().contains(wallId)) {
-                return sector;
-            }
-        }
-
-        return null;
-    }
-
-    public void addSectors(Sector... sectors) {
-        this.sectors.addAll(Arrays.asList(sectors));
-    }
-
-    public void addSector(Sector sector) {
-        this.sectors.add(sector);
-    }
-
-    public void removeSector(Sector sector) {
-        this.sectors.remove(sector);
-    }
-
-    public void removeSector(int id) {
-        sectors.removeIf(sector -> sector.id == id);
-    }
-
-    public void addWalls(Wall... walls) {
-        this.walls.addAll(Arrays.asList(walls));
-    }
-
-    public void addWall(Wall wall) {
-        this.walls.add(wall);
-    }
-
-    public void removeWall(Wall wall) {
-        this.walls.remove(wall);
-    }
-
-    public void removeWall(int id) {
-        walls.removeIf(wall -> wall.getId() == id);
     }
 }

@@ -2,6 +2,8 @@ package fr.cubibox.com.mapcreator.graphics.ui;
 
 
 import fr.cubibox.com.mapcreator.Application;
+import fr.cubibox.com.mapcreator.graphics.ui.pane.PaneController;
+import fr.cubibox.com.mapcreator.graphics.ui.pane.TabPaneController;
 import fr.cubibox.com.mapcreator.map.*;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -17,7 +19,7 @@ public class PropertyBoardController {
 
 
     public PropertyBoardController() {
-
+        initialize();
     }
 
     public void initialize() {
@@ -28,7 +30,9 @@ public class PropertyBoardController {
                 "-fx-padding : 10px;" +
                 "-fx-spacing : 5px"
         );
+        board.getChildren().add(new Label("here"));
         this.board = board;
+        System.out.println("test property");
     }
 
     public void init(Sector sector){
@@ -39,6 +43,7 @@ public class PropertyBoardController {
         close.setPrefSize(10d,10d);
         close.setOnMouseReleased(event -> {
             Repositories.getInstance().remove(sector);
+            TabPaneController.getInstance().draw();
 //            this.controller.actualizeBoard();
         });
         HBox delete = new HBox();
@@ -58,7 +63,7 @@ public class PropertyBoardController {
                 showP.setText("Hide Points");
                 sector.setShowPoint(true);
             }
-//            drawPolygons();
+            TabPaneController.getInstance().draw();
         });
 
 
@@ -84,7 +89,7 @@ public class PropertyBoardController {
                 (obs, oldval, newVal) -> {
                     ceilHeight.setValue(newVal.intValue());
                     sector.setCeilHeight((float) ceilHeight.getValue());
-//                    this.controller.drawPolygons();
+                    TabPaneController.getInstance().draw();
                 }
         );
         Slider floorHeight = new Slider(0, 31, sector.getFloorHeight());
@@ -96,7 +101,7 @@ public class PropertyBoardController {
                 (obs, oldval, newVal) -> {
                     floorHeight.setValue(newVal.intValue());
                     sector.setFloorHeight((float) floorHeight.getValue());
-//                    this.controller.drawPolygons();
+                    TabPaneController.getInstance().draw();
                 }
         );
         heightBox.getChildren().addAll(label,ceilHeight,floorHeight);
@@ -110,7 +115,7 @@ public class PropertyBoardController {
             typeButton.setToggleGroup(choise);
             typeButton.selectedProperty().addListener(event -> {
                 sector.setType(type);
-//                this.controller.drawPolygons();
+                TabPaneController.getInstance().draw();
             });
             if (sector.getType() == type) typeButton.setSelected(true);
             rightPart.getChildren().add(typeButton);
@@ -149,6 +154,7 @@ public class PropertyBoardController {
         close.setOnMouseReleased(event -> {
 //            controller.tpmPoints.remove(p);
             Repositories.getInstance().remove(p);
+            TabPaneController.getInstance().draw();
 //            this.controller.actualizeBoard();
         });
 
@@ -169,6 +175,7 @@ public class PropertyBoardController {
         xSlid.valueProperty().addListener(event -> {
             p.setX((float) xSlid.getValue());
             Repositories.getInstance().tpmPoints = new ArrayList<>(Vector2v.shortPoints(Repositories.getInstance().tpmPoints));
+            TabPaneController.getInstance().draw();
 //            this.controller.drawPolygons();
         });
         xSlid.setPrefWidth(250);
@@ -183,6 +190,7 @@ public class PropertyBoardController {
         ySlid.valueProperty().addListener(event -> {
             p.setY((float) ySlid.getValue());
             Repositories.getInstance().tpmPoints = new ArrayList<>(Vector2v.shortPoints(Repositories.getInstance().tpmPoints));
+            TabPaneController.getInstance().draw();
 //            this.controller.drawPolygons();
         });
         ySlid.setPrefWidth(250);
@@ -216,6 +224,7 @@ public class PropertyBoardController {
         close.setOnMouseReleased(event -> {
 //            controller.tpmPoints.remove(p);
             Repositories.getInstance().remove(wall);
+            TabPaneController.getInstance().draw();
 //            this.controller.actualizeBoard();
         });
 
@@ -237,6 +246,7 @@ public class PropertyBoardController {
                 vec1.setX(vec1.getX() + 1);
                 vec2.setX(vec2.getX() + 1);
             }
+            TabPaneController.getInstance().draw();
 //            this.controller.actualizeBoard();
         });
 
@@ -249,6 +259,7 @@ public class PropertyBoardController {
                 vec1.setX(vec1.getX() - 1);
                 vec2.setX(vec2.getX() - 1);
             }
+            TabPaneController.getInstance().draw();
 //            this.controller.actualizeBoard();
         });
 
@@ -261,6 +272,7 @@ public class PropertyBoardController {
                 vec1.setY(vec1.getY() + 1);
                 vec2.setY(vec2.getY() + 1);
             }
+            TabPaneController.getInstance().draw();
 //            this.controller.actualizeBoard();
         });
 
@@ -273,6 +285,7 @@ public class PropertyBoardController {
                 vec1.setY(vec1.getY() - 1);
                 vec2.setY(vec2.getY() - 1);
             }
+            TabPaneController.getInstance().draw();
 //            this.controller.actualizeBoard();
         });
         moveBoard.getChildren().addAll(new Label("move : "),xAdd,xMinus,yAdd,yMinus);
@@ -281,6 +294,7 @@ public class PropertyBoardController {
         split.setPrefSize(300d,25d);
         split.setOnMouseReleased(event -> {
             Repositories.getInstance().subdivideWall(wall);
+            TabPaneController.getInstance().draw();
 //            this.controller.actualizeBoard();
         });
 
@@ -290,9 +304,5 @@ public class PropertyBoardController {
 
     public VBox getBoard(){
         return board;
-    }
-
-    public VBox getPropertyBoard() {
-        return propertyBoard;
     }
 }

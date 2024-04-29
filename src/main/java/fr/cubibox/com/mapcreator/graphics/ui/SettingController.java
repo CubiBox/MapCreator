@@ -1,13 +1,13 @@
 package fr.cubibox.com.mapcreator.graphics.ui;
 
 import fr.cubibox.com.mapcreator.Application;
-import fr.cubibox.com.mapcreator.graphics.render.RenderPane;
+import fr.cubibox.com.mapcreator.graphics.ui.pane.PaneController;
+import fr.cubibox.com.mapcreator.graphics.ui.pane.TabPaneController;
 import fr.cubibox.com.mapcreator.map.*;
 import javafx.event.ActionEvent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.Pane;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,10 +17,6 @@ import java.util.Objects;
 public class SettingController {
     public ToggleButton topView;
     public ImageView topViewImage;
-
-    public ToggleButton bottom;
-    public ToggleButton top;
-    public ToggleButton walls;
 
     public ToggleButton horizontalView;
     public Slider mapSizeSlide;
@@ -46,24 +42,7 @@ public class SettingController {
     }
 
     public void initialize() {
-        bottom.setSelected(true);
-        bottom.setOnMouseClicked(event -> {
-            PaneController.getInstance().draw();
-        });
-
-        top.setSelected(true);
-        top.setOnMouseClicked(event -> {
-            PaneController.getInstance().draw();
-        });
-
-        walls.setSelected(true);
-        walls.setOnMouseClicked(event -> {
-            PaneController.getInstance().draw();
-        });
-
-        isoview.setOnMouseClicked(event -> {
-            PaneController.getInstance().switchRender(isoview.isSelected());
-        });
+        System.out.println("init settings");
     }
 
     public void actualizeView(ActionEvent ae){
@@ -80,7 +59,7 @@ public class SettingController {
         imgSclt.setFitWidth(30);
         imgSclt.setFitHeight(30);
 
-        PaneController.getInstance().draw();
+        TabPaneController.getInstance().draw();
     }
 
     public Type selectType(ToggleGroup tg){
@@ -88,21 +67,12 @@ public class SettingController {
         return Type.toType(rd.getId());
     }
 
-    public boolean drawableType(Type type){
-        switch (type) {
-            case WALL -> { return walls.isSelected(); }
-            case CELLING -> { return top.isSelected(); }
-            case FLOOR -> { return bottom.isSelected(); }
-        }
-        return false;
-    }
-
     public void setPolygon(ActionEvent ignored) {
         ArrayList<Vector2v> tpmPoints = Repositories.getInstance().tpmPoints;
         if (Repositories.getInstance().tpmPoints.size() >= 2) {
             setPolygon(Repositories.getInstance().tpmPoints);
             Repositories.getInstance().tpmPoints = new ArrayList<>();
-            PaneController.getInstance().draw();
+            TabPaneController.getInstance().draw();
         }
     }
 
@@ -120,31 +90,29 @@ public class SettingController {
             buff = vec;
         }
 
-        Sector obj = new Sector(
+        Sector sec = new Sector(
                 (float) polHeightSlide.getValue(),
                 (float) 0.,
                 Type.WALL
 //                selectType(SelectionOption)
         );
-        obj.addWallIds(wallsID);
+        sec.addWallIds(wallsID);
 
         TreeItem<String> pointItem = new TreeItem<>("Vectors");
         pointItem.setExpanded(false);
         TreeItem<String> wallItem = new TreeItem<>("Walls");
         wallItem.setExpanded(false);
 
-        for (Vector2v v : Repositories.getInstance().getVectors(obj))
+        for (Vector2v v : Repositories.getInstance().getVectors(sec))
             pointItem.getChildren().add(v.getTreeItem());
 
-        for (Wall w : Repositories.getInstance().getWalls(obj))
+        for (Wall w : Repositories.getInstance().getWalls(sec))
             wallItem.getChildren().add(w.getTreeItem());
 
-        obj.getTreeItem().getChildren().add(wallItem);
-        obj.getTreeItem().getChildren().add(pointItem);
+        sec.getTreeItem().getChildren().add(wallItem);
+        sec.getTreeItem().getChildren().add(pointItem);
 
-        TreeViewController.getInstance().sectorTree.getRoot().getChildren().add(obj.getTreeItem());
-        System.out.println(TreeViewController.getInstance().sectorTree.getRoot().getChildren().toString());
-        Repositories.getInstance().add(obj.id, obj);
+        Repositories.getInstance().add(sec.id, sec);
 
 //        actualizeBoard();
 //        drawPolygons();

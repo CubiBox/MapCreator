@@ -76,4 +76,8 @@ public class Sector {
 
         return str.toString();
     }
+
+    public int getId() {
+        return id;
+    }
 }

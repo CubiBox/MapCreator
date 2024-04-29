@@ -7,7 +7,7 @@
 <!--      <fx:include fx:id="menubar" source="menubar.fxml"/>-->
 <!--   </top>-->
 <!--   <center>-->
-<!--      <fx:include fx:id="pane" source="pane.fxml"/>-->
+<!--      <fx:include fx:id="pane" source="tabPane.fxml"/>-->
 <!--   </center>-->
 <!--   <left>-->
 <!--      <fx:include fx:id="settingBoard" source="settingBoard.fxml"/>-->

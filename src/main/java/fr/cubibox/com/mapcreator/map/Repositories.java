@@ -1,5 +1,6 @@
 package fr.cubibox.com.mapcreator.map;
 
+import fr.cubibox.com.mapcreator.graphics.ui.TreeViewController;
 import fr.cubibox.com.mapcreator.maths.Vector2F;
 import javafx.scene.control.TreeItem;
 
@@ -14,11 +15,12 @@ public class Repositories {
 
     private ArrayList<Type> drawablePol;
     public ArrayList<Vector2v> tpmPoints;
-
+    public TreeViewController treeViewController;
 
     private static Repositories instance;
 
     private Repositories() {
+        treeViewController = new TreeViewController();
         sectors = new HashMap<>();
         vectors = new HashMap<>();
         walls = new HashMap<>();
@@ -77,7 +79,7 @@ public class Repositories {
         int vec2ID = (walls[1].getVector1ID() == vector.getId()) ? walls[1].getVector2ID() : walls[1].getVector1ID();
 
         Sector sec = getSectorByWallID(walls[0].getId());
-        for (Wall wall : getWallsByVectorID(vector.getId())) {
+        for (Wall wall : walls) {
             remove(wall);
             //sec.getWallIds().remove(wall.getId());
         }
@@ -98,8 +100,8 @@ public class Repositories {
 
         //create new vector
         Vector2v newVec = new Vector2v(
-                (int)((getVectorByID(vec1ID).getX() + getVectorByID(vec2ID).getX())/2),
-                (int)((getVectorByID(vec1ID).getY() + getVectorByID(vec2ID).getY())/2)
+                ((getVectorByID(vec1ID).getX() + getVectorByID(vec2ID).getX())/2),
+                ((getVectorByID(vec1ID).getY() + getVectorByID(vec2ID).getY())/2)
         );
         add(newVec.getId(), newVec);
         wall.setVector2ID(newVec.getId());
@@ -136,19 +138,10 @@ public class Repositories {
         remove(vector.getId(), vector);
     }
 
-
-    public boolean contains(int id){
-        return (
-                sectors.containsKey(id) ||
-                        vectors.containsKey(id) ||
-                        walls.containsKey(id)
-        );
-    }
-
     public boolean contains(Sector sector){
         return (sectors.containsValue(sector));
     }
-    public boolean contains(Vector2F vector){
+    public boolean contains(Vector2v vector){
         return (vectors.containsValue(vector));
     }
     public boolean contains(Wall wall){
@@ -241,5 +234,9 @@ public class Repositories {
         sectors = new HashMap<>();
         vectors = new HashMap<>();
         walls = new HashMap<>();
+    }
+
+    public TreeViewController getTreeViewController() {
+        return treeViewController;
     }
 }
