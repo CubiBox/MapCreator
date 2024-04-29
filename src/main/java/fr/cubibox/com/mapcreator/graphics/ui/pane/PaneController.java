@@ -99,6 +99,7 @@ public class PaneController {
                         SettingController.getInstance().setPolygon(pts);
                         currentRender.setTempPolygons(new ArrayList<>());
                         Repositories.getInstance().tpmPoints = new ArrayList<>();
+
                     }
                     else {
                         Repositories.getInstance().tpmPoints.add(pts.get(0));
